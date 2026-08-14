@@ -1,0 +1,270 @@
+================================================================================
+PROPUESTAS DE BACKEND - CONSIDERANDO AWS Y 3 PLATAFORMAS EXISTENTES
+================================================================================
+
+SITUACION ACTUAL:
+- 3 plataformas independientes ya en AWS
+- 3 bases de datos en RDS (una por plataforma)
+- Necesidad: Unificar todo en 1 portal
+
+================================================================================
+OPCION 1: BACKEND UNIFICADOR (RECOMENDADO)
+================================================================================
+
+¿QUE ES?
+Un nuevo Backend que actúa como intermediario entre Angular y las 3 plataformas.
+
+FLUJO:
+Angular (Frontend)
+    ↓
+Backend Unificador (nuevo)
+    ↓
+Conecta a:
+    - Plataforma NIX (AWS)
+    - Plataforma Cartelera (AWS)
+    - Plataforma Contactos (AWS)
+    ↓
+Cada plataforma consulta su BD en RDS
+
+VENTAJAS:
+- No tocas las plataformas existentes (bajo riesgo)
+- Frontend solo conoce 1 Backend
+- Fácil de mantener
+- Angular se conecta a un solo lugar
+
+DESVENTAJAS:
+- Backend tiene que hacer llamadas a 3 plataformas
+- Latencia (esperar respuestas de 3 servicios)
+- Más complejidad en el Backend
+
+TECNOLOGIA:
+- Node.js + Express
+- Python + Flask/Django
+- .NET Core
+- Java + Spring Boot
+
+TIEMPO ESTIMADO:
+2-3 semanas (según complejidad)
+
+DONDE HOSTEAR:
+- EC2 en AWS (misma región que RDS)
+- Contenedor en Docker
+- Lambda (serverless)
+
+================================================================================
+OPCION 2: MIGRACION DE DATOS (LONG TERM)
+================================================================================
+
+¿QUE ES?
+Traer TODOS los datos de los 3 RDS a una sola base de datos central.
+
+FLUJO:
+RDS NIX      ┐
+RDS Cartelera├─→ NUEVA BD UNIFICADA ← Backend único (simple)
+RDS Contactos┘
+
+VENTAJAS:
+- Backend es simple (solo consulta 1 BD)
+- Rendimiento optimizado
+- Solución definitiva
+- Una sola verdad (un solo lugar para los datos)
+
+DESVENTAJAS:
+- Requiere migración de datos (tiempo, validación)
+- Riesgo de pérdida de datos si hay error
+- Hay que actualizar las 3 plataformas existentes
+- Mayor tiempo de implementación
+
+TECNOLOGIA:
+- Script de migración (Python, Node, SQL)
+- RDS nueva con datos unificados
+- Backend simple
+
+TIEMPO ESTIMADO:
+4-6 semanas (incluye migración y pruebas)
+
+¿COMO SE HACE?
+1. Crear nueva BD en RDS
+2. Hacer backup de las 3 BD existentes
+3. Escribir scripts de migración
+4. Ejecutar migración y validar
+5. Cambiar Backend para usar nueva BD
+6. Cambiar 3 plataformas existentes para usar nueva BD
+7. Decommisionar 3 BD viejas
+
+================================================================================
+OPCION 3: BACKEND HIBRIDO (RECOMENDADO PARA LONG TERM)
+================================================================================
+
+¿QUE ES?
+Fase 1: Backend Unificador (opcion 1)
+Fase 2: Migración de datos (opcion 2)
+
+PLAN:
+AHORA (Corto plazo):
+- Crear Backend que conecte a los 3 RDS
+- Frontend conecta al Backend unificador
+- Portal funcional y operativo
+
+DESPUÉS (Mediano/largo plazo):
+- Migrar datos a BD central
+- Simplificar Backend
+- Optimizar rendimiento
+
+VENTAJAS:
+- Puedo entregar portal rápido
+- Bajo riesgo inicial
+- Datos seguros en RDS existentes
+- Tiempo para planificar migración
+
+TIEMPO ESTIMADO:
+Fase 1: 2-3 semanas
+Fase 2: 4-6 semanas (después)
+
+TOTAL: Solución completa en 6-9 semanas
+
+================================================================================
+OPCION 4: API GATEWAY + LAMBDA (SERVERLESS)
+================================================================================
+
+¿QUE ES?
+Usar servicios de AWS sin servidor dedicado.
+
+FLUJO:
+Angular
+    ↓
+AWS API Gateway (enrutador)
+    ↓
+AWS Lambda (funciones sin servidor)
+    ↓
+RDS existentes
+
+VENTAJAS:
+- No hay que gestionar servidor
+- Escalable automáticamente
+- Barato (pagas solo por uso)
+- Todo en AWS
+
+DESVENTAJAS:
+- Complejidad adicional
+- Curva de aprendizaje
+- Debug más complicado
+
+TECNOLOGIA:
+- API Gateway
+- Lambda
+- EventBridge (opcional)
+
+TIEMPO ESTIMADO:
+3-4 semanas
+
+COSTO ESTIMADO:
+Bajo-medio (depende de uso)
+
+================================================================================
+COMPARACION RAPIDA
+================================================================================
+
+                    TIEMPO  COSTO   RIESGO  MANTENIMIENTO  RECOMENDADO
+OPCION 1           2-3w    bajo    bajo    medio          SI (short term)
+OPCION 2           4-6w    bajo    alto    bajo           SI (long term)
+OPCION 3           6-9w    bajo    bajo    bajo           SI (MEJOR)
+OPCION 4           3-4w    medio   bajo    alto           NO (overcomplicado)
+
+================================================================================
+MI RECOMENDACION (PARA LA REUNION)
+================================================================================
+
+"Propongo un Backend Unificador que:
+
+1. Conecte a las 3 plataformas existentes en AWS
+2. Actúe como intermediario entre Angular y las 3 RDS
+3. Se pueda lanzar en 2-3 semanas
+4. No toque las plataformas actuales (seguro)
+
+Después, en una Fase 2, podemos migrar datos a una BD central
+si lo consideramos necesario.
+
+De esta forma: Rápido + Seguro + Iterativo"
+
+================================================================================
+ESTRUCTURA TECNICA DEL BACKEND UNIFICADOR
+================================================================================
+
+ENDPOINTS QUE EXPONE AL FRONTEND:
+GET    /api/nix
+GET    /api/nix/:id
+POST   /api/nix
+PUT    /api/nix/:id
+DELETE /api/nix/:id
+
+GET    /api/cartelera-standby
+GET    /api/cartelera-standby/:id
+POST   /api/cartelera-standby
+PUT    /api/cartelera-standby/:id
+DELETE /api/cartelera-standby/:id
+
+GET    /api/contactos
+GET    /api/contactos/:id
+POST   /api/contactos
+PUT    /api/contactos/:id
+DELETE /api/contactos/:id
+
+QUE HACE INTERNAMENTE:
+/api/nix → Llama a la API de la plataforma NIX en AWS
+/api/cartelera-standby → Llama a la API de Cartelera en AWS
+/api/contactos → Llama a la API de Contactos en AWS
+
+Backend recibe la respuesta de cada plataforma y la devuelve al Frontend
+
+================================================================================
+STACK RECOMENDADO
+================================================================================
+
+OPCION A: Node.js + Express (MAS RAPIDO)
+Lenguaje: JavaScript/TypeScript
+Framework: Express
+BD: Conecta a RDS existentes
+Hosting: EC2 o Elastic Beanstalk
+Tiempo: 2-3 semanas
+Experiencia requerida: Intermedia
+
+OPCION B: Python + Flask (MAS SIMPLE)
+Lenguaje: Python
+Framework: Flask o Django
+BD: Conecta a RDS existentes
+Hosting: EC2 o Elastic Beanstalk
+Tiempo: 2-3 semanas
+Experiencia requerida: Intermedia
+
+OPCION C: .NET Core (MAS ROBUSTO)
+Lenguaje: C#
+Framework: .NET Core
+BD: Conecta a RDS existentes
+Hosting: EC2 o Elastic Beanstalk
+Tiempo: 3-4 semanas
+Experiencia requerida: Avanzada
+
+RECOMENDACION: Node.js + Express (es el más usado, iterativo y rápido)
+
+================================================================================
+PREGUNTAS PARA HACER EN LA REUNION
+================================================================================
+
+1. ¿Qué equipo hace el Backend?
+
+2. ¿Cuál stack prefieren? (Node.js, Python, .NET, Java, etc.)
+
+3. ¿Vamos a mantener las 3 BD existentes o migrar a una central?
+
+4. ¿Tenemos documentación de las APIs de las 3 plataformas?
+
+5. ¿Hay autenticación/autorizacion en las 3 plataformas?
+
+6. ¿Cuál es el timeline?
+
+7. ¿El Backend puede exponer los endpoints exactos que Angular necesita?
+
+8. ¿Hay datos sensibles que requieren encriptación?
+
+================================================================================

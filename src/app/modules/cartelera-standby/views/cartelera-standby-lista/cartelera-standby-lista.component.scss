@@ -1,0 +1,447 @@
+@import 'src/styles/bancolombia-colors';
+@import 'src/styles/bancolombia-mixins';
+
+.cartelera-standby {
+  padding: 2rem;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    color: $negro-cib;
+    margin-bottom: .5rem;
+  }
+
+  p {
+    color: $gray-600;
+  }
+}
+
+.filtros-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.filtro {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+
+  select,
+  input {
+    @include input-base;
+  }
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.app-card {
+  @include card;
+
+  padding: 1.5rem;
+  border-top: 5px solid $orquidea;
+
+  transition: .3s;
+
+  &:hover {
+    border-top-color: $caribe;
+  }
+}
+
+.card-header {
+
+  h3 {
+    color: $negro-cib;
+    margin: 0;
+  }
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  margin-top: 1rem;
+}
+
+.card-footer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-primary-custom {
+  @include btn-primary;
+  margin-top:20px;
+}
+
+.btn-secondary-custom {
+  @include btn-secondary;
+}
+
+.btn-agregar-standby {
+  @include btn-base;
+
+  background-color: $andino;
+  color: $blanco;
+
+  &:hover {
+    background-color: darken($andino, 8%);
+  }
+}
+
+.btn-ver-standby {
+  @include btn-base;
+
+  background-color: $caribe;
+  color: $blanco;
+
+  &:hover {
+    background-color: darken($caribe, 8%);
+  }
+}
+
+/* ===================================== */
+/* MODAL */
+/* ===================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba($negro-cib, .55);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 999;
+  padding: 1rem;
+}
+
+.modal-standby {
+  @include card;
+
+  width: 100%;
+  max-width: 1200px;
+  max-height: 90vh;
+
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 1.5rem;
+
+  background: $negro-cib;
+  color: $blanco;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.btn-cerrar {
+  border: none;
+  background: transparent;
+  color: $blanco;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+.modal-body {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+
+  gap: 2rem;
+
+  padding: 2rem;
+}
+
+.panel-izquierdo,
+.panel-derecho {
+  @include card;
+
+  padding: 1.5rem;
+  height: fit-content;
+}
+
+.panel-derecho {
+
+  input[type='text'] {
+    @include input-base;
+    width: 100%;
+  }
+}
+
+.mensaje-seleccion {
+  @include mensaje-exito;
+
+  margin-bottom: 1rem;
+}
+
+/* ===================================== */
+/* CALENDARIO */
+/* ===================================== */
+
+.calendario-carrusel {
+
+  h4 {
+    margin: 0 0 .25rem;
+    color: $negro-cib;
+  }
+
+  .ayuda-calendario {
+    font-size: .85rem;
+    color: $gray-500;
+    margin-bottom: 1rem;
+  }
+}
+
+.calendario-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 1rem;
+}
+
+.mes-actual {
+  font-weight: 700;
+  color: $negro-cib;
+  text-transform: capitalize;
+}
+
+.nav-flecha {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 50%;
+  border: 1px solid $gray-300;
+
+  background: $blanco;
+  cursor: pointer;
+
+  transition: .2s;
+
+  &:hover {
+    background: $caribe;
+    color: $blanco;
+    border-color: $caribe;
+  }
+}
+
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+
+  gap: .4rem;
+}
+
+.dia-nombre {
+  text-align: center;
+
+  font-size: .75rem;
+  font-weight: 700;
+
+  color: $gray-500;
+}
+
+.dia-celda {
+  width: 42px;
+  height: 42px;
+
+  justify-self: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  font-size: .85rem;
+
+  color: $gray-400;
+
+  cursor: not-allowed;
+
+  transition: .2s;
+}
+
+.dia-celda.otro-mes {
+  color: $gray-300;
+}
+
+.dia-celda.es-viernes {
+  background: rgba($orquidea, .15);
+
+  color: $negro-cib;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.dia-celda.es-viernes:hover {
+  background: rgba($orquidea, .3);
+}
+
+.dia-celda.seleccionado {
+  background: $orquidea;
+  color: $blanco;
+}
+
+/* ===================================== */
+/* PROGRAMACIONES */
+/* ===================================== */
+
+.lista-programaciones {
+  margin-top: 1.5rem;
+
+  h4 {
+    margin-bottom: .75rem;
+    color: $negro-cib;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+  }
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: .75rem;
+
+    border-radius: .5rem;
+
+    background: rgba($andino, .08);
+    border-left: 4px solid $andino;
+  }
+
+  button {
+    border: none;
+    background: transparent;
+
+    color: $flamenco;
+
+    cursor: pointer;
+    font-weight: 700;
+  }
+}
+
+/* ===================================== */
+/* USUARIOS */
+/* ===================================== */
+
+.lista-usuarios {
+  max-height: 400px;
+  overflow-y: auto;
+
+  margin-top: 1rem;
+}
+
+.usuario-item {
+  display: flex;
+  align-items: center;
+
+  gap: .75rem;
+
+  padding: .75rem 0;
+
+  border-bottom: 1px solid $gray-200;
+
+  cursor: pointer;
+}
+
+/* ===================================== */
+/* RESUMEN */
+/* ===================================== */
+
+.resumen {
+  padding: 2rem;
+
+  border-top: 1px solid $gray-200;
+
+  h3 {
+    color: $negro-cib;
+    margin-bottom: 1rem;
+  }
+
+  ul {
+    margin: .5rem 0 1rem;
+  }
+}
+
+/* ===================================== */
+/* FOOTER */
+/* ===================================== */
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+
+  padding: 1.5rem 2rem;
+
+  border-top: 1px solid $gray-200;
+}
+
+/* ===================================== */
+/* RESPONSIVE */
+/* ===================================== */
+
+@media (max-width: 992px) {
+
+  .filtros-container {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-body {
+    grid-template-columns: 1fr;
+  }
+
+  .card-footer {
+    flex-direction: column;
+  }
+}
+
+.mensaje-instruccion {
+
+  padding: 1rem 1.25rem;
+
+  border-radius: .5rem;
+
+  background: rgba($alba, .12);
+
+  border-left: 4px solid $alba;
+
+  color: darken($alba, 10%);
+
+  font-weight: 600;
+
+  margin-bottom: 1rem;
+
+}
+
+.calendario-deshabilitado {
+
+  opacity: .45;
+
+  pointer-events: none;
+
+  user-select: none;
+
+}

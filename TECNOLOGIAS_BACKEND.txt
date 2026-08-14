@@ -1,0 +1,375 @@
+================================================================================
+TECNOLOGIAS BACKEND - COMPARATIVA PARA PROYECTOS EN AWS
+================================================================================
+
+¿POR QUE IMPORTA LA TECNOLOGIA?
+- Velocidad de desarrollo
+- Compatibilidad con AWS
+- Facilidad de mantenimiento
+- Costo operacional
+- Escalabilidad
+- Experiencia del equipo
+
+================================================================================
+OPCION 1: NODE.JS + EXPRESS
+================================================================================
+
+¿QUE ES?
+JavaScript en el servidor (sin navegador).
+Framework ligero para crear APIs rápidamente.
+
+VENTAJAS:
+- Más rápido de desarrollar
+- Ideal para APIs REST
+- Bajo consumo de recursos
+- Excelente en AWS (EC2, Lambda)
+- Asincrónico (maneja muchas conexiones simultáneamente)
+- Comunidad grande
+- Muchas librerías disponibles
+
+DESVENTAJAS:
+- Menos "robusto" para sistemas muy grandes
+- Requiere buenas prácticas de código
+
+TECNOLOGIA ASOCIADA:
+- npm (gestor de paquetes)
+- TypeScript (opcional pero recomendado)
+- Librerías: axios, pg (para PostgreSQL), mysql2 (para MySQL)
+
+COSTO EN AWS:
+- Bajo-Medio (depende del volumen)
+
+HOSTING EN AWS:
+- EC2 (máquina virtual)
+- Elastic Beanstalk (gesionado)
+- Lambda (serverless)
+
+EJEMPLO DE ENDPOINT:
+app.get('/api/nix', (req, res) => {
+  // Conectar a RDS
+  // Traer datos
+  // Responder con JSON
+});
+
+TIEMPO ESTIMADO:
+2-3 semanas
+
+EXPERIENCIA REQUERIDA:
+- Intermedia
+
+¿CUANDO USARLO?
+- Frontend + Backend juntos (Angular + Node.js)
+- Necesitas ir rápido
+- Equipo conoce JavaScript
+
+================================================================================
+OPCION 2: PYTHON + FLASK
+================================================================================
+
+¿QUE ES?
+Python es un lenguaje de programación.
+Flask es un framework ligero para crear APIs.
+
+VENTAJAS:
+- Muy fácil de leer y entender
+- Ideal para prototipado rápido
+- Excelente documentación
+- Perfecto para lógica de negocio compleja
+- Debugging fácil
+
+DESVENTAJAS:
+- Más lento que Node.js en rendimiento
+- Requiere servidor WSGI (complejidad adicional)
+
+TECNOLOGIA ASOCIADA:
+- pip (gestor de paquetes)
+- Flask o Django (frameworks)
+- SQLAlchemy (para trabajar con BD)
+- requests (para conectar a otras APIs)
+
+COSTO EN AWS:
+- Bajo
+
+HOSTING EN AWS:
+- EC2
+- Elastic Beanstalk
+- Lambda
+
+EJEMPLO DE ENDPOINT:
+@app.route('/api/nix', methods=['GET'])
+def get_nix():
+    # Conectar a RDS
+    # Traer datos
+    # Responder con JSON
+
+TIEMPO ESTIMADO:
+2-3 semanas
+
+EXPERIENCIA REQUERIDA:
+- Intermedia-Avanzada
+
+¿CUANDO USARLO?
+- Equipo sabe Python
+- Lógica de negocio compleja
+- Necesitas máxima claridad en el código
+
+================================================================================
+OPCION 3: .NET CORE (C#)
+================================================================================
+
+¿QUE ES?
+Framework de Microsoft para crear aplicaciones robustas.
+Lenguaje compilado (más seguro que interpretado).
+
+VENTAJAS:
+- Muy robusto y confiable
+- Excelente para sistemas grandes y complejos
+- Tipado fuerte (menos errores)
+- Rendimiento muy bueno
+- Integración perfecta con Windows
+- Entity Framework (ORM muy poderoso)
+
+DESVENTAJAS:
+- Más lento de desarrollar
+- Más pesado (consume más recursos)
+- Costo de hosting más alto
+- Curva de aprendizaje más pronunciada
+
+TECNOLOGIA ASOCIADA:
+- ASP.NET Core (framework web)
+- Entity Framework (para BD)
+- NuGet (gestor de paquetes)
+- Lenguaje: C#
+
+COSTO EN AWS:
+- Medio-Alto
+
+HOSTING EN AWS:
+- EC2 (más recomendado)
+- Elastic Beanstalk
+- App Runner
+
+EJEMPLO DE ENDPOINT:
+[HttpGet("api/nix")]
+public async Task<ActionResult<List<Nix>>> GetNix()
+{
+    // Conectar a RDS
+    // Traer datos
+    // Responder con JSON
+}
+
+TIEMPO ESTIMADO:
+3-4 semanas
+
+EXPERIENCIA REQUERIDA:
+- Avanzada
+
+¿CUANDO USARLO?
+- Sistema muy grande y complejo
+- Equipo conoce .NET
+- Máxima confiabilidad requerida
+- Presupuesto disponible para hosting
+
+================================================================================
+OPCION 4: JAVA + SPRING BOOT
+================================================================================
+
+¿QUE ES?
+Java es un lenguaje empresarial.
+Spring Boot es el framework más popular para APIs en Java.
+
+VENTAJAS:
+- Muy robusto y escalable
+- Usado en grandes empresas
+- Rendimiento excelente
+- Mucha documentación y comunidad
+- Seguridad integrada
+- Fácil deployment en AWS
+
+DESVENTAJAS:
+- Más lento de desarrollar
+- Consume muchos recursos
+- Costo de hosting más alto
+- Setup inicial más complejo
+
+TECNOLOGIA ASOCIADA:
+- Spring Framework
+- Maven o Gradle (gestores de dependencias)
+- Hibernate (para BD)
+- Lenguaje: Java
+
+COSTO EN AWS:
+- Medio-Alto
+
+HOSTING EN AWS:
+- EC2
+- Elastic Beanstalk
+- ECS (contenedores)
+
+EJEMPLO DE ENDPOINT:
+@GetMapping("/api/nix")
+public List<Nix> getNix() {
+    // Conectar a RDS
+    // Traer datos
+    // Responder con JSON
+}
+
+TIEMPO ESTIMADO:
+3-4 semanas
+
+EXPERIENCIA REQUERIDA:
+- Avanzada
+
+¿CUANDO USARLO?
+- Aplicación empresarial muy grande
+- Equipo conoce Java
+- Máxima estabilidad requerida
+
+================================================================================
+OPCION 5: GO (GOLANG)
+================================================================================
+
+¿QUE ES?
+Lenguaje compilado moderno de Google.
+Muy usado en microservicios y APIs.
+
+VENTAJAS:
+- Extremadamente rápido
+- Muy ligero
+- Excelente para microservicios
+- Fácil de desplegar (binario único)
+- Concurrencia nativa
+
+DESVENTAJAS:
+- Menos librerías que otros lenguajes
+- Equipo probablemente no lo conoce
+- Comunidad más pequeña
+
+TECNOLOGIA ASOCIADA:
+- Echo o Gin (frameworks)
+- go mod (gestor de paquetes)
+
+COSTO EN AWS:
+- Muy bajo
+
+HOSTING EN AWS:
+- EC2
+- Lambda
+- ECS
+
+TIEMPO ESTIMADO:
+2-3 semanas (si el equipo lo conoce)
+4-5 semanas (si lo aprenden)
+
+EXPERIENCIA REQUERIDA:
+- Avanzada
+
+¿CUANDO USARLO?
+- Máximo rendimiento necesario
+- Equipo conoce Go
+- Costo de infraestructura crítico
+
+================================================================================
+COMPARACION RAPIDA
+================================================================================
+
+CRITERIO              NODE.JS  PYTHON  .NET    JAVA    GO
+Velocidad desarrollo  Muy rápido Rápido Lento  Lento   Muy rápido
+Rendimiento           Bueno    Medio   Excelente Excelente Excelente
+Facilidad             Fácil    Muy fácil Medio Medio    Difícil
+Escalabilidad         Excelente Buena Excelente Excelente Excelente
+Costo AWS             Bajo     Bajo    Medio   Medio    Muy bajo
+Comunidad             Enorme   Enorme  Buena   Enorme   Mediana
+Librerías             Enorme   Enorme  Buenas  Enorme   Buenas
+Mantenimiento         Medio    Medio   Fácil   Fácil    Fácil
+
+================================================================================
+RECOMENDACION SEGUN PRIORIDAD
+================================================================================
+
+SI PRIORIDAD ES VELOCIDAD:
+1. Node.js + Express (2-3 semanas)
+2. Go (2-3 semanas si el equipo lo sabe)
+3. Python + Flask (2-3 semanas)
+
+SI PRIORIDAD ES ROBUSTEZ:
+1. .NET Core (3-4 semanas)
+2. Java + Spring Boot (3-4 semanas)
+3. Node.js + TypeScript (3-4 semanas)
+
+SI PRIORIDAD ES COSTO:
+1. Go (muy bajo costo)
+2. Node.js (bajo costo)
+3. Python (bajo costo)
+
+SI PRIORIDAD ES MANTENIMIENTO:
+1. Python (muy claro)
+2. .NET Core (estructura clara)
+3. Node.js (si usan TypeScript)
+
+================================================================================
+MI RECOMENDACION FINAL
+================================================================================
+
+PARA TU PROYECTO:
+
+1ER LUGAR: Node.js + Express
+   - Rápido de desarrollar (2-3 semanas)
+   - Bajo costo en AWS
+   - Perfectamente capaz para tus necesidades
+   - Fácil de mantener
+   - MEJOR RELACION TIEMPO/COSTO
+
+2DO LUGAR: Python + Flask
+   - Si el equipo conoce Python
+   - Muy legible el código
+   - Fácil debugging
+
+3ER LUGAR: .NET Core
+   - Si quieren máxima robustez
+   - Si el equipo conoce .NET
+   - Están dispuestos a esperar 3-4 semanas
+
+EVITAR: Java para este proyecto
+   - Es overkill
+   - Demasiado pesado
+   - Consume demasiados recursos
+
+================================================================================
+¿QUE PREGUNTARLE AL EQUIPO BACKEND?
+================================================================================
+
+1. ¿Qué lenguaje prefieren?
+2. ¿En qué están escritas las 3 plataformas actuales?
+3. ¿Cuál es el servidor actual donde está alojado?
+4. ¿Tienen experiencia con Node.js/Python/.NET/Go?
+5. ¿Cuál es el presupuesto de infraestructura?
+6. ¿Necesitan máxima performance o está bien algo moderado?
+
+================================================================================
+ESTRUCTURA MINIMA DE UN BACKEND SIMPLE
+================================================================================
+
+Backend con Node.js + Express:
+
+carpeta-backend/
+├── server.js (punto de entrada)
+├── routes/
+│   ├── nix.routes.js
+│   ├── cartelera.routes.js
+│   └── contactos.routes.js
+├── controllers/
+│   ├── nix.controller.js
+│   ├── cartelera.controller.js
+│   └── contactos.controller.js
+├── services/
+│   ├── nix.service.js (conecta a RDS)
+│   ├── cartelera.service.js (conecta a RDS)
+│   └── contactos.service.js (conecta a RDS)
+├── config/
+│   └── database.js (configuración RDS)
+└── package.json
+
+Líneas de código aproximadas: 500-1000 líneas
+
+================================================================================

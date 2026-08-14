@@ -1,0 +1,110 @@
+@import '../../../styles/bancolombia-colors.scss';
+
+.sidebar {
+  width: 250px;
+  height: 100%;
+  background-color: $negro-cib;
+  color: $blanco;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+
+  .sidebar-brand {
+    padding: 1.5rem 1.25rem;
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    flex: 1;
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: rgba($blanco, 0.75);
+      text-decoration: none;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      cursor: pointer;
+
+      .nav-icon {
+        width: 18px;
+        text-align: center;
+      }
+
+      &:hover {
+        background-color: rgba($blanco, 0.06);
+        color: $blanco;
+      }
+
+      &.active {
+        background-color: $macondo;
+        color: $negro-cib;
+        font-weight: 700;
+      }
+
+      &.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+
+        &:hover {
+          background-color: transparent;
+          color: rgba($blanco, 0.75);
+        }
+      }
+    }
+  }
+
+  .sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgba($blanco, 0.1);
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: $macondo;
+      color: $negro-cib;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+
+      .user-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .user-email {
+        font-size: 0.75rem;
+        color: rgba($blanco, 0.55);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}

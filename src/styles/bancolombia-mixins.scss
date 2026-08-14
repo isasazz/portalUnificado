@@ -1,0 +1,201 @@
+// =============================================================================
+// MIXINS Y ESTILOS REUTILIZABLES - SISTEMA DE DISEÑO BANCOLOMBIA
+// Importar junto con bancolombia-colors.scss en cualquier componente
+// =============================================================================
+
+@import 'bancolombia-colors';
+
+// ==================== SOMBRAS ====================
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+// ==================== BOTONES ====================
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: $shadow-md;
+}
+
+// Botón primario: acción principal (Amarillo Macondo)
+@mixin btn-primary {
+  @include btn-base;
+  background-color: $macondo;
+  color: $negro-cib;
+
+  &:hover {
+    background-color: darken($macondo, 6%);
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: $shadow-sm;
+  }
+}
+
+// Botón secundario: acción alternativa (Negro CIB)
+@mixin btn-secondary {
+  @include btn-base;
+  background-color: $negro-cib;
+  color: $blanco;
+
+  &:hover {
+    background-color: lighten($negro-cib, 10%);
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+// Botón de ícono circular pequeño (editar, eliminar, etc.)
+@mixin btn-icon($bg: $gray-100, $color: $negro-cib) {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  background-color: $bg;
+  color: $color;
+  text-decoration: none;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+@mixin btn-icon-hover($bg, $color, $shadow-color) {
+  &:hover {
+    background-color: $bg;
+    color: $color;
+    transform: scale(1.1);
+    box-shadow: 0 2px 6px rgba($shadow-color, 0.3);
+  }
+}
+
+// ==================== BADGES / ETIQUETAS DE ESTADO ====================
+@mixin badge-base {
+  display: inline-block;
+  padding: 0.375rem 0.875rem 0.375rem 0.625rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+@mixin badge-success {
+  @include badge-base;
+  background-color: rgba($andino, 0.12);
+  color: $andino;
+  border-left: 3px solid $andino;
+}
+
+@mixin badge-danger {
+  @include badge-base;
+  background-color: rgba($flamenco, 0.18);
+  color: darken($flamenco, 25%);
+  border-left: 3px solid $flamenco;
+}
+
+@mixin badge-warning {
+  @include badge-base;
+  background-color: rgba($alba, 0.15);
+  color: darken($alba, 10%);
+  border-left: 3px solid $alba;
+}
+
+// ==================== TARJETAS / CONTENEDORES ====================
+@mixin card {
+  background: $blanco;
+  border-radius: 0.75rem;
+  box-shadow: $shadow-md;
+}
+
+// ==================== INPUTS / FORMULARIOS ====================
+@mixin input-base {
+  padding: 0.875rem 1.25rem;
+  border: 1px solid $gray-300;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: $blanco;
+  color: $negro-cib;
+  transition: all 0.3s ease;
+
+  &::placeholder {
+    color: $gray-500;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $macondo;
+    box-shadow: 0 0 0 3px rgba($macondo, 0.15);
+  }
+}
+
+// ==================== ENCABEZADO DE TABLA ====================
+@mixin table-header {
+  background: linear-gradient(135deg, $negro-cib 0%, lighten($negro-cib, 8%) 100%);
+  color: $blanco;
+
+  th {
+    padding: 1.25rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid $macondo;
+  }
+}
+
+// ==================== SPINNER DE CARGA ====================
+@mixin spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid $gray-200;
+  border-top: 4px solid $macondo;
+  border-radius: 50%;
+  animation: bancolombia-spin 1s linear infinite;
+}
+
+@keyframes bancolombia-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes bancolombia-slide-down {
+  from { opacity: 0; transform: translateY(-1rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// ==================== BANNER DE MENSAJE (EXITO) ====================
+@mixin mensaje-exito {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background-color: rgba($andino, 0.1);
+  border-left: 4px solid $andino;
+  border-radius: 0.375rem;
+  color: darken($andino, 15%);
+  font-weight: 500;
+  box-shadow: $shadow-sm;
+  animation: bancolombia-slide-down 0.3s ease;
+}

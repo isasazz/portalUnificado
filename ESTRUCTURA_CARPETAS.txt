@@ -1,0 +1,98 @@
+portal-unificado/
+│
+├── 📄 package.json                 # Dependencias y scripts
+├── 📄 angular.json                 # Configuración de Angular
+├── 📄 tsconfig.json                # Configuración de TypeScript
+├── 📄 tsconfig.app.json            # Config TS para app
+├── 📄 .gitignore                   # Archivos a ignorar en git
+│
+├── 📖 README.md                    # Documentación principal
+├── 📖 DEVELOPMENT.md               # Guía de desarrollo
+├── 📖 QUICKSTART.md                # Guía de inicio rápido
+│
+├── src/
+│   ├── index.html                  # HTML principal
+│   ├── main.ts                     # Punto de entrada
+│   ├── styles.scss                 # Estilos globales
+│   ├── favicon.ico.txt             # Placeholder favicon
+│   │
+│   ├── environments/
+│   │   ├── environment.ts          # Configuración desarrollo
+│   │   └── environment.prod.ts     # Configuración producción
+│   │
+│   └── app/
+│       ├── app.component.ts        # Componente raíz
+│       ├── app.component.html
+│       ├── app.component.scss
+│       ├── app.routes.ts           # Rutas principales
+│       │
+│       ├── layout/
+│       │   ├── main-layout/
+│       │   │   ├── main-layout.component.ts
+│       │   │   ├── main-layout.component.html
+│       │   │   └── main-layout.component.scss
+│       │   ├── header/
+│       │   │   ├── header.component.ts
+│       │   │   ├── header.component.html
+│       │   │   └── header.component.scss
+│       │   └── sidebar/
+│       │       ├── sidebar.component.ts
+│       │       ├── sidebar.component.html
+│       │       └── sidebar.component.scss
+│       │
+│       └── modules/
+│           ├── nix/
+│           │   ├── nix.routes.ts
+│           │   ├── services/
+│           │   │   └── nix.service.ts
+│           │   └── views/
+│           │       ├── nix-dashboard/
+│           │       │   ├── nix-dashboard.component.ts
+│           │       │   ├── nix-dashboard.component.html
+│           │       │   └── nix-dashboard.component.scss
+│           │       ├── nix-lista/
+│           │       │   ├── nix-lista.component.ts
+│           │       │   ├── nix-lista.component.html
+│           │       │   └── nix-lista.component.scss
+│           │       └── nix-detalle/
+│           │           ├── nix-detalle.component.ts
+│           │           ├── nix-detalle.component.html
+│           │           └── nix-detalle.component.scss
+│           │
+│           ├── cartelera-standby/
+│           │   ├── cartelera-standby.routes.ts
+│           │   ├── services/
+│           │   │   └── cartelera-standby.service.ts
+│           │   └── views/
+│           │       ├── cartelera-standby-dashboard/
+│           │       │   ├── cartelera-standby-dashboard.component.ts
+│           │       │   ├── cartelera-standby-dashboard.component.html
+│           │       │   └── cartelera-standby-dashboard.component.scss
+│           │       ├── cartelera-standby-lista/
+│           │       │   ├── cartelera-standby-lista.component.ts
+│           │       │   ├── cartelera-standby-lista.component.html
+│           │       │   └── cartelera-standby-lista.component.scss
+│           │       └── cartelera-standby-detalle/
+│           │           ├── cartelera-standby-detalle.component.ts
+│           │           ├── cartelera-standby-detalle.component.html
+│           │           └── cartelera-standby-detalle.component.scss
+│           │
+│           └── administrador-contactos/
+│               ├── administrador-contactos.routes.ts
+│               ├── services/
+│               │   └── administrador-contactos.service.ts
+│               └── views/
+│                   ├── administrador-contactos-dashboard/
+│                   │   ├── administrador-contactos-dashboard.component.ts
+│                   │   ├── administrador-contactos-dashboard.component.html
+│                   │   └── administrador-contactos-dashboard.component.scss
+│                   ├── administrador-contactos-lista/
+│                   │   ├── administrador-contactos-lista.component.ts
+│                   │   ├── administrador-contactos-lista.component.html
+│                   │   └── administrador-contactos-lista.component.scss
+│                   └── administrador-contactos-detalle/
+│                       ├── administrador-contactos-detalle.component.ts
+│                       ├── administrador-contactos-detalle.component.html
+│                       └── administrador-contactos-detalle.component.scss
+│
+└── 📁 node_modules/                # Dependencias (generado con npm install)

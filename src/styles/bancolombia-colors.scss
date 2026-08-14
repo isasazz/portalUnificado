@@ -1,0 +1,97 @@
+// =============================================================================
+// VARIABLES DE COLOR - MANUAL DE MARCA BANCOLOMBIA
+// =============================================================================
+
+// PALETA PRIMARIA
+// Colores principales con mayor peso visual
+:root {
+  // Negro CIB - Color principal
+  --color-negro-cib: #2C2A29;
+  --color-negro-cib-hex: 2C2A29;
+  --color-negro-cib-rgb: 44, 42, 41;
+  --color-negro-cib-pms-c: Pantone Black C;
+  
+  // Blanco - Color complementario
+  --color-blanco: #FFFFFF;
+  --color-blanco-hex: FFFFFF;
+  --color-blanco-rgb: 255, 255, 255;
+  --color-blanco-pms-c: White;
+}
+
+// PALETA SECUNDARIA - COLORES CON MAYOR PESO
+:root {
+  // Amarillo Macondo - Color de confianza (siempre presente)
+  --color-amarillo-macondo: #FDDA24;
+  --color-amarillo-macondo-hex: FDDA24;
+  --color-amarillo-macondo-rgb: 253, 218, 36;
+  --color-amarillo-macondo-pantone: PANTONE 115C;
+  
+  // Verde Andino
+  --color-verde-andino: #00C389;
+  --color-verde-andino-hex: 00C389;
+  --color-verde-andino-rgb: 0, 195, 137;
+  --color-verde-andino-pantone: PANTONE 3395C;
+  
+  // Violeta Orquídea
+  --color-violeta-orquidea: #9063CD;
+  --color-violeta-orquidea-hex: 9063CD;
+  --color-violeta-orquidea-rgb: 144, 99, 205;
+  --color-violeta-orquidea-pantone: PANTONE 265C;
+}
+
+// PALETA SECUNDARIA - TONOS CÁLIDOS
+:root {
+  // Naranja Alba
+  --color-naranja-alba: #FF7F41;
+  --color-naranja-alba-hex: FF7F41;
+  --color-naranja-alba-rgb: 255, 127, 65;
+  --color-naranja-alba-pantone: PANTONE 164C;
+  
+  // Rosa Flamenco
+  --color-rosa-flamenco: #F586CD;
+  --color-rosa-flamenco-hex: F586CD;
+  --color-rosa-flamenco-rgb: 245, 182, 205;
+  --color-rosa-flamenco-pantone: PANTONE 1895C;
+  
+  // Azul Caribe
+  --color-azul-caribe: #59CBEB;
+  --color-azul-caribe-hex: 59CBEB;
+  --color-azul-caribe-rgb: 89, 203, 235;
+  --color-azul-caribe-pantone: PANTONE 305C;
+}
+
+// =============================================================================
+// VARIABLES SCSS - PARA USAR EN ARCHIVOS .scss
+// =============================================================================
+
+// PALETA PRIMARIA
+$negro-cib: #2C2A29;
+$blanco: #FFFFFF;
+
+// PALETA SECUNDARIA
+$macondo: #FDDA24;     // Amarillo
+$andino: #00C389;      // Verde
+$orquidea: #9063CD;    // Violeta
+$alba: #FF7F41;        // Naranja
+$flamenco: #F586CD;    // Rosa
+$caribe: #59CBEB;      // Azul
+
+// ALIAS PARA FACILITAR USO
+$color-primary: $negro-cib;
+$color-secondary: $macondo;
+$color-success: $andino;
+$color-warning: $alba;
+$color-danger: $flamenco;
+$color-info: $caribe;
+$color-accent: $orquidea;
+
+// GRISES Y TONOS NEUTROS (Para diseño)
+$gray-100: #F5F5F5;    // Fondo muy claro
+$gray-200: #EEEEEE;    // Fondo claro
+$gray-300: #E0E0E0;    // Bordes claros
+$gray-400: #BDBDBD;    // Texto deshabilitado
+$gray-500: #9E9E9E;    // Texto secundario
+$gray-600: #757575;    // Texto terciario
+$gray-700: #616161;    // Texto oscuro
+$gray-800: #424242;    // Texto muy oscuro
+$gray-900: #212121;    // Negro texto
