@@ -1,16 +1,24 @@
+@use 'styles/abstracts/colors' as *;
+@use 'styles/abstracts/shadows' as *;
+@use 'styles/abstracts/spacing' as *;
+@use 'styles/abstracts/variables' as *;
+
+@use 'styles/components/buttons' as *;
+@use 'styles/components/cards' as *;
+@use 'styles/components/forms' as *;
+
 .administrador-contactos-detalle {
   max-width: 600px;
 
   h1 {
-    color: #2c3e50;
-    margin-bottom: 30px;
+    color: $negro-cib;
+    margin-bottom: $space-8;
   }
 
   .formulario {
-    background: white;
+    @include card;
+
     padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
     .form-group {
       margin-bottom: 20px;
@@ -18,32 +26,23 @@
       label {
         display: block;
         margin-bottom: 8px;
-        color: #2c3e50;
-        font-weight: bold;
+        color: $negro-cib;
+        font-weight: 600;
       }
 
       .form-control {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #bdc3c7;
-        border-radius: 4px;
-        font-size: 14px;
-        transition: border-color 0.3s ease;
+        @include input-base;
 
-        &:focus {
-          outline: none;
-          border-color: #e74c3c;
-          box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
-        }
+        width: 100%;
 
         &.error {
-          border-color: #e74c3c;
+          border-color: $color-danger;
         }
       }
 
       .error-msg {
         margin-top: 8px;
-        color: #e74c3c;
+        color: $color-danger;
         font-size: 12px;
 
         p {
@@ -58,37 +57,25 @@
       margin-top: 30px;
 
       .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s ease;
         text-decoration: none;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        &.btn-primary {
-          background-color: #e74c3c;
-          color: white;
+      .btn-primary {
+        @include btn-primary;
 
-          &:hover:not(:disabled) {
-            background-color: #c0392b;
-          }
-
-          &:disabled {
-            background-color: #bdc3c7;
-            cursor: not-allowed;
-          }
+        &:disabled {
+          background-color: $gray-400;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
         }
+      }
 
-        &.btn-secondary {
-          background-color: #95a5a6;
-          color: white;
-
-          &:hover {
-            background-color: #7f8c8d;
-          }
-        }
+      .btn-secondary {
+        @include btn-secondary;
       }
     }
   }
@@ -96,6 +83,6 @@
   .loading {
     text-align: center;
     padding: 40px;
-    color: #7f8c8d;
+    color: $gray-600;
   }
 }

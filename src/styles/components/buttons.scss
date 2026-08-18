@@ -1,0 +1,28 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/shadows' as *;
+
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .875rem 1.75rem;
+  border: none;
+  border-radius: .5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all .3s ease;
+}
+
+@mixin btn-primary {
+  @include btn-base;
+
+  background: $macondo;
+  color: $negro-cib;
+}
+
+@mixin btn-secondary {
+  @include btn-base;
+
+  background: $negro-cib;
+  color: $blanco;
+}
