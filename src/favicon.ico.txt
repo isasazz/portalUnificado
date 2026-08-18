@@ -1,8 +1,0 @@
-# Favicon
-
-Este archivo debería ser reemplazado con el favicon real del proyecto.
-
-Para agregar un favicon:
-1. Convertir una imagen a .ico usando herramientas online
-2. Colocar el archivo en `src/favicon.ico`
-3. El archivo `index.html` ya está configurado para referenciarlo

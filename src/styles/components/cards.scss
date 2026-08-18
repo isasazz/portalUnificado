@@ -1,8 +1,0 @@
-@use '../abstracts/colors' as *;
-@use '../abstracts/shadows' as *;
-
-@mixin card {
-  background: $blanco;
-  border-radius: .75rem;
-  box-shadow: $shadow-md;
-}
