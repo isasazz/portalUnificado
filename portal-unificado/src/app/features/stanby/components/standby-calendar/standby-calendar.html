@@ -1,0 +1,60 @@
+<div class="calendar-wrapper">
+
+  <div class="calendar-header">
+
+    <button
+      (click)="previousMonth()"
+    >
+      ‹
+    </button>
+
+    <h3>
+      {{ monthLabel }}
+    </h3>
+
+    <button
+      (click)="nextMonth()"
+    >
+      ›
+    </button>
+
+  </div>
+
+  <div class="weekdays">
+
+    @for (
+      day of weekDays;
+      track day
+    ) {
+
+      <div>
+        {{ day }}
+      </div>
+
+    }
+
+  </div>
+
+  <div class="days-grid">
+
+    @for (
+      day of days;
+      track day.date
+    ) {
+
+      <div
+        class="calendar-day"
+        [class.disabled]="!enabled"
+        [class.friday]="day.isFriday"
+        (click)="selectDate(day)"
+      >
+
+        {{ day.dayNumber }}
+
+      </div>
+
+    }
+
+  </div>
+
+</div>

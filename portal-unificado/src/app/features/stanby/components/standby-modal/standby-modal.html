@@ -23,25 +23,26 @@
 
         @if (!selectedUser) {
 
-  <div class="info-message">
+          <div class="info-message">
 
-    Selecciona un responsable para habilitar
-    la programación de standby.
+            Selecciona un responsable para habilitar
+            la programación de standby.
 
-  </div>
+          </div>
 
-            } @else {
+        } @else {
 
-            <div class="info-message success">
+          <div class="info-message success">
 
-                Responsable seleccionado:
-                {{ selectedUser }}
+            Responsable seleccionado:
+            {{ selectedUser }}
 
-            </div>
+          </div>
 
-            }
+        }
 
-        <app-standby-calendar>
+        <app-standby-calendar
+          [enabled]="!!selectedUser">
         </app-standby-calendar>
 
       </div>

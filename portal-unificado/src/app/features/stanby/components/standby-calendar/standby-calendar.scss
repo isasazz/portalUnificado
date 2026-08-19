@@ -1,0 +1,55 @@
+@use 'abstracts/colors' as *;
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: $space-16;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+
+  margin-bottom: $space-12;
+
+  font-weight: 600;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+
+  gap: $space-8;
+}
+
+.calendar-day {
+  height: 60px;
+
+  border: 1px solid $border-color;
+
+  border-radius: $radius-sm;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.calendar-day.disabled {
+  opacity: .35;
+}
+
+.calendar-day.friday {
+  cursor: pointer;
+
+  border: 2px solid $amarillo-macondo;
+
+  font-weight: $font-weight-bold;
+}
+
+.calendar-day.friday:hover {
+  background: rgba(253, 218, 36, .20);
+}

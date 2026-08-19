@@ -1,15 +1,22 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { StandbyCalendarComponent }
-from '../standby-calendar/standby-calendar';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output
+} from '@angular/core';
+
+import {
+  StandbyCalendarComponent
+} from '../standby-calendar/standby-calendar';
 
 @Component({
   selector: 'app-standby-modal',
   standalone: true,
   imports: [
-  StandbyCalendarComponent
-],
+    StandbyCalendarComponent
+  ],
   templateUrl: './standby-modal.html',
-  styleUrl: './standby-modal.scss'
+  styleUrls: ['./standby-modal.scss']
 })
 export class StandbyModalComponent {
 
@@ -19,7 +26,7 @@ export class StandbyModalComponent {
   @Output()
   closed = new EventEmitter<void>();
 
- selectedUser?: string;
+  selectedUser?: string;
 
   selectedFriday?: Date;
 
@@ -34,6 +41,12 @@ export class StandbyModalComponent {
   selectUser(user: string): void {
 
     this.selectedUser = user;
+
+  }
+
+  close(): void {
+
+    this.closed.emit();
 
   }
 
