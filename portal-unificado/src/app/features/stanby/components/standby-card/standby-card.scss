@@ -1,0 +1,62 @@
+@use 'abstracts/colors' as *;
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+.standby-card {
+  @include card;
+
+  padding: $space-24;
+
+  border: 2px solid $violeta-orquidea;
+
+  cursor: pointer;
+
+  min-height: 240px;
+
+  @include transition;
+}
+
+.standby-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow: $shadow-md;
+}
+
+.standby-card.selected {
+  border-color: $verde-andino;
+
+  background: rgba(0, 195, 137, 0.05);
+}
+
+.card-check {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-bottom: $space-12;
+}
+
+.card-check input {
+  width: 18px;
+  height: 18px;
+}
+
+.standby-card h3 {
+  margin-bottom: $space-12;
+}
+
+.description {
+  color: $text-secondary;
+
+  margin-bottom: $space-20;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+
+  gap: $space-8;
+}
+
+.label {
+  font-weight: $font-weight-semibold;
+}

@@ -1,0 +1,180 @@
+<div class="contactos-page">
+
+  <div class="page-header">
+
+    <div class="page-info">
+      <h1>Administrador de Contactos</h1>
+
+      <p>10 contactos registrados</p>
+    </div>
+
+    <div class="page-actions">
+
+      <button class="btn-secondary">
+        Exportar
+      </button>
+
+      <button class="btn-primary">
+        + Nuevo
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="filters-container">
+
+  <div class="search-container">
+    <input
+      type="text"
+      placeholder="Buscar contacto..."
+    />
+  </div>
+
+  <div class="filter-select">
+    <select>
+      <option>Todos los EVC</option>
+    </select>
+  </div>
+
+  <div class="filter-select">
+    <select>
+      <option>Todas las líneas</option>
+    </select>
+  </div>
+
+  <div class="filter-select">
+    <select>
+      <option>Todas las aplicaciones</option>
+    </select>
+  </div>
+
+</div>
+
+<div class="table-card">
+
+  <table>
+
+    <thead>
+
+      <tr class="group-header">
+
+        <th class="application-column">
+          APLICACIÓN
+        </th>
+
+        <th colspan="5" class="production-column">
+          PRODUCCIÓN
+        </th>
+
+      </tr>
+
+      <tr>
+
+        <th>
+          Código / Nombre Aplicación
+        </th>
+
+        <th>
+          Celular
+        </th>
+
+        <th>
+          Nombre
+        </th>
+
+        <th>
+          Correo
+        </th>
+
+        <th>
+          Horario
+        </th>
+
+        
+
+      </tr>
+
+    </thead>
+
+    <tbody>
+
+  <tr>
+
+    <td>
+      <a
+  class="application-link"
+  (click)="openEditModal()"
+>
+  NU0113001
+</a>
+    </td>
+
+    <td>
+      +57 310 539 0611
+    </td>
+
+    <td>
+      Daniel Lopez Montes
+    </td>
+
+    <td>
+      dlmontes@bancolombia.com.co
+    </td>
+
+    <td>
+      <span class="badge badge-247">
+        24/7
+      </span>
+    </td>
+
+    
+
+
+
+  </tr>
+
+  <tr>
+
+    <td>
+      <a
+  class="application-link"
+  (click)="openEditModal()"
+>
+  NU0113001
+</a>
+    </td>
+
+    <td>
+      +57 320 111 2233
+    </td>
+
+    <td>
+      María Pérez
+    </td>
+
+    <td>
+      mperez@bancolombia.com.co
+    </td>
+
+    <td>
+      <span class="badge badge-personalizado">
+        Personalizado
+      </span>
+    </td>
+
+    
+
+  </tr>
+
+</tbody>
+
+  </table>
+
+  <app-contacto-modal
+  [visible]="showModal"
+  (closed)="closeEditModal()">
+</app-contacto-modal>
+
+</div>
+</div>

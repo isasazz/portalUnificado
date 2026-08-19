@@ -1,0 +1,160 @@
+@use '../../../../styles/abstracts/colors' as *;
+@use '../../../../styles/abstracts/variables' as *;
+@use '../../../../styles/abstracts/mixins' as *;
+
+
+
+.contactos-page {
+  padding: $space-32;
+}
+
+.page-header {
+  @include flex-between;
+
+  margin-bottom: $space-32;
+}
+
+.page-info {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.page-info h1 {
+  color: $text-primary;
+}
+
+.page-info p {
+  color: $text-secondary;
+}
+
+.page-actions {
+  display: flex;
+  gap: $space-12;
+}
+
+.btn-secondary {
+  @include button-base;
+
+  background: $blanco;
+  border: 1px solid $border-color;
+  color: $text-primary;
+}
+
+.btn-primary {
+  @include button-base;
+
+  background: $negro-cib;
+  color: $blanco;
+}
+
+.filters-container {
+  display: flex;
+  gap: $space-16;
+
+  margin-bottom: $space-24;
+}
+
+.search-container {
+  flex: 1;
+}
+
+.search-container input {
+  @include input-base;
+
+  width: 100%;
+}
+
+.filter-select {
+  min-width: 220px;
+}
+
+.filter-select select {
+  @include input-base;
+
+  width: 100%;
+}
+
+.table-card {
+  background: $background-surface;
+
+  border-radius: $radius-md;
+
+  overflow: hidden;
+
+  box-shadow: $shadow-sm;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.group-header .application-column {
+  background: $table-header-black;
+  color: $blanco;
+}
+
+.group-header .production-column {
+  background: $table-header-yellow;
+  color: $negro-cib;
+}
+
+thead th {
+  padding: $space-16;
+  text-align: left;
+}
+
+tbody td {
+  padding: $space-16;
+}
+
+tbody tr {
+  border-bottom: 1px solid $border-light;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+a {
+  color: $link-color;
+  font-weight: $font-weight-semibold;
+}
+
+.badge {
+  @include badge;
+}
+
+.badge-247 {
+  background: $badge-247-bg;
+  color: $badge-247-text;
+}
+
+.badge-personalizado {
+  background: $badge-personalizado-bg;
+  color: $badge-personalizado-text;
+}
+
+.badge-standby {
+  background: $badge-standby-bg;
+  color: $badge-standby-text;
+}
+
+.application-link {
+  color: $link-color;
+  font-weight: $font-weight-semibold;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.application-link:hover {
+  text-decoration: underline;
+}
+
+.today {
+  box-shadow:
+    0 0 0 2px #FDDA24;
+
+  font-weight: 700;
+}

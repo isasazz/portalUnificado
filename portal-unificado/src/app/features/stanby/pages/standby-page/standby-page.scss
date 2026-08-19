@@ -1,0 +1,56 @@
+@use 'abstracts/colors' as *;
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+.standby-page {
+  padding: $space-32;
+}
+
+.page-header {
+  @include flex-between;
+
+  margin-bottom: $space-24;
+}
+
+.page-info {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.page-info p {
+  color: $text-secondary;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: $space-16;
+
+  margin-bottom: $space-20;
+}
+
+.filters select,
+.filters input {
+  @include input-base;
+
+  width: 100%;
+}
+
+.selection-row {
+  @include flex-between;
+
+  margin-bottom: $space-24;
+}
+
+.select-all {
+  display: flex;
+  align-items: center;
+  gap: $space-8;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-20;
+}

@@ -1,0 +1,18 @@
+@use '../../styles/abstracts/colors' as *;
+@use '../../styles/abstracts/variables' as *;
+
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: $background-body;
+}
+
+.sidebar-container {
+  width: $sidebar-width;
+  flex-shrink: 0;
+}
+
+.content-container {
+  flex: 1;
+  overflow-x: auto;
+}

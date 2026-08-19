@@ -1,0 +1,47 @@
+<div
+  class="standby-card"
+  [class.selected]="application.selected"
+  (click)="toggleSelection()"
+>
+
+  <div class="card-check">
+
+    <input
+      type="checkbox"
+      [checked]="application.selected"
+    >
+
+  </div>
+
+  <h3>
+    {{ application.nombreAplicacion }}
+  </h3>
+
+  <p class="description">
+    Aplicación seleccionable para configuración de standby
+  </p>
+
+  <div class="info">
+
+    <span class="label">
+      Responsable asociado
+    </span>
+
+    <span>
+      Descripción:
+      {{ application.descripcion }}
+    </span>
+
+    <span>
+      Estado:
+      {{ application.estado }}
+    </span>
+
+    <span>
+      Fecha:
+      {{ application.fecha | date:'dd/MM/yyyy' }}
+    </span>
+
+  </div>
+
+</div>

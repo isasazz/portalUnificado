@@ -1,0 +1,78 @@
+<div class="standby-page">
+
+  <div class="page-header">
+
+    <div class="page-info">
+
+      <h1>Cartelera de Standby</h1>
+
+      <p>
+        Administra las programaciones de standby
+      </p>
+
+    </div>
+
+  </div>
+
+  <div class="filters">
+
+    <select>
+      <option>Todos los EVC</option>
+    </select>
+
+    <select>
+      <option>Todas las líneas</option>
+    </select>
+
+    <input
+      type="text"
+      placeholder="Buscar aplicación"
+    />
+
+  </div>
+
+  <div class="selection-row">
+
+    <div class="select-all">
+
+      <input
+        #selectAll
+        type="checkbox"
+        (change)="toggleSelectAll(selectAll.checked)"
+      />
+
+      <span>
+        Seleccionar todos
+      </span>
+
+    </div>
+
+    <app-standby-selection-bar
+      [visible]="hasSelection"
+      (addStandby)="openStandbyModal()">
+    </app-standby-selection-bar>
+
+  </div>
+
+  <div class="cards-grid">
+
+    @for (
+      application of applications;
+      track application.id
+    ) {
+
+      <app-standby-card
+        [application]="application"
+        (selected)="toggleCard($event)">
+      </app-standby-card>
+
+    }
+
+  </div>
+
+  <app-standby-modal
+    [visible]="showStandbyModal"
+    (closed)="closeStandbyModal()">
+  </app-standby-modal>
+
+</div>

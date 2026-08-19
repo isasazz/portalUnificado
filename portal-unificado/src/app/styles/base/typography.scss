@@ -1,0 +1,33 @@
+@use '../abstracts/colors' as *;
+@use '../abstracts/variables' as *;
+
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-md;
+  color: $text-primary;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: $font-size-h1;
+  font-weight: $font-weight-bold;
+}
+
+h2 {
+  font-size: $font-size-h2;
+  font-weight: $font-weight-bold;
+}
+
+h3 {
+  font-size: $font-size-h3;
+  font-weight: $font-weight-semibold;
+}

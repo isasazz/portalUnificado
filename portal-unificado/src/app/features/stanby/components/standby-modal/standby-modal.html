@@ -1,0 +1,88 @@
+@if (visible) {
+
+<div class="modal-backdrop">
+
+  <div class="modal-container">
+
+    <div class="modal-header">
+
+      <h2>Agregar Standby</h2>
+
+      <button
+        class="close-button"
+        (click)="close()"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <div class="modal-content">
+
+      <div class="calendar-section">
+
+        @if (!selectedUser) {
+
+  <div class="info-message">
+
+    Selecciona un responsable para habilitar
+    la programación de standby.
+
+  </div>
+
+            } @else {
+
+            <div class="info-message success">
+
+                Responsable seleccionado:
+                {{ selectedUser }}
+
+            </div>
+
+            }
+
+        <app-standby-calendar>
+        </app-standby-calendar>
+
+      </div>
+
+      <div class="users-section">
+
+        <h3>Responsables</h3>
+
+        @for (
+          user of users;
+          track user
+        ) {
+
+          <div
+            class="user-card"
+            [class.selected]="selectedUser === user"
+            (click)="selectUser(user)"
+          >
+
+            {{ user }}
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="btn-primary">
+
+        Guardar
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+}

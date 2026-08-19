@@ -1,0 +1,85 @@
+// ======================================================
+// PALETA CORPORATIVA BANCOLOMBIA
+// ======================================================
+
+// Primarios
+
+$amarillo-macondo: #fdda24;
+$negro-cib: #2c2a29;
+$blanco: #ffffff;
+
+// Secundarios
+
+$verde-andino: #00c389;
+$violeta-orquidea: #9063cd;
+$naranja-alba: #ff7f41;
+$rosa-flamenco: #f586cd;
+$azul-caribe: #59cbeb;
+
+// ======================================================
+// TEXTO
+// ======================================================
+
+$text-primary: $negro-cib;
+$text-secondary: #6b7280;
+$text-disabled: #a4acb9;
+
+$link-color: #0099d8;
+
+// ======================================================
+// FONDOS
+// ======================================================
+
+$background-body: #f7f8fa;
+$background-surface: $blanco;
+$background-sidebar: $negro-cib;
+
+// ======================================================
+// BORDES
+// ======================================================
+
+$border-color: #e5e7eb;
+$border-light: #f0f2f5;
+
+// ======================================================
+// ESTADOS
+// ======================================================
+
+$success: $verde-andino;
+$warning: $amarillo-macondo;
+$info: $azul-caribe;
+$accent: $violeta-orquidea;
+
+// ======================================================
+// TABLA CONTACTOS
+// ======================================================
+
+$table-header-black: $negro-cib;
+$table-header-yellow: $amarillo-macondo;
+
+// ======================================================
+// SIDEBAR
+// ======================================================
+
+$sidebar-active-bg: $amarillo-macondo;
+$sidebar-active-text: $negro-cib;
+
+// ======================================================
+// BADGES HORARIO
+// ======================================================
+
+$badge-247-bg: $azul-caribe;
+$badge-247-text: $blanco;
+
+$badge-personalizado-bg: $naranja-alba;
+$badge-personalizado-text: $blanco;
+
+// ======================================================
+// BADGES STANDBY
+// ======================================================
+
+$badge-standby-bg: $violeta-orquidea;
+$badge-standby-text: $blanco;
+
+$badge-proximo-bg: #f3eeff;
+$badge-proximo-text: $violeta-orquidea;

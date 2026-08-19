@@ -1,0 +1,95 @@
+@use './colors' as *;
+@use './variables' as *;
+
+// ======================================================
+// FLEX
+// ======================================================
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// ======================================================
+// CARD
+// ======================================================
+
+@mixin card {
+  background: $background-surface;
+  border-radius: $radius-md;
+  box-shadow: $shadow-sm;
+}
+
+// ======================================================
+// TRANSICIONES
+// ======================================================
+
+@mixin transition {
+  transition: all 0.2s ease;
+}
+
+// ======================================================
+// BADGES
+// ======================================================
+
+@mixin badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-4;
+
+  padding: 6px 14px;
+
+  border-radius: $radius-pill;
+
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+}
+
+// ======================================================
+// INPUTS
+// ======================================================
+
+@mixin input-base {
+  height: 48px;
+
+  border: 1px solid $border-color;
+
+  border-radius: $radius-sm;
+
+  background: $blanco;
+
+  padding: 0 $space-16;
+
+  font-size: $font-size-md;
+}
+
+// ======================================================
+// BOTONES
+// ======================================================
+
+@mixin button-base {
+  border: 0;
+
+  border-radius: $radius-sm;
+
+  cursor: pointer;
+
+  font-weight: $font-weight-semibold;
+
+  padding: $space-12 $space-24;
+
+  @include transition;
+}

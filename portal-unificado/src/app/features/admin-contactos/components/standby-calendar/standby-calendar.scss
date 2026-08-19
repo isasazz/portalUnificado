@@ -1,0 +1,146 @@
+.standby-layout {
+  display: flex;
+  min-height: 500px;
+}
+
+.sidebar {
+  width: 280px;
+
+  border-right: 1px solid #e5e7eb;
+
+  padding: 20px;
+}
+
+.assignment-card {
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  padding: 16px;
+
+  margin-top: 16px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.assignment-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.calendar-container {
+  flex: 1;
+  padding: 24px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 24px;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+
+  margin-bottom: 12px;
+
+  color: #6b7280;
+
+  font-weight: 600;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+
+  gap: 8px;
+}
+
+.calendar-day {
+  position: relative;
+
+  height: 64px;
+
+  border: 1px solid transparent;
+
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.tooltip {
+  position: absolute;
+
+  bottom: calc(100% + 8px);
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  min-width: 220px;
+
+  padding: 12px;
+
+  border-radius: 12px;
+
+  background: #2c2a29;
+
+  color: white;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.2);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition: all 0.2s ease;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  z-index: 10;
+}
+
+.tooltip small {
+  color: rgba(255,255,255,.8);
+}
+
+.calendar-day:hover .tooltip {
+  opacity: 1;
+}
+
+.tooltip small {
+  color: rgba(255,255,255,.8);
+}
+
+.calendar-day:hover .tooltip {
+  opacity: 1;
+}
+
+.calendar-day:hover .tooltip {
+  opacity: 1;
+}
+
+.empty-day {
+  height: 64px;
+}
