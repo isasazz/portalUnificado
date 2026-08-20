@@ -22,6 +22,9 @@ export class StandbyAlertComponent {
   @Input()
   message = '';
 
+  @Input()
+  variant: 'info' | 'success' = 'info';
+
   @Output()
   closed = new EventEmitter<void>();
 

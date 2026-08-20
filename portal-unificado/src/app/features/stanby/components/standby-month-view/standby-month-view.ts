@@ -19,6 +19,9 @@ export class StandbyMonthViewComponent implements OnInit, OnChanges {
   @Input()
   assignments: StandbyAssignment[] = [];
 
+  @Input()
+  showPeopleList = true;
+
   currentDate = new Date();
 
   calendarDays: CalendarDay[] = [];

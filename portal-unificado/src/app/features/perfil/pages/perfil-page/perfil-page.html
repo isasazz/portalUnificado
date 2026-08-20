@@ -1,0 +1,138 @@
+<div class="perfil-page">
+
+  <section class="hero">
+
+    <span class="hero__orb hero__orb--rosa"></span>
+    <span class="hero__orb hero__orb--violeta"></span>
+
+    <div class="hero__identity">
+
+      <div class="hero__avatar">
+        {{ profile.initials }}
+      </div>
+
+      <div class="hero__copy">
+
+        <span class="hero__badge">
+          Mi perfil
+        </span>
+
+        <h1>{{ profile.nombre }}</h1>
+
+        <p>{{ profile.cargo }}</p>
+
+      </div>
+
+    </div>
+
+    <div class="hero__meta">
+
+      <div class="meta-chip meta-chip--violeta">
+        <label>Correo</label>
+        <span>{{ profile.correo }}</span>
+      </div>
+
+      <div class="meta-chip meta-chip--rosa">
+        <label>Celular</label>
+        <span>{{ profile.celular }}</span>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="stats">
+
+    <article class="stat-card stat-card--azul">
+      <label>EVC</label>
+      <strong>{{ profile.evc }}</strong>
+    </article>
+
+    <article class="stat-card stat-card--violeta">
+      <label>Línea</label>
+      <strong>{{ profile.linea }}</strong>
+    </article>
+
+    <article class="stat-card stat-card--amarillo">
+      <label>Próximo standby</label>
+      @if (nextStandby) {
+        <strong>
+          {{ nextStandby.fechaInicio | date:'dd/MM' }}
+          →
+          {{ nextStandby.fechaFin | date:'dd/MM' }}
+        </strong>
+      } @else {
+        <strong>Sin turnos</strong>
+      }
+    </article>
+
+    <article class="stat-card stat-card--rosa">
+      <label>Turnos programados</label>
+      <strong>{{ myStandby.length }}</strong>
+    </article>
+
+  </section>
+
+  <section class="perfil-grid">
+
+    <div class="upcoming-card">
+
+      <h2>Mis standby</h2>
+
+      <p class="upcoming-card__hint">
+        Cada turno va de viernes a jueves
+      </p>
+
+      @for (
+        assignment of upcomingStandby;
+        track assignment.id
+      ) {
+
+        <div
+          class="week-item"
+          [class.week-item--rosa]="$odd"
+        >
+
+          <span class="week-item__dot"></span>
+
+          <div>
+
+            <strong>
+              De
+              {{ assignment.fechaInicio | date:'dd/MM/yyyy' }}
+              a
+              {{ assignment.fechaFin | date:'dd/MM/yyyy' }}
+            </strong>
+
+            <small>Turno asignado a ti</small>
+
+          </div>
+
+        </div>
+
+      }
+
+      @if (upcomingStandby.length === 0) {
+
+        <p class="empty">
+          Aún no tienes standby programado.
+        </p>
+
+      }
+
+    </div>
+
+    <div class="calendar-card">
+
+      <h2>Calendario personal</h2>
+
+      <app-standby-month-view
+        [assignments]="myStandby"
+        [showPeopleList]="false"
+      />
+
+    </div>
+
+  </section>
+
+</div>

@@ -9,11 +9,9 @@ from '../models/standby-assignment.model';
 export class StandbyScheduleService {
 
   private readonly colors = [
-    '#7C3AED',
-    '#0891B2',
-    '#10B981',
-    '#F59E0B',
-    '#9063CD'
+    '#9063cd',
+    '#f586cd',
+    '#00c389'
   ];
 
   private userColors =
@@ -70,6 +68,17 @@ export class StandbyScheduleService {
   get hasSaved(): boolean {
 
     return this.savedAssignments.length > 0;
+
+  }
+
+  getByResponsable(
+    responsable: string
+  ): StandbyAssignment[] {
+
+    return this.savedAssignments.filter(
+      assignment =>
+        assignment.responsable === responsable
+    );
 
   }
 

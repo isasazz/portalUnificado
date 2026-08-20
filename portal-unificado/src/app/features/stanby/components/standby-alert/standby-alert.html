@@ -2,7 +2,13 @@
 
 <div class="alert-backdrop">
 
-  <div class="alert-container">
+  <div
+    class="alert-container"
+    [class.alert-success]="variant === 'success'"
+    [class.alert-info]="variant === 'info'"
+  >
+
+    <div class="alert-accent"></div>
 
     <div class="alert-header">
 
@@ -19,10 +25,18 @@
 
     <div class="alert-body">
 
+      <div class="alert-icon">
+        @if (variant === 'success') {
+          ✓
+        } @else {
+          i
+        }
+      </div>
+
       <p>{{ message }}</p>
 
       <button
-        class="btn-primary"
+        class="btn-corporate"
         (click)="close()"
       >
         Aceptar

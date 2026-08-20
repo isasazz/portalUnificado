@@ -26,6 +26,20 @@ export const routes: Routes = [
           import(
             './features/stanby/pages/standby-page/standby-page'
           ).then(m => m.StandbyPageComponent)
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import(
+            './features/perfil/pages/perfil-page/perfil-page'
+          ).then(m => m.PerfilPageComponent)
+      },
+      {
+        path: 'mantenimiento',
+        loadComponent: () =>
+          import(
+            './features/mantenimiento/pages/mantenimiento-page/mantenimiento-page'
+          ).then(m => m.MantenimientoPageComponent)
       }
     ]
   }

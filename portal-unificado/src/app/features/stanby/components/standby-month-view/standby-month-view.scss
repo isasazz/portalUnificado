@@ -7,8 +7,13 @@
   min-height: 500px;
 }
 
+.standby-layout--calendar-only .calendar-container {
+  padding-left: 0;
+}
+
 .sidebar {
   width: 280px;
+  flex-shrink: 0;
 
   border-right: 1px solid $border-color;
 
@@ -110,8 +115,9 @@
 }
 
 .calendar-nav:hover {
-  background: $background-body;
-  border-color: $negro-cib;
+  background: $violeta-orquidea;
+  border-color: $violeta-orquidea;
+  color: $blanco;
 }
 
 .weekdays {

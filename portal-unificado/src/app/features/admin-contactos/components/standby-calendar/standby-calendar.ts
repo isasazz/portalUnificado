@@ -41,7 +41,7 @@ export class StandbyCalendarComponent implements OnInit {
     celular: '+57 310 539 0611',
     fechaInicio: new Date(2026, 6, 31),
     fechaFin: new Date(2026, 7, 6),
-    color: '#7C3AED'
+    color: '#9063cd'
   },
   {
     id: 2,
@@ -49,7 +49,7 @@ export class StandbyCalendarComponent implements OnInit {
     celular: '+57 320 111 2233',
     fechaInicio: new Date(2026, 7, 7),
     fechaFin: new Date(2026, 7, 13),
-    color: '#0891B2'
+    color: '#f586cd'
   },
   {
     id: 3,
@@ -57,7 +57,7 @@ export class StandbyCalendarComponent implements OnInit {
     celular: '+57 315 444 5566',
     fechaInicio: new Date(2026, 7, 14),
     fechaFin: new Date(2026, 7, 20),
-    color: '#10B981'
+    color: '#00c389'
   },
   {
     id: 4,
@@ -65,7 +65,7 @@ export class StandbyCalendarComponent implements OnInit {
     celular: '+57 301 987 6543',
     fechaInicio: new Date(2026, 7, 21),
     fechaFin: new Date(2026, 7, 27),
-    color: '#F59E0B'
+    color: '#9063cd'
   }
 ];
 }

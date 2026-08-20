@@ -1,0 +1,57 @@
+@use 'abstracts/colors' as *;
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+.mantenimiento-page {
+  padding: $space-32;
+}
+
+.page-header {
+  @include flex-between;
+
+  margin-bottom: $space-32;
+}
+
+.page-info {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.page-info p {
+  color: $text-secondary;
+}
+
+.btn-primary {
+  @include button-primary;
+}
+
+.empty-state {
+  @include card;
+
+  padding: $space-64 $space-32;
+
+  text-align: center;
+
+  border: 1px solid $border-light;
+  border-top: 6px solid $amarillo-macondo;
+}
+
+.empty-state__badge {
+  @include badge;
+
+  background: $amarillo-macondo;
+  color: $negro-cib;
+
+  margin-bottom: $space-16;
+}
+
+.empty-state h2 {
+  font-size: $font-size-h3;
+  color: $negro-cib;
+}
+
+.empty-state p {
+  margin-top: $space-12;
+  color: $text-secondary;
+}

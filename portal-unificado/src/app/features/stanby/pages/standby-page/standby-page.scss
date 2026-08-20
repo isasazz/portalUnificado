@@ -50,11 +50,7 @@
 }
 
 .btn-secondary {
-  @include button-base;
-
-  background: $blanco;
-  border: 1px solid $border-color;
-  color: $text-primary;
+  @include button-secondary;
 }
 
 .select-all {

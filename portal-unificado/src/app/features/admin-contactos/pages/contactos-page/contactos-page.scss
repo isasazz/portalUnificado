@@ -34,18 +34,27 @@
 }
 
 .btn-secondary {
-  @include button-base;
-
-  background: $blanco;
-  border: 1px solid $border-color;
-  color: $text-primary;
+  @include button-secondary;
 }
 
 .btn-primary {
-  @include button-base;
+  @include button-primary;
+}
 
-  background: $negro-cib;
-  color: $blanco;
+.table-card {
+  background: $background-surface;
+
+  border-radius: $radius-md;
+
+  overflow: hidden;
+
+  box-shadow: $shadow-sm;
+}
+
+.table-card::before {
+  content: '';
+  display: block;
+  @include corporate-strip;
 }
 
 .filters-container {
@@ -73,16 +82,6 @@
   @include input-base;
 
   width: 100%;
-}
-
-.table-card {
-  background: $background-surface;
-
-  border-radius: $radius-md;
-
-  overflow: hidden;
-
-  box-shadow: $shadow-sm;
 }
 
 table {
@@ -157,7 +156,7 @@ a {
 
 .today {
   box-shadow:
-    0 0 0 2px #FDDA24;
+    0 0 0 2px $amarillo-macondo;
 
   font-weight: $font-weight-bold;
 }

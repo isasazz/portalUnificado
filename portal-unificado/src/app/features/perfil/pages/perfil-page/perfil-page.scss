@@ -1,0 +1,298 @@
+@use 'abstracts/colors' as *;
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+.perfil-page {
+  padding: $space-32;
+}
+
+.hero {
+  @include flex-between;
+
+  gap: $space-24;
+
+  padding: $space-32;
+
+  border-radius: $radius-lg;
+
+  background: $negro-cib;
+  color: $blanco;
+
+  overflow: hidden;
+  position: relative;
+
+  border-top: 8px solid $amarillo-macondo;
+}
+
+.hero::before {
+  content: '';
+
+  position: absolute;
+  left: 120px;
+  bottom: -60px;
+
+  width: 140px;
+  height: 140px;
+
+  border-radius: 50%;
+
+  background: $verde-andino;
+  opacity: 0.22;
+}
+
+.hero::after {
+  content: '';
+
+  position: absolute;
+  right: -40px;
+  top: -40px;
+
+  width: 180px;
+  height: 180px;
+
+  border-radius: 50%;
+
+  background: $amarillo-macondo;
+  opacity: 0.28;
+}
+
+.hero__orb {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.hero__orb--rosa {
+  width: 90px;
+  height: 90px;
+  left: 52%;
+  top: 18px;
+  background: $rosa-flamenco;
+  opacity: 0.35;
+}
+
+.hero__orb--violeta {
+  width: 70px;
+  height: 70px;
+  right: 180px;
+  bottom: 16px;
+  background: $violeta-orquidea;
+  opacity: 0.4;
+}
+
+.hero__identity {
+  display: flex;
+  align-items: center;
+  gap: $space-20;
+  z-index: 1;
+}
+
+.hero__avatar {
+  width: 88px;
+  height: 88px;
+
+  border-radius: 50%;
+
+  background: $amarillo-macondo;
+  color: $negro-cib;
+
+  border: 4px solid $violeta-orquidea;
+
+  font-size: $font-size-h2;
+  font-weight: $font-weight-bold;
+
+  @include flex-center;
+}
+
+.hero__badge {
+  @include badge;
+
+  background: $rosa-flamenco;
+  color: $negro-cib;
+
+  margin-bottom: $space-8;
+}
+
+.hero__copy h1 {
+  color: $blanco;
+}
+
+.hero__copy p {
+  margin-top: $space-8;
+  color: $rosa-flamenco;
+}
+
+.hero__meta {
+  display: flex;
+  flex-direction: column;
+  gap: $space-12;
+  z-index: 1;
+}
+
+.meta-chip {
+  min-width: 240px;
+
+  padding: $space-12 $space-16;
+
+  border-radius: $radius-md;
+
+  background: rgba(144, 99, 205, 0.18);
+  border-left: 4px solid $violeta-orquidea;
+}
+
+.meta-chip--rosa {
+  background: rgba(245, 134, 205, 0.18);
+  border-left-color: $rosa-flamenco;
+}
+
+.meta-chip label {
+  @include text-label;
+  color: $violeta-orquidea;
+}
+
+.meta-chip--rosa label {
+  color: $rosa-flamenco;
+}
+
+.meta-chip span {
+  display: block;
+  margin-top: $space-4;
+  color: $blanco;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-16;
+
+  margin: $space-24 0;
+}
+
+.stat-card {
+  @include card;
+
+  padding: $space-20;
+
+  border: 1px solid $border-light;
+  border-top: 6px solid $azul-caribe;
+}
+
+.stat-card--violeta {
+  border-top-color: $violeta-orquidea;
+}
+
+.stat-card--amarillo {
+  background: $amarillo-macondo;
+  border-color: $amarillo-macondo;
+  border-top-color: $naranja-alba;
+}
+
+.stat-card--rosa {
+  border-top-color: $rosa-flamenco;
+  background: rgba(245, 134, 205, 0.12);
+}
+
+.stat-card label {
+  @include text-label;
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: $space-8;
+  font-size: $font-size-lg;
+  color: $negro-cib;
+}
+
+.perfil-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: $space-24;
+}
+
+.upcoming-card,
+.calendar-card {
+  @include card;
+
+  padding: $space-24;
+
+  border: 1px solid $border-light;
+  overflow: hidden;
+}
+
+.upcoming-card {
+  border-top: 6px solid $rosa-flamenco;
+}
+
+.calendar-card {
+  border-top: 6px solid $violeta-orquidea;
+}
+
+.upcoming-card h2,
+.calendar-card h2 {
+  font-size: $font-size-h3;
+  color: $negro-cib;
+}
+
+.upcoming-card__hint {
+  margin: $space-8 0 $space-20;
+
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.week-item {
+  display: flex;
+  gap: $space-12;
+  align-items: flex-start;
+
+  padding: $space-16;
+
+  margin-bottom: $space-8;
+
+  border-radius: $radius-sm;
+
+  background: rgba(144, 99, 205, 0.12);
+  border-left: 4px solid $violeta-orquidea;
+}
+
+.week-item--rosa {
+  background: rgba(245, 134, 205, 0.16);
+  border-left-color: $rosa-flamenco;
+}
+
+.week-item:last-of-type {
+  margin-bottom: 0;
+}
+
+.week-item__dot {
+  width: 12px;
+  height: 12px;
+
+  margin-top: 6px;
+
+  border-radius: 50%;
+
+  background: $violeta-orquidea;
+  box-shadow: 0 0 0 4px rgba(144, 99, 205, 0.2);
+  flex-shrink: 0;
+}
+
+.week-item--rosa .week-item__dot {
+  background: $rosa-flamenco;
+  box-shadow: 0 0 0 4px rgba(245, 134, 205, 0.25);
+}
+
+.week-item small {
+  display: block;
+  margin-top: $space-4;
+  color: $violeta-orquidea;
+  font-weight: $font-weight-semibold;
+}
+
+.week-item--rosa small {
+  color: $rosa-flamenco;
+}
+
+.empty {
+  color: $text-secondary;
+}

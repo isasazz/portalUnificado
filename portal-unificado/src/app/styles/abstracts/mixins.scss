@@ -74,6 +74,14 @@
   padding: 0 $space-16;
 
   font-size: $font-size-md;
+
+  @include transition;
+
+  &:focus {
+    outline: none;
+    border-color: $amarillo-macondo;
+    box-shadow: 0 0 0 3px rgba(253, 218, 36, 0.35);
+  }
 }
 
 // ======================================================
@@ -94,6 +102,36 @@
   padding: $space-12 $space-24;
 
   @include transition;
+}
+
+@mixin button-primary {
+  @include button-base;
+
+  background: $amarillo-macondo;
+  color: $negro-cib;
+
+  &:hover {
+    background: $negro-cib;
+    color: $amarillo-macondo;
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+
+  background: $blanco;
+  border: 1px solid $border-color;
+  color: $text-primary;
+
+  &:hover {
+    border-color: $violeta-orquidea;
+    color: $violeta-orquidea;
+  }
+}
+
+@mixin corporate-strip {
+  height: 6px;
+  background: $amarillo-macondo;
 }
 
 @mixin text-label {

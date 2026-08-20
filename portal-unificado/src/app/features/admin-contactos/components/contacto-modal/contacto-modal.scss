@@ -28,6 +28,12 @@
   overflow: hidden;
 }
 
+.modal-container::before {
+  content: '';
+  display: block;
+  @include corporate-strip;
+}
+
 .modal-header {
   background: $negro-cib;
   color: $blanco;
@@ -45,7 +51,7 @@
 
   font-size: $font-size-md;
   font-weight: $font-weight-regular;
-  color: rgba(255, 255, 255, 0.8);
+  color: $amarillo-macondo;
 }
 
 .close-button {
@@ -58,9 +64,9 @@
 
   cursor: pointer;
 
-  color: $blanco;
+  color: $negro-cib;
 
-  background: rgba(255, 255, 255, 0.18);
+  background: $amarillo-macondo;
 
   font-size: $font-size-lg;
 }
@@ -185,21 +191,15 @@
 }
 
 .pdn {
-  background: #7c3aed;
+  background: $violeta-orquidea;
 }
 
 .qa {
-  background: #f59e0b;
+  background: $naranja-alba;
 }
 
 .dev {
-  background: #10b981;
-}
-
-.distribution-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $space-24;
+  background: $verde-andino;
 }
 
 .footer-actions {
@@ -207,6 +207,20 @@
   justify-content: flex-end;
 
   margin-top: $space-16;
+}
+
+.btn-primary {
+  @include button-primary;
+}
+
+.btn-secondary {
+  @include button-secondary;
+}
+
+.distribution-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-24;
 }
 
 .mantenimiento-container {

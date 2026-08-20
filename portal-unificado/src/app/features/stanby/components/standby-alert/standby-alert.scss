@@ -6,7 +6,7 @@
   position: fixed;
   inset: 0;
 
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(44, 42, 41, 0.62);
 
   display: flex;
   justify-content: center;
@@ -24,6 +24,17 @@
   border-radius: $radius-md;
 
   overflow: hidden;
+
+  box-shadow: $shadow-lg;
+}
+
+.alert-accent {
+  height: 8px;
+  background: $amarillo-macondo;
+}
+
+.alert-success .alert-accent {
+  background: $verde-andino;
 }
 
 .alert-header {
@@ -49,13 +60,13 @@
 
   border-radius: 50%;
 
-  background: rgba(255, 255, 255, 0.18);
-
-  color: $blanco;
+  background: $rosa-flamenco;
+  color: $negro-cib;
 
   cursor: pointer;
 
   font-size: $font-size-md;
+  font-weight: $font-weight-bold;
 }
 
 .alert-body {
@@ -64,19 +75,49 @@
   @include flex-column;
   align-items: center;
 
-  gap: $space-24;
+  gap: $space-20;
 
   text-align: center;
+
+  background: $background-body;
+}
+
+.alert-icon {
+  width: 64px;
+  height: 64px;
+
+  border-radius: 50%;
+
+  background: $violeta-orquidea;
+  color: $blanco;
+
+  font-size: $font-size-h2;
+  font-weight: $font-weight-bold;
+
+  @include flex-center;
+}
+
+.alert-success .alert-icon {
+  background: $rosa-flamenco;
+  color: $negro-cib;
 }
 
 .alert-body p {
   font-size: $font-size-md;
-  color: $text-primary;
+  font-weight: $font-weight-medium;
+  color: $negro-cib;
 }
 
-.btn-primary {
+.btn-corporate {
   @include button-base;
 
-  background: $negro-cib;
+  background: $amarillo-macondo;
+  color: $negro-cib;
+
+  min-width: 160px;
+}
+
+.btn-corporate:hover {
+  background: $violeta-orquidea;
   color: $blanco;
 }

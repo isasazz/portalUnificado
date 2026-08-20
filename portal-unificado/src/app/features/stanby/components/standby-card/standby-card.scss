@@ -28,24 +28,23 @@
   left: 0;
   right: 0;
 
+  @include corporate-strip;
   height: 6px;
-
-  background: $violeta-orquidea;
 }
 
 .standby-card:hover {
   transform: translateY(-4px);
   box-shadow: $shadow-lg;
-  border-color: $violeta-orquidea;
+  border-color: $amarillo-macondo;
 }
 
 .standby-card.selected {
-  border-color: $verde-andino;
-  background: rgba(0, 195, 137, 0.06);
+  border-color: $amarillo-macondo;
+  background: rgba(253, 218, 36, 0.12);
 }
 
 .standby-card.selected::before {
-  background: $verde-andino;
+  background: $amarillo-macondo;
 }
 
 .card-check {
@@ -75,7 +74,7 @@
 .app-code {
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
-  color: $link-color;
+  color: $azul-caribe;
   letter-spacing: 0.04em;
 }
 
@@ -95,6 +94,18 @@
   align-items: center;
 
   gap: $space-4;
+}
+
+.card-field:nth-child(1) label {
+  color: $violeta-orquidea;
+}
+
+.card-field:nth-child(2) label {
+  color: $rosa-flamenco;
+}
+
+.card-field:nth-child(3) label {
+  color: $naranja-alba;
 }
 
 .card-field label {

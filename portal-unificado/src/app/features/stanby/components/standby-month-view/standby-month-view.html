@@ -1,4 +1,9 @@
-<div class="standby-layout">
+<div
+  class="standby-layout"
+  [class.standby-layout--calendar-only]="!showPeopleList"
+>
+
+  @if (showPeopleList) {
 
   <aside class="sidebar">
 
@@ -42,6 +47,8 @@
     }
 
   </aside>
+
+  }
 
   <section class="calendar-container">
 

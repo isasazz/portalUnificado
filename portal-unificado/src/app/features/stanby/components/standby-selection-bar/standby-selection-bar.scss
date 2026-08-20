@@ -3,9 +3,5 @@
 @use 'abstracts/mixins' as *;
 
 .btn-primary {
-  @include button-base;
-
-  background: $negro-cib;
-
-  color: $blanco;
+  @include button-primary;
 }

@@ -28,6 +28,12 @@
   overflow: hidden;
 }
 
+.modal-container::before {
+  content: '';
+  display: block;
+  @include corporate-strip;
+}
+
 .modal-header {
   background: $negro-cib;
   color: $blanco;
@@ -47,9 +53,9 @@
 
   border-radius: 50%;
 
-  background: rgba(255, 255, 255, 0.18);
+  background: $amarillo-macondo;
 
-  color: $blanco;
+  color: $negro-cib;
 
   cursor: pointer;
 
