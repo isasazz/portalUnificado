@@ -130,3 +130,76 @@
 
   border: 1px solid $azul-caribe;
 }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+
+  gap: $space-12;
+}
+
+.btn-save {
+  @include button-base;
+
+  background: $verde-andino;
+
+  color: $blanco;
+}
+
+.btn-save:hover {
+  filter: brightness(.95);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, .45);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 2000;
+}
+
+.modal-container {
+  width: 800px;
+  max-width: 90vw;
+
+  background: $blanco;
+
+  border-radius: $radius-md;
+
+  overflow: hidden;
+
+  box-shadow: $shadow-lg;
+}
+
+.modal-header-popup {
+  @include flex-between;
+
+  padding: $space-24;
+
+  background: $negro-cib;
+
+  color: $blanco;
+}
+
+.modal-body-popup {
+  padding: $space-24;
+}
+
+.window-card {
+  @include card;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: $space-16;
+
+  margin-bottom: $space-12;
+
+  border: 1px solid $border-light;
+}

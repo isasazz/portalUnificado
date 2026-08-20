@@ -297,3 +297,39 @@
 
   border-radius: $radius-md;
 }
+.standby-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top: $space-24;
+}
+
+.btn-standby {
+  @include button-base;
+
+  background: $verde-andino;
+
+  color: $blanco;
+}
+
+.btn-standby:hover {
+  filter: brightness(.95);
+}
+
+.maintenance-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top: $space-24;
+}
+
+.btn-maintenance {
+  @include button-base;
+
+  background: $verde-andino;
+  color: $blanco;
+}
+
+.btn-maintenance:hover {
+  filter: brightness(.95);
+}

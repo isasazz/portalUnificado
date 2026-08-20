@@ -37,8 +37,22 @@
   @include button-secondary;
 }
 
-.btn-primary {
-  @include button-primary;
+.btn-new-contact {
+  @include button-base;
+
+  background: $blanco;
+
+  color: $negro-cib;
+
+  border: 1px solid $border-color;
+}
+
+.btn-new-contact:hover {
+  background: $amarillo-macondo;
+
+  color: $negro-cib;
+
+  border-color: $amarillo-macondo;
 }
 
 .table-card {

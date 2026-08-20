@@ -86,10 +86,9 @@
   </div>
 
   <app-standby-modal
-    [visible]="showStandbyModal"
-    (closed)="closeStandbyModal()"
-    (saved)="onStandbySaved()">
-  </app-standby-modal>
+  [visible]="showStandbyModal"
+  (closed)="closeStandbyModal()">
+</app-standby-modal>
 
   <app-standby-view-modal
     [visible]="showViewModal"

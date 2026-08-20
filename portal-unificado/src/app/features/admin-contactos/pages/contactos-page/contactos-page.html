@@ -10,13 +10,18 @@
 
     <div class="page-actions">
 
-      <button class="btn-secondary">
-        Exportar
-      </button>
 
-      <button class="btn-primary">
-        + Nuevo
-      </button>
+      <button
+  class="btn-new-contact"
+  (click)="openNewContactModal()"
+>
+  + Nuevo contacto
+</button>
+
+    <app-nuevo-contacto-modal
+    [visible]="showNewContactModal"
+    (closed)="closeNewContactModal()">
+  </app-nuevo-contacto-modal>
 
     </div>
 

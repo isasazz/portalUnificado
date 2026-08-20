@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { STANDBY_APPLICATIONS }
 from '../../mocks/standby-applications.mock';
@@ -15,36 +16,64 @@ from '../../components/standby-selection-bar/standby-selection-bar';
 import { StandbyModalComponent }
 from '../../components/standby-modal/standby-modal';
 
-import { StandbyViewModalComponent }
-from '../../components/standby-view-modal/standby-view-modal';
-
-import { StandbyScheduleService }
-from '../../services/standby-schedule.service';
-
 @Component({
   selector: 'app-standby-page',
   standalone: true,
   imports: [
     StandbyCardComponent,
     StandbySelectionBarComponent,
-    StandbyModalComponent,
-    StandbyViewModalComponent
+    StandbyModalComponent
   ],
   templateUrl: './standby-page.html',
   styleUrl: './standby-page.scss'
 })
-export class StandbyPageComponent {
+export class StandbyPageComponent implements OnInit {
 
   applications: StandbyApplication[] =
     [...STANDBY_APPLICATIONS];
 
   showStandbyModal = false;
 
-  showViewModal = false;
-
   constructor(
-    private scheduleService: StandbyScheduleService
+    private route: ActivatedRoute
   ) {}
+
+ ngOnInit(): void {
+
+  this.route.queryParams.subscribe(params => {
+
+    console.log('PARAMS', params);
+
+    const appCode = params['app'];
+
+    if (!appCode) {
+      return;
+    }
+
+    const application =
+      this.applications.find(
+        app =>
+          app.codigoAplicacion === appCode
+      );
+
+    console.log('APPLICATION', application);
+
+    if (!application) {
+      return;
+    }
+
+    application.selected = true;
+
+    this.showStandbyModal = true;
+
+    console.log(
+      'SHOW MODAL',
+      this.showStandbyModal
+    );
+
+  });
+
+}
 
   toggleCard(id: number): void {
 
@@ -80,18 +109,6 @@ export class StandbyPageComponent {
 
   }
 
-  get canViewStandby(): boolean {
-
-    return this.scheduleService.hasSaved;
-
-  }
-
-  get savedAssignments() {
-
-    return this.scheduleService.savedAssignments;
-
-  }
-
   openStandbyModal(): void {
 
     this.showStandbyModal = true;
@@ -101,24 +118,6 @@ export class StandbyPageComponent {
   closeStandbyModal(): void {
 
     this.showStandbyModal = false;
-
-  }
-
-  onStandbySaved(): void {
-
-    this.showStandbyModal = false;
-
-  }
-
-  openViewModal(): void {
-
-    this.showViewModal = true;
-
-  }
-
-  closeViewModal(): void {
-
-    this.showViewModal = false;
 
   }
 

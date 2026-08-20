@@ -1,7 +1,15 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { StandbyCalendarComponent }
-from '../standby-calendar/standby-calendar';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output
+} from '@angular/core';
 
+import { Router } from '@angular/router';
+
+import {
+  StandbyCalendarComponent
+} from '../standby-calendar/standby-calendar';
 
 @Component({
   selector: 'app-contacto-modal',
@@ -24,6 +32,10 @@ export class ContactoModalComponent {
     | 'standby'
     | 'mantenimiento' = 'detalle';
 
+  constructor(
+    private router: Router
+  ) {}
+
   close(): void {
     this.closed.emit();
   }
@@ -35,6 +47,39 @@ export class ContactoModalComponent {
       | 'standby'
       | 'mantenimiento'
   ): void {
+
     this.activeTab = tab;
+
   }
+
+  goToStandby(): void {
+
+    this.close();
+
+    this.router.navigate(
+      ['/standby'],
+      {
+        queryParams: {
+          app: 'NU0113001'
+        }
+      }
+    );
+
+  }
+  goToMaintenance(): void {
+
+  this.close();
+
+  this.router.navigate(
+    ['/mantenimiento'],
+    {
+      queryParams: {
+        app: 'NU0113001'
+      }
+    }
+  );
+
+}
+
+
 }
