@@ -4,6 +4,8 @@ export interface StandbyAssignment {
 
   responsable: string;
 
+  celular: string;
+
   fechaInicio: Date;
 
   fechaFin: Date;

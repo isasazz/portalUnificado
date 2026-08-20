@@ -34,37 +34,40 @@ export class StandbyCalendarComponent implements OnInit {
 
     private loadAssignments(): void {
 
-  this.assignments = [
-    {
-      id: 1,
-      responsable: 'Daniel Lopez Montes',
-      fechaInicio: new Date(2026, 6, 31),
-      fechaFin: new Date(2026, 7, 6),
-      color: '#7C3AED'
-    },
-    {
-      id: 2,
-      responsable: 'Bibiana Montoya',
-      fechaInicio: new Date(2026, 7, 7),
-      fechaFin: new Date(2026, 7, 13),
-      color: '#0891B2'
-    },
-    {
-      id: 3,
-      responsable: 'Dylan Martinez',
-      fechaInicio: new Date(2026, 7, 14),
-      fechaFin: new Date(2026, 7, 20),
-      color: '#10B981'
-    },
-    {
-      id: 4,
-      responsable: 'Jahiver Horacio Lopez',
-      fechaInicio: new Date(2026, 7, 21),
-      fechaFin: new Date(2026, 7, 27),
-      color: '#F59E0B'
-    }
-  ];
-
+ this.assignments = [
+  {
+    id: 1,
+    responsable: 'Daniel Lopez Montes',
+    celular: '+57 310 539 0611',
+    fechaInicio: new Date(2026, 6, 31),
+    fechaFin: new Date(2026, 7, 6),
+    color: '#7C3AED'
+  },
+  {
+    id: 2,
+    responsable: 'Bibiana Montoya',
+    celular: '+57 320 111 2233',
+    fechaInicio: new Date(2026, 7, 7),
+    fechaFin: new Date(2026, 7, 13),
+    color: '#0891B2'
+  },
+  {
+    id: 3,
+    responsable: 'Dylan Martinez',
+    celular: '+57 315 444 5566',
+    fechaInicio: new Date(2026, 7, 14),
+    fechaFin: new Date(2026, 7, 20),
+    color: '#10B981'
+  },
+  {
+    id: 4,
+    responsable: 'Jahiver Horacio Lopez',
+    celular: '+57 301 987 6543',
+    fechaInicio: new Date(2026, 7, 21),
+    fechaFin: new Date(2026, 7, 27),
+    color: '#F59E0B'
+  }
+];
 }
 
   ngOnInit(): void {

@@ -7,6 +7,7 @@ export interface CalendarDay {
   dayNumber: number;
 
   isFriday: boolean;
+  selectedDate?: Date;
 
 }
 
