@@ -4,33 +4,318 @@
 
     <div class="page-info">
 
-      <h1>Ventana de mantenimiento</h1>
+      <h1>Ventanas de mantenimiento</h1>
 
       <p>
-        Consulta y programa las ventanas de mantenimiento
+        Programa y administra ventanas de mantenimiento
+        para aplicaciones y servicios.
       </p>
 
     </div>
 
     <button class="btn-primary">
-      + Nueva ventana
+
+      Guardar ventana
+
     </button>
 
   </div>
 
-  <section class="empty-state">
+  <div class="maintenance-form">
 
-    <span class="empty-state__badge">
-      Próximamente
-    </span>
+    <!-- PROGRAMACIÓN -->
 
-    <h2>Aún no hay ventanas programadas</h2>
+    <div class="form-section">
 
-    <p>
-      Aquí verás el listado de mantenimientos por aplicación,
-      horario y responsables.
-    </p>
+      <div class="section-title">
 
-  </section>
+        <span class="section-badge">
+          Programación
+        </span>
+
+        <h2>
+          Configuración de la ventana
+        </h2>
+
+      </div>
+
+      <div class="filters-grid">
+
+        <div class="field">
+
+          <label>
+            EVC
+          </label>
+
+          <select>
+
+            <option>
+              Todos los EVC
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Línea
+          </label>
+
+          <select>
+
+            <option>
+              Todas las líneas
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Aplicación
+          </label>
+
+          <select>
+
+            <option>
+              Todas las aplicaciones
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          Frecuencia
+        </label>
+
+        <select>
+
+          <option value="once">
+            Una vez
+          </option>
+
+          <option value="daily">
+            Diaria
+          </option>
+
+          <option value="weekly">
+            Semanal
+          </option>
+
+          <option value="monthly">
+            Mensual
+          </option>
+
+        </select>
+
+        <small>
+          Define la recurrencia de la ventana de mantenimiento.
+        </small>
+
+      </div>
+
+      <div class="form-grid">
+
+        <div class="field">
+
+          <label>
+            Fecha y hora de inicio
+          </label>
+
+          <input
+            type="datetime-local"
+          />
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Fecha y hora de finalización
+          </label>
+
+          <input
+            type="datetime-local"
+          />
+
+        </div>
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          Zona horaria
+        </label>
+
+        <select>
+
+          <option>
+            América / Bogotá
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <!-- ALCANCE -->
+
+    <div class="form-section">
+
+      <div class="section-title">
+
+        <span class="section-badge purple">
+          Alcance
+        </span>
+
+        <h2>
+          Aplicación asociada
+        </h2>
+
+      </div>
+
+      <p class="help-text">
+
+        Información de la aplicación seleccionada
+        para la ventana de mantenimiento.
+
+      </p>
+
+      <div class="summary-grid">
+
+        <div class="summary-item">
+
+          <label>
+            Código
+          </label>
+
+          <span>
+            NU0113001
+          </span>
+
+        </div>
+
+        <div class="summary-item">
+
+          <label>
+            Aplicación
+          </label>
+
+          <span>
+            Núcleo Único
+          </span>
+
+        </div>
+
+        <div class="summary-item">
+
+          <label>
+            EVC
+          </label>
+
+          <span>
+            EVC Core Bancario
+          </span>
+
+        </div>
+
+        <div class="summary-item">
+
+          <label>
+            Línea
+          </label>
+
+          <span>
+            Aplicaciones
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- IMPACTO -->
+
+    <div class="form-section">
+
+      <div class="section-title">
+
+        <span class="section-badge pink">
+          Impacto
+        </span>
+
+        <h2>
+          Resumen de la ventana
+        </h2>
+
+      </div>
+
+      <div class="summary-grid">
+
+        <div class="summary-item">
+
+          <label>
+            Estado
+          </label>
+
+          <span>
+            Programada
+          </span>
+
+        </div>
+
+        <div class="summary-item">
+
+          <label>
+            Duración estimada
+          </label>
+
+          <span>
+            4 horas
+          </span>
+
+        </div>
+
+        <div class="summary-item">
+
+          <label>
+            Próxima ejecución
+          </label>
+
+          <span>
+            20/08/2026 22:00
+          </span>
+
+        </div>
+
+        <div class="summary-item">
+
+          <label>
+            Responsable
+          </label>
+
+          <span>
+            Daniel Lopez Montes
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
 
 </div>

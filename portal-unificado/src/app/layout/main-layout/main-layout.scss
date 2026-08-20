@@ -3,17 +3,27 @@
 
 .main-layout {
   display: flex;
+
   min-height: 100vh;
+
+  align-items: stretch;
+
   background-color: $background-body;
 }
 
 .sidebar-container {
   width: $sidebar-width;
+
   flex-shrink: 0;
+
+  display: flex;
 }
 
 .content-container {
   flex: 1;
+
+  min-height: 100vh;
+
   overflow-x: auto;
-  border-top: 6px solid $amarillo-macondo;
+
 }

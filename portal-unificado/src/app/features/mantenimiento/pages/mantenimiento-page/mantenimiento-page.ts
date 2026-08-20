@@ -6,4 +6,8 @@ import { Component } from '@angular/core';
   templateUrl: './mantenimiento-page.html',
   styleUrl: './mantenimiento-page.scss'
 })
-export class MantenimientoPageComponent {}
+export class MantenimientoPageComponent {
+
+  recurrence = 'once';
+
+}

@@ -226,3 +226,74 @@
 .mantenimiento-container {
   min-height: 320px;
 }
+
+.mantenimiento-container {
+  display: flex;
+  flex-direction: column;
+
+  gap: $space-24;
+}
+
+.maintenance-section {
+  @include card;
+
+  padding: $space-24;
+
+  border: 1px solid $border-light;
+}
+
+.maintenance-badge {
+  @include badge;
+
+  background: $amarillo-macondo;
+
+  color: $negro-cib;
+
+  margin-bottom: $space-16;
+}
+
+.maintenance-badge.history {
+  background: $rosa-flamenco;
+}
+
+.maintenance-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: $space-20;
+}
+
+.maintenance-item {
+  display: flex;
+  flex-direction: column;
+
+  gap: $space-8;
+}
+
+.maintenance-item label {
+  @include text-label;
+}
+
+.maintenance-item span {
+  @include text-value;
+}
+
+.maintenance-history {
+  display: flex;
+  flex-direction: column;
+
+  gap: $space-12;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: $space-16;
+
+  border: 1px solid $border-light;
+
+  border-radius: $radius-md;
+}

@@ -2,6 +2,7 @@
 @use 'abstracts/variables' as *;
 @use 'abstracts/mixins' as *;
 
+
 .mantenimiento-page {
   padding: $space-32;
 }
@@ -26,32 +27,106 @@
   @include button-primary;
 }
 
-.empty-state {
+.maintenance-form {
   @include card;
 
-  padding: $space-64 $space-32;
+  position: relative;
 
-  text-align: center;
+  padding: $space-32;
 
-  border: 1px solid $border-light;
-  border-top: 6px solid $amarillo-macondo;
+  overflow: hidden;
 }
 
-.empty-state__badge {
+
+
+.form-section {
+  margin-bottom: $space-40;
+}
+
+.section-title {
+  margin-bottom: $space-20;
+}
+
+.section-title h2 {
+  margin-top: $space-8;
+}
+
+.section-badge {
   @include badge;
 
   background: $amarillo-macondo;
   color: $negro-cib;
-
-  margin-bottom: $space-16;
 }
 
-.empty-state h2 {
-  font-size: $font-size-h3;
+.section-badge.purple {
+  background: $violeta-orquidea;
+  color: $blanco;
+}
+
+.section-badge.pink {
+  background: $rosa-flamenco;
   color: $negro-cib;
 }
 
-.empty-state p {
-  margin-top: $space-12;
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: $space-20;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: $space-16;
+
+  margin: $space-20 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+
+  gap: $space-8;
+
+  margin-bottom: $space-20;
+}
+
+.field label {
+  @include text-label;
+}
+
+.field input,
+.field select {
+  @include input-base;
+
+  width: 100%;
+}
+
+.field small,
+.help-text {
   color: $text-secondary;
+}
+
+.btn-secondary {
+  @include button-secondary;
+}
+ 
+
+.filters-grid select,
+.filters-grid input {
+  @include input-base;
+
+  width: 100%;
+}
+
+.impact-panel {
+  padding: $space-20;
+
+  border-radius: $radius-md;
+
+  background: rgba(89, 203, 235, 0.08);
+
+  border: 1px solid $azul-caribe;
 }

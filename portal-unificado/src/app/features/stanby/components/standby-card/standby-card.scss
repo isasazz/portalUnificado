@@ -72,10 +72,23 @@
 }
 
 .app-code {
-  font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
+  font-size: 28px;
+
+  font-weight: $font-weight-bold;
+
   color: $azul-caribe;
+
   letter-spacing: 0.04em;
+
+  line-height: 1;
+}
+
+.app-name {
+  font-size: $font-size-lg;
+
+  font-weight: $font-weight-semibold;
+
+  color: $negro-cib;
 }
 
 .card-fields {
