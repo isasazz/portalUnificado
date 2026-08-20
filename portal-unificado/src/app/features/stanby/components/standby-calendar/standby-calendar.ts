@@ -7,7 +7,8 @@ export interface CalendarDay {
   dayNumber: number;
 
   isFriday: boolean;
-  selectedDate?: Date;
+
+  currentMonth: boolean;
 
 }
 
@@ -23,11 +24,13 @@ export class StandbyCalendarComponent {
   enabled = false;
 
   @Output()
-  fridaySelected =
-    new EventEmitter<Date>();
+  selectionChange =
+    new EventEmitter<Date[]>();
 
   currentDate =
     new Date();
+
+  selectedFridays: Date[] = [];
 
   readonly weekDays = [
     'Lun',
@@ -57,12 +60,35 @@ export class StandbyCalendarComponent {
     const month =
       this.currentDate.getMonth();
 
+    const firstDay = new Date(year, month, 1);
     const totalDays =
       new Date(
         year,
         month + 1,
         0
       ).getDate();
+
+    let firstWeekDay = firstDay.getDay();
+
+    firstWeekDay =
+      firstWeekDay === 0
+        ? 6
+        : firstWeekDay - 1;
+
+    for (
+      let i = 0;
+      i < firstWeekDay;
+      i++
+    ) {
+
+      this.days.push({
+        date: new Date(),
+        dayNumber: 0,
+        isFriday: false,
+        currentMonth: false
+      });
+
+    }
 
     for (
       let day = 1;
@@ -80,9 +106,8 @@ export class StandbyCalendarComponent {
       this.days.push({
         date,
         dayNumber: day,
-
-        isFriday:
-          date.getDay() === 5
+        isFriday: date.getDay() === 5,
+        currentMonth: true
       });
 
     }
@@ -95,12 +120,69 @@ export class StandbyCalendarComponent {
       return;
     }
 
-    if (!day.isFriday) {
+    if (!day.currentMonth || !day.isFriday) {
       return;
     }
 
-    this.fridaySelected.emit(
-      day.date
+    const exists =
+      this.selectedFridays.find(
+        friday =>
+          this.isSameDate(friday, day.date)
+      );
+
+    if (exists) {
+
+      this.selectedFridays =
+        this.selectedFridays.filter(
+          friday =>
+            !this.isSameDate(friday, day.date)
+        );
+
+    } else {
+
+      this.selectedFridays = [
+        ...this.selectedFridays,
+        day.date
+      ];
+
+    }
+
+    this.selectionChange.emit(
+      [...this.selectedFridays]
+    );
+
+  }
+
+  clearSelection(): void {
+
+    this.selectedFridays = [];
+
+    this.selectionChange.emit([]);
+
+  }
+
+  isSelected(day: CalendarDay): boolean {
+
+    if (!day.currentMonth) {
+      return false;
+    }
+
+    return this.selectedFridays.some(
+      friday =>
+        this.isSameDate(friday, day.date)
+    );
+
+  }
+
+  private isSameDate(
+    a: Date,
+    b: Date
+  ): boolean {
+
+    return (
+      a.getDate() === b.getDate() &&
+      a.getMonth() === b.getMonth() &&
+      a.getFullYear() === b.getFullYear()
     );
 
   }

@@ -3,36 +3,54 @@
 @use 'abstracts/mixins' as *;
 
 .standby-card {
+  position: relative;
+
   @include card;
 
-  padding: $space-24;
+  padding: $space-24 $space-20 $space-32;
 
-  border: 2px solid $violeta-orquidea;
+  border: 1px solid $border-color;
 
   cursor: pointer;
 
-  min-height: 240px;
+  min-height: 280px;
+
+  overflow: hidden;
 
   @include transition;
 }
 
-.standby-card:hover {
-  transform: translateY(-2px);
+.standby-card::before {
+  content: '';
 
-  box-shadow: $shadow-md;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 6px;
+
+  background: $violeta-orquidea;
+}
+
+.standby-card:hover {
+  transform: translateY(-4px);
+  box-shadow: $shadow-lg;
+  border-color: $violeta-orquidea;
 }
 
 .standby-card.selected {
   border-color: $verde-andino;
+  background: rgba(0, 195, 137, 0.06);
+}
 
-  background: rgba(0, 195, 137, 0.05);
+.standby-card.selected::before {
+  background: $verde-andino;
 }
 
 .card-check {
   display: flex;
   justify-content: flex-end;
-
-  margin-bottom: $space-12;
 }
 
 .card-check input {
@@ -40,23 +58,49 @@
   height: 18px;
 }
 
-.standby-card h3 {
-  margin-bottom: $space-12;
-}
-
-.description {
-  color: $text-secondary;
-
-  margin-bottom: $space-20;
-}
-
-.info {
-  display: flex;
-  flex-direction: column;
+.card-body {
+  @include flex-column;
+  align-items: center;
+  text-align: center;
 
   gap: $space-8;
+
+  margin-top: $space-8;
 }
 
-.label {
+.card-body h3 {
+  font-size: $font-size-h3;
+}
+
+.app-code {
+  font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
+  color: $link-color;
+  letter-spacing: 0.04em;
+}
+
+.card-fields {
+  width: 100%;
+
+  @include flex-column;
+  align-items: center;
+
+  gap: $space-16;
+
+  margin-top: $space-20;
+}
+
+.card-field {
+  @include flex-column;
+  align-items: center;
+
+  gap: $space-4;
+}
+
+.card-field label {
+  @include text-label;
+}
+
+.card-field span {
+  @include text-value;
 }

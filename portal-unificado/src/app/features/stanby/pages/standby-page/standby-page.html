@@ -47,10 +47,25 @@
 
     </div>
 
-    <app-standby-selection-bar
-      [visible]="hasSelection"
-      (addStandby)="openStandbyModal()">
-    </app-standby-selection-bar>
+    <div class="selection-actions">
+
+      @if (canViewStandby) {
+
+        <button
+          class="btn-secondary"
+          (click)="openViewModal()"
+        >
+          Ver standby
+        </button>
+
+      }
+
+      <app-standby-selection-bar
+        [visible]="hasSelection"
+        (addStandby)="openStandbyModal()">
+      </app-standby-selection-bar>
+
+    </div>
 
   </div>
 
@@ -72,7 +87,14 @@
 
   <app-standby-modal
     [visible]="showStandbyModal"
-    (closed)="closeStandbyModal()">
+    (closed)="closeStandbyModal()"
+    (saved)="onStandbySaved()">
   </app-standby-modal>
+
+  <app-standby-view-modal
+    [visible]="showViewModal"
+    [assignments]="savedAssignments"
+    (closed)="closeViewModal()">
+  </app-standby-view-modal>
 
 </div>

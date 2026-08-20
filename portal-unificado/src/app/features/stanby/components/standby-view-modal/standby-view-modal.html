@@ -1,0 +1,32 @@
+@if (visible) {
+
+<div class="modal-backdrop">
+
+  <div class="modal-container">
+
+    <div class="modal-header">
+
+      <h2>Ver Standby</h2>
+
+      <button
+        class="close-button"
+        (click)="close()"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <app-standby-month-view
+        [assignments]="assignments"
+      />
+
+    </div>
+
+  </div>
+
+</div>
+
+}

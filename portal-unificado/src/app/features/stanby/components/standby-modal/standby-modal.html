@@ -19,34 +19,6 @@
 
     <div class="modal-content">
 
-      <div class="calendar-section">
-
-        @if (!selectedUser) {
-
-          <div class="info-message">
-
-            Selecciona un responsable para habilitar
-            la programación de standby.
-
-          </div>
-
-        } @else {
-
-          <div class="info-message success">
-
-            Responsable seleccionado:
-            {{ selectedUser }}
-
-          </div>
-
-        }
-
-        <app-standby-calendar
-          [enabled]="!!selectedUser">
-        </app-standby-calendar>
-
-      </div>
-
       <div class="users-section">
 
         <h3>Responsables</h3>
@@ -70,11 +42,136 @@
 
       </div>
 
+      <div class="calendar-section">
+
+        @if (!selectedUser) {
+
+          <div class="info-message">
+
+            Selecciona un responsable para habilitar
+            la programación de standby.
+            Solo los viernes están disponibles.
+
+          </div>
+
+        } @else {
+
+          <div class="info-message success">
+
+            Responsable seleccionado:
+            {{ selectedUser }}
+            · Solo viernes habilitados
+
+          </div>
+
+        }
+
+        <app-standby-calendar
+          [enabled]="!!selectedUser"
+          (selectionChange)="onSelectionChange($event)">
+        </app-standby-calendar>
+
+      </div>
+
+    </div>
+
+    <div class="selection-summary">
+
+      @if (standbyWeeks.length > 0) {
+
+        <div class="summary-card">
+
+          <label>Resumen de programación</label>
+
+          <small>
+            Cada standby dura de viernes a jueves
+            @if (selectedUser) {
+              · {{ selectedUser }}
+            }
+          </small>
+
+          <ul class="week-list">
+
+            @for (
+              week of standbyWeeks;
+              track week.start
+            ) {
+
+              <li>
+                De
+                {{ week.start | date:'dd/MM/yyyy' }}
+                a
+                {{ week.end | date:'dd/MM/yyyy' }}
+              </li>
+
+            }
+
+          </ul>
+
+          <button
+            class="btn-primary accept-button"
+            (click)="acceptSelection()"
+          >
+            Aceptar selección
+          </button>
+
+        </div>
+
+      } @else {
+
+        <div class="summary-card empty">
+
+          <label>Resumen de programación</label>
+
+          <p>
+            Selecciona un responsable y los viernes
+            que quieras programar. Cada uno cubre
+            de viernes a jueves.
+          </p>
+
+        </div>
+
+      }
+
+      @if (acceptedAssignments.length > 0) {
+
+        <div class="summary-card trace">
+
+          <label>Selecciones aceptadas</label>
+
+          <ul class="week-list">
+
+            @for (
+              assignment of acceptedAssignments;
+              track assignment.id
+            ) {
+
+              <li>
+                {{ assignment.responsable }}
+                ·
+                De
+                {{ assignment.fechaInicio | date:'dd/MM/yyyy' }}
+                a
+                {{ assignment.fechaFin | date:'dd/MM/yyyy' }}
+              </li>
+
+            }
+
+          </ul>
+
+        </div>
+
+      }
+
     </div>
 
     <div class="modal-footer">
 
-      <button class="btn-primary">
+      <button
+        class="btn-primary"
+        [disabled]="!canSave"
+        (click)="save()"
+      >
 
         Guardar
 
@@ -87,3 +184,17 @@
 </div>
 
 }
+
+<app-standby-alert
+  [visible]="showAcceptAlert"
+  title="Selección aceptada"
+  message="Continúa con otros usuarios para programar standby."
+  (closed)="closeAcceptAlert()">
+</app-standby-alert>
+
+<app-standby-alert
+  [visible]="showSaveAlert"
+  title="Guardado exitosamente"
+  message="El standby se guardó correctamente. Ya puedes verlo en el calendario."
+  (closed)="closeSaveAlert()">
+</app-standby-alert>

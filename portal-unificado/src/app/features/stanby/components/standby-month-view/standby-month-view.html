@@ -1,0 +1,155 @@
+<div class="standby-layout">
+
+  <aside class="sidebar">
+
+    <h4>PERSONAS PROGRAMADAS</h4>
+
+    @for (
+      person of monthPeople;
+      track person.responsable
+    ) {
+
+      <div class="assignment-card">
+
+        <div class="assignment-header">
+
+          <span
+            class="color-dot"
+            [style.background]="person.color"
+          ></span>
+
+          <div class="assignment-info">
+
+            <strong>
+              {{ person.responsable }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    }
+
+    @if (monthPeople.length === 0) {
+
+      <p class="empty-list">
+        No hay personas programadas
+        en este mes.
+      </p>
+
+    }
+
+  </aside>
+
+  <section class="calendar-container">
+
+    <div class="calendar-header">
+
+      <h3>
+        {{ monthLabel }}
+      </h3>
+
+      <div class="calendar-header-actions">
+
+        <span class="total-days">
+          Total días: {{ totalDays }}
+        </span>
+
+        <button
+          class="calendar-nav"
+          (click)="previousMonth()"
+        >
+          ‹
+        </button>
+
+        <button
+          class="calendar-nav"
+          (click)="nextMonth()"
+        >
+          ›
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="weekdays">
+
+      @for (
+        day of weekDays;
+        track day
+      ) {
+
+        <div>
+          {{ day }}
+        </div>
+
+      }
+
+    </div>
+
+    <div class="days-grid">
+
+      @for (
+        day of calendarDays;
+        track $index
+      ) {
+
+        @if (day.currentMonth) {
+
+          <div
+            class="calendar-day"
+            [class.has-assignment]="!!day.assignment"
+            [class.is-range-start]="day.isRangeStart"
+            [class.is-range-end]="day.isRangeEnd"
+            [style.background]="
+              day.assignment
+                ? day.assignment.color + '22'
+                : ''
+            "
+            [style.borderColor]="
+              day.assignment
+                ? day.assignment.color
+                : ''
+            "
+          >
+
+            <span class="day-number">
+              {{ day.dayNumber }}
+            </span>
+
+            @if (day.assignment) {
+
+              <div class="tooltip">
+
+                <strong>
+                  {{ day.assignment.responsable }}
+                </strong>
+
+                <small>
+                  {{ day.assignment.fechaInicio | date:'dd/MM/yyyy' }}
+                  →
+                  {{ day.assignment.fechaFin | date:'dd/MM/yyyy' }}
+                </small>
+
+              </div>
+
+            }
+
+          </div>
+
+        } @else {
+
+          <div class="empty-day"></div>
+
+        }
+
+      }
+
+    </div>
+
+  </section>
+
+</div>

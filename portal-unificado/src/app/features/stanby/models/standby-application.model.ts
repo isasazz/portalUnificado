@@ -10,11 +10,7 @@ export interface StandbyApplication {
 
   linea: string;
 
-  descripcion: string;
-
-  estado: string;
-
-  fecha: Date;
+  responsable: string;
 
   selected: boolean;
 

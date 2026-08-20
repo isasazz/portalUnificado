@@ -43,6 +43,8 @@
   display: block;
   margin-top: $space-8;
 
+  font-size: $font-size-md;
+  font-weight: $font-weight-regular;
   color: rgba(255, 255, 255, 0.8);
 }
 
@@ -60,7 +62,7 @@
 
   background: rgba(255, 255, 255, 0.18);
 
-  font-size: 20px;
+  font-size: $font-size-lg;
 }
 
 .tabs {
@@ -83,13 +85,17 @@
 
   background: transparent;
   color: $blanco;
+
+  font-family: $font-family-base;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
 }
 
 .tab.active {
   background: $amarillo-macondo;
   color: $negro-cib;
 
-  font-weight: $font-weight-bold;
+  font-weight: $font-weight-semibold;
 }
 
 .modal-body {
@@ -101,66 +107,58 @@
   flex-direction: column;
   gap: $space-12;
 }
+
 .detalle-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: $space-24;
 }
 
 .detalle-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: $space-8;
 }
 
 .detalle-item label {
-  font-size: 14px;
-  font-weight: 600;
-  color: $text-secondary;
+  @include text-label;
 }
 
 .detalle-item span {
-  font-size: 18px;
+  @include text-value;
 }
 
 .detalle-footer {
   display: flex;
   justify-content: flex-end;
-  margin-top: 24px;
+  margin-top: $space-24;
 }
+
 .contacto-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: $space-24;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: $space-24;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: $space-8;
 }
 
 .field label {
-  font-size: 14px;
-  font-weight: 600;
-  color: $text-secondary;
+  @include text-label;
 }
 
 .field input,
 .field select {
-  height: 48px;
-
-  border: 1px solid $border-color;
-
-  border-radius: $radius-sm;
-
-  padding: 0 16px;
+  @include input-base;
 }
 
 .distribution-card {
@@ -168,7 +166,7 @@
 
   border-radius: $radius-md;
 
-  padding: 16px;
+  padding: $space-16;
 }
 
 .distribution-header {
@@ -180,11 +178,10 @@
 
   color: $blanco;
 
-  font-size: 14px;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
 
-  font-weight: 700;
-
-  margin-bottom: 16px;
+  margin-bottom: $space-16;
 }
 
 .pdn {
@@ -202,12 +199,16 @@
 .distribution-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: $space-24;
 }
 
 .footer-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
 
-  margin-top: 16px;
+  margin-top: $space-16;
+}
+
+.mantenimiento-container {
+  min-height: 320px;
 }

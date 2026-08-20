@@ -43,6 +43,20 @@
   margin-bottom: $space-24;
 }
 
+.selection-actions {
+  display: flex;
+  align-items: center;
+  gap: $space-12;
+}
+
+.btn-secondary {
+  @include button-base;
+
+  background: $blanco;
+  border: 1px solid $border-color;
+  color: $text-primary;
+}
+
 .select-all {
   display: flex;
   align-items: center;

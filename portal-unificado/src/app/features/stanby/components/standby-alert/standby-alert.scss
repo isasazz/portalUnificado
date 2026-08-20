@@ -1,0 +1,82 @@
+@use 'abstracts/colors' as *;
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+.alert-backdrop {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1100;
+}
+
+.alert-container {
+  width: 480px;
+  max-width: 90vw;
+
+  background: $blanco;
+
+  border-radius: $radius-md;
+
+  overflow: hidden;
+}
+
+.alert-header {
+  background: $negro-cib;
+  color: $blanco;
+
+  padding: $space-20 $space-24;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-header h2 {
+  font-size: $font-size-h3;
+}
+
+.close-button {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.18);
+
+  color: $blanco;
+
+  cursor: pointer;
+
+  font-size: $font-size-md;
+}
+
+.alert-body {
+  padding: $space-32 $space-24;
+
+  @include flex-column;
+  align-items: center;
+
+  gap: $space-24;
+
+  text-align: center;
+}
+
+.alert-body p {
+  font-size: $font-size-md;
+  color: $text-primary;
+}
+
+.btn-primary {
+  @include button-base;
+
+  background: $negro-cib;
+  color: $blanco;
+}

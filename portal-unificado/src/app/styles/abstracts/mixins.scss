@@ -87,9 +87,25 @@
 
   cursor: pointer;
 
+  font-family: $font-family-base;
+  font-size: $font-size-md;
   font-weight: $font-weight-semibold;
 
   padding: $space-12 $space-24;
 
   @include transition;
+}
+
+@mixin text-label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@mixin text-value {
+  font-size: $font-size-md;
+  font-weight: $font-weight-regular;
+  color: $text-primary;
 }

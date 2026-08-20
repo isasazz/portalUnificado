@@ -30,7 +30,10 @@
 .menu-item {
   padding: $space-12 $space-16;
   border-radius: $radius-sm;
-  color:white;
+  color: $blanco;
+
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
 
   cursor: pointer;
 }

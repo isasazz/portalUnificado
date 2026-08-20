@@ -3,6 +3,7 @@
   <div class="calendar-header">
 
     <button
+      class="calendar-nav"
       (click)="previousMonth()"
     >
       ‹
@@ -13,6 +14,7 @@
     </h3>
 
     <button
+      class="calendar-nav"
       (click)="nextMonth()"
     >
       ›
@@ -39,19 +41,28 @@
 
     @for (
       day of days;
-      track day.date
+      track $index
     ) {
 
-      <div
-        class="calendar-day"
-        [class.disabled]="!enabled"
-        [class.friday]="day.isFriday"
-        (click)="selectDate(day)"
-      >
+      @if (day.currentMonth) {
 
-        {{ day.dayNumber }}
+        <div
+          class="calendar-day"
+          [class.disabled]="!enabled || !day.isFriday"
+          [class.friday]="day.isFriday && enabled"
+          [class.selected]="isSelected(day)"
+          (click)="selectDate(day)"
+        >
 
-      </div>
+          {{ day.dayNumber }}
+
+        </div>
+
+      } @else {
+
+        <div class="empty-day"></div>
+
+      }
 
     }
 

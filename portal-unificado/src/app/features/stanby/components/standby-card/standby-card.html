@@ -13,34 +13,34 @@
 
   </div>
 
-  <h3>
-    {{ application.nombreAplicacion }}
-  </h3>
+  <div class="card-body">
 
-  <p class="description">
-    Aplicación seleccionable para configuración de standby
-  </p>
+    <h3>
+      {{ application.nombreAplicacion }}
+    </h3>
 
-  <div class="info">
-
-    <span class="label">
-      Responsable asociado
+    <span class="app-code">
+      {{ application.codigoAplicacion }}
     </span>
 
-    <span>
-      Descripción:
-      {{ application.descripcion }}
-    </span>
+    <div class="card-fields">
 
-    <span>
-      Estado:
-      {{ application.estado }}
-    </span>
+      <div class="card-field">
+        <label>EVC</label>
+        <span>{{ application.evc }}</span>
+      </div>
 
-    <span>
-      Fecha:
-      {{ application.fecha | date:'dd/MM/yyyy' }}
-    </span>
+      <div class="card-field">
+        <label>Línea</label>
+        <span>{{ application.linea }}</span>
+      </div>
+
+      <div class="card-field">
+        <label>Responsable</label>
+        <span>{{ application.responsable }}</span>
+      </div>
+
+    </div>
 
   </div>
 

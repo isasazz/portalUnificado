@@ -15,13 +15,20 @@ from '../../components/standby-selection-bar/standby-selection-bar';
 import { StandbyModalComponent }
 from '../../components/standby-modal/standby-modal';
 
+import { StandbyViewModalComponent }
+from '../../components/standby-view-modal/standby-view-modal';
+
+import { StandbyScheduleService }
+from '../../services/standby-schedule.service';
+
 @Component({
   selector: 'app-standby-page',
   standalone: true,
   imports: [
     StandbyCardComponent,
     StandbySelectionBarComponent,
-    StandbyModalComponent
+    StandbyModalComponent,
+    StandbyViewModalComponent
   ],
   templateUrl: './standby-page.html',
   styleUrl: './standby-page.scss'
@@ -32,6 +39,12 @@ export class StandbyPageComponent {
     [...STANDBY_APPLICATIONS];
 
   showStandbyModal = false;
+
+  showViewModal = false;
+
+  constructor(
+    private scheduleService: StandbyScheduleService
+  ) {}
 
   toggleCard(id: number): void {
 
@@ -67,9 +80,19 @@ export class StandbyPageComponent {
 
   }
 
-  openStandbyModal(): void {
+  get canViewStandby(): boolean {
 
-    console.log('ABRIR MODAL');
+    return this.scheduleService.hasSaved;
+
+  }
+
+  get savedAssignments() {
+
+    return this.scheduleService.savedAssignments;
+
+  }
+
+  openStandbyModal(): void {
 
     this.showStandbyModal = true;
 
@@ -77,9 +100,25 @@ export class StandbyPageComponent {
 
   closeStandbyModal(): void {
 
-    console.log('CERRAR MODAL');
+    this.showStandbyModal = false;
+
+  }
+
+  onStandbySaved(): void {
 
     this.showStandbyModal = false;
+
+  }
+
+  openViewModal(): void {
+
+    this.showViewModal = true;
+
+  }
+
+  closeViewModal(): void {
+
+    this.showViewModal = false;
 
   }
 

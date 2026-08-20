@@ -230,4 +230,12 @@ private buildCalendar(): void {
 
   }
 
+  get totalDays(): number {
+
+    return this.calendarDays.filter(
+      day => day.currentMonth
+    ).length;
+
+  }
+
 }

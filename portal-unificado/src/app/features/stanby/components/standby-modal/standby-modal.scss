@@ -25,7 +25,8 @@
 
   border-radius: $radius-md;
 
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 95vh;
 }
 
 .modal-header {
@@ -40,31 +41,41 @@
 }
 
 .close-button {
+  width: 40px;
+  height: 40px;
+
   border: none;
-  background: transparent;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.18);
 
   color: $blanco;
 
   cursor: pointer;
 
-  font-size: 24px;
+  font-size: $font-size-lg;
 }
 
 .modal-content {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 2fr;
 
-  min-height: 550px;
-}
-
-.calendar-section {
-  padding: $space-24;
+  min-height: 420px;
 }
 
 .users-section {
   padding: $space-24;
 
-  border-left: 1px solid $border-color;
+  border-right: 1px solid $border-color;
+}
+
+.users-section h3 {
+  margin-bottom: $space-16;
+}
+
+.calendar-section {
+  padding: $space-24;
 }
 
 .info-message {
@@ -75,16 +86,13 @@
   border-radius: $radius-sm;
 
   margin-bottom: $space-24;
+
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
 }
 
-.calendar-placeholder {
-  height: 400px;
-
-  border: 2px dashed $border-color;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.info-message.success {
+  background: rgba(0, 195, 137, 0.16);
 }
 
 .user-card {
@@ -97,11 +105,84 @@
   margin-bottom: $space-12;
 
   cursor: pointer;
+
+  font-size: $font-size-md;
+
+  @include transition;
+}
+
+.user-card:hover {
+  border-color: $verde-andino;
 }
 
 .user-card.selected {
   background: $verde-andino;
   color: $blanco;
+  border-color: $verde-andino;
+}
+
+.selection-summary {
+  padding: 0 $space-24;
+}
+
+.summary-card {
+  @include card;
+
+  padding: $space-16 $space-24;
+
+  border: 1px solid $border-color;
+}
+
+.summary-card label {
+  @include text-label;
+}
+
+.summary-card p {
+  margin-top: $space-8;
+
+  font-size: $font-size-md;
+  font-weight: $font-weight-regular;
+}
+
+.summary-card small {
+  display: block;
+
+  margin-top: $space-4;
+
+  color: $text-secondary;
+}
+
+.week-list {
+  margin: $space-12 0 0;
+  padding: 0;
+
+  list-style: none;
+
+  @include flex-column;
+  gap: $space-8;
+}
+
+.week-list li {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}
+
+.accept-button {
+  margin-top: $space-16;
+}
+
+.confirmation {
+  margin-top: $space-16;
+}
+
+.trace {
+  margin-top: $space-16;
+}
+
+.summary-card.empty p {
+  font-size: $font-size-md;
+  font-weight: $font-weight-regular;
+  color: $text-secondary;
 }
 
 .modal-footer {
@@ -109,4 +190,16 @@
 
   display: flex;
   justify-content: flex-end;
+}
+
+.btn-primary {
+  @include button-base;
+
+  background: $negro-cib;
+  color: $blanco;
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

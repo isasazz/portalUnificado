@@ -3,11 +3,36 @@
 @use 'abstracts/mixins' as *;
 
 .calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  @include flex-between;
 
   margin-bottom: $space-16;
+}
+
+.calendar-header h3 {
+  text-transform: capitalize;
+}
+
+.calendar-nav {
+  width: 36px;
+  height: 36px;
+
+  border: 1px solid $border-color;
+
+  border-radius: $radius-sm;
+
+  background: $blanco;
+
+  cursor: pointer;
+
+  font-size: $font-size-lg;
+
+  @include flex-center;
+  @include transition;
+}
+
+.calendar-nav:hover {
+  background: $background-body;
+  border-color: $negro-cib;
 }
 
 .weekdays {
@@ -16,7 +41,11 @@
 
   margin-bottom: $space-12;
 
-  font-weight: 600;
+  color: $text-secondary;
+
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  text-align: center;
 }
 
 .days-grid {
@@ -27,29 +56,46 @@
 }
 
 .calendar-day {
-  height: 60px;
+  height: 64px;
 
-  border: 1px solid $border-color;
+  border: 1.5px solid $border-light;
 
-  border-radius: $radius-sm;
+  border-radius: $radius-md;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: $background-body;
+
+  color: $text-disabled;
+
+  @include flex-center;
 }
 
 .calendar-day.disabled {
-  opacity: .35;
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .calendar-day.friday {
   cursor: pointer;
 
+  color: $text-primary;
+
   border: 2px solid $amarillo-macondo;
+
+  background: $blanco;
 
   font-weight: $font-weight-bold;
 }
 
 .calendar-day.friday:hover {
-  background: rgba(253, 218, 36, .20);
+  background: rgba(253, 218, 36, 0.2);
+}
+
+.calendar-day.selected {
+  background: $amarillo-macondo;
+  color: $negro-cib;
+  border-color: $amarillo-macondo;
+}
+
+.empty-day {
+  height: 64px;
 }

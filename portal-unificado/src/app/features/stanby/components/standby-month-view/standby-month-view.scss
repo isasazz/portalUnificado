@@ -15,6 +15,13 @@
   padding: $space-20;
 }
 
+.empty-list {
+  margin-top: $space-16;
+
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
 .assignment-card {
   border: 1px solid $border-color;
 
@@ -54,11 +61,6 @@
 
   border-radius: 50%;
   flex-shrink: 0;
-}
-
-.phone-number {
-  font-size: $font-size-sm;
-  color: $text-secondary;
 }
 
 .calendar-container {

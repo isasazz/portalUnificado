@@ -18,25 +18,24 @@
             [style.background]="assignment.color"
           ></span>
 
-          <strong>
-            {{ assignment.responsable }}
-          </strong></br>
+          <div class="assignment-info">
 
-          <span>
+            <strong>
+              {{ assignment.responsable }}
+            </strong>
 
-            {{ assignment.celular }}
+            <span class="phone-number">
+              {{ assignment.celular }}
+            </span>
 
-          </span>
+          </div>
 
         </div>
 
-        <span>
-        {{ assignment.fechaInicio | date:'dd/MM/yyyy' }}
-        </span>
-
-        <span>
-        →
-        {{ assignment.fechaFin | date:'dd/MM/yyyy' }}
+        <span class="assignment-dates">
+          {{ assignment.fechaInicio | date:'dd/MM/yyyy' }}
+          →
+          {{ assignment.fechaFin | date:'dd/MM/yyyy' }}
         </span>
 
       </div>
@@ -49,30 +48,31 @@
 
     <div class="calendar-header">
 
-      
-       <button
-  class="calendar-nav"
-  (click)="previousMonth()"
->
-  ‹
-        </button>
-
-        <h3>
+      <h3>
         {{ monthLabel }}
-        </h3>
+      </h3>
 
-        <span>
+      <div class="calendar-header-actions">
 
-            Total días: {{ calendarDays.length }}
-            7
-            </span>
+        <span class="total-days">
+          Total días: {{ totalDays }}
+        </span>
 
         <button
-        class="calendar-nav"
-        (click)="nextMonth()"
+          class="calendar-nav"
+          (click)="previousMonth()"
         >
-        ›
+          ‹
         </button>
+
+        <button
+          class="calendar-nav"
+          (click)="nextMonth()"
+        >
+          ›
+        </button>
+
+      </div>
 
     </div>
 
@@ -102,22 +102,23 @@
 
     <div
       class="calendar-day"
+      [class.has-assignment]="!!day.assignment"
+      [class.is-range-start]="day.isRangeStart"
+      [class.is-range-end]="day.isRangeEnd"
       [style.background]="
         day.assignment
-          ? day.assignment.color + '20'
+          ? day.assignment.color + '22'
           : ''
       "
       [style.borderColor]="
         day.assignment
           ? day.assignment.color
-          : '#E5E7EB'
+          : ''
       "
     >
 
-      <span>
-
+      <span class="day-number">
         {{ day.dayNumber }}
-
       </span>
 
       @if (day.assignment) {

@@ -103,10 +103,13 @@ table {
 thead th {
   padding: $space-16;
   text-align: left;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
 }
 
 tbody td {
   padding: $space-16;
+  font-size: $font-size-md;
 }
 
 tbody tr {
@@ -156,5 +159,5 @@ a {
   box-shadow:
     0 0 0 2px #FDDA24;
 
-  font-weight: 700;
+  font-weight: $font-weight-bold;
 }

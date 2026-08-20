@@ -21,14 +21,19 @@ export class ContactoModalComponent {
   activeTab:
     | 'detalle'
     | 'contacto'
-    | 'standby' = 'detalle';
+    | 'standby'
+    | 'mantenimiento' = 'detalle';
 
   close(): void {
     this.closed.emit();
   }
 
   selectTab(
-    tab: 'detalle' | 'contacto' | 'standby'
+    tab:
+      | 'detalle'
+      | 'contacto'
+      | 'standby'
+      | 'mantenimiento'
   ): void {
     this.activeTab = tab;
   }

@@ -1,0 +1,61 @@
+@use 'abstracts/colors' as *;
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1000;
+}
+
+.modal-container {
+  width: 1200px;
+  max-width: 95vw;
+
+  min-height: 700px;
+
+  background: $blanco;
+
+  border-radius: $radius-md;
+
+  overflow: hidden;
+}
+
+.modal-header {
+  background: $negro-cib;
+  color: $blanco;
+
+  padding: $space-24;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-button {
+  width: 40px;
+  height: 40px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.18);
+
+  color: $blanco;
+
+  cursor: pointer;
+
+  font-size: $font-size-lg;
+}
+
+.modal-body {
+  padding: $space-8;
+}
