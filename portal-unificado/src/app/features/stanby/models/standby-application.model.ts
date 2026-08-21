@@ -14,4 +14,6 @@ export interface StandbyApplication {
 
   selected: boolean;
 
+  programmed?: boolean;
+
 }

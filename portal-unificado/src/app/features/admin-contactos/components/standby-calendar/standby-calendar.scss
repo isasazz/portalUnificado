@@ -13,6 +13,8 @@
   border-right: 1px solid $border-color;
 
   padding: $space-20;
+
+  background: $surface;
 }
 
 .assignment-card {
@@ -97,7 +99,7 @@
 
   border-radius: $radius-sm;
 
-  background: $blanco;
+  background: $surface;
 
   cursor: pointer;
 

@@ -28,5 +28,23 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     linea: 'Aplicaciones',
     responsable: 'Dylan Martinez',
     selected: false
+  },
+  {
+    id: 4,
+    codigoAplicacion: 'NU0113004',
+    nombreAplicacion: 'Gestión de Alertas',
+    evc: 'EVC Operaciones',
+    linea: 'Monitoreo',
+    responsable: 'Jahiver Horacio Lopez',
+    selected: false
+  },
+  {
+    id: 5,
+    codigoAplicacion: 'NU0113005',
+    nombreAplicacion: 'Pasarela de Pagos',
+    evc: 'EVC Canales',
+    linea: 'Aplicaciones',
+    responsable: 'Miguel Ángel García',
+    selected: false
   }
 ];

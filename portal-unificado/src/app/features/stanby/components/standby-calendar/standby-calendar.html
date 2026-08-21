@@ -3,6 +3,7 @@
   <div class="calendar-header">
 
     <button
+      type="button"
       class="calendar-nav"
       (click)="previousMonth()"
     >
@@ -14,6 +15,7 @@
     </h3>
 
     <button
+      type="button"
       class="calendar-nav"
       (click)="nextMonth()"
     >
@@ -48,9 +50,16 @@
 
         <div
           class="calendar-day"
-          [class.disabled]="!enabled || !day.isFriday"
-          [class.friday]="day.isFriday && enabled"
-          [class.selected]="isSelected(day)"
+          [class.disabled]="
+            !isOccupied(day) &&
+            (
+              !enabled ||
+              (!day.isFriday && !isInSelectedRange(day))
+            )
+          "
+          [class.friday]="isSelectableFriday(day)"
+          [class.selected]="isInSelectedRange(day) && !isOccupied(day)"
+          [class.occupied]="isOccupied(day)"
           (click)="selectDate(day)"
         >
 

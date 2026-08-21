@@ -20,7 +20,7 @@
 
   border-radius: $radius-sm;
 
-  background: $blanco;
+  background: $surface;
 
   cursor: pointer;
 
@@ -78,25 +78,62 @@
 .calendar-day.friday {
   cursor: pointer;
 
-  color: $violeta-orquidea;
+  color: $text-primary;
 
-  border: 2px solid $violeta-orquidea;
+  border: 1.5px solid $border-color;
 
-  background: rgba(144, 99, 205, 0.08);
+  background: $surface;
 
-  font-weight: $font-weight-bold;
+  font-weight: $font-weight-semibold;
 }
 
 .calendar-day.friday:hover {
-  background: rgba(245, 134, 205, 0.28);
-  border-color: $rosa-flamenco;
-  color: $negro-cib;
+  border-color: $violeta-orquidea;
+  background: rgba(144, 99, 205, 0.06);
 }
 
 .calendar-day.selected {
-  background: $verde-andino;
-  color: $blanco;
-  border-color: $verde-andino;
+  background: rgba(144, 99, 205, 0.18);
+  color: $violeta-orquidea;
+  border: 2px solid $violeta-orquidea;
+  font-weight: $font-weight-bold;
+  opacity: 1;
+  cursor: default;
+}
+
+.calendar-day.selected.friday {
+  cursor: pointer;
+}
+
+.calendar-day.selected:hover {
+  background: rgba(144, 99, 205, 0.24);
+  border-color: $violeta-orquidea;
+  color: $violeta-orquidea;
+}
+
+.calendar-day.occupied {
+  background: $border-light;
+  color: $text-disabled;
+  border: 1.5px solid $border-color;
+  font-weight: $font-weight-medium;
+  opacity: 0.7;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.calendar-day.occupied.friday {
+  cursor: pointer;
+  pointer-events: auto;
+  background: $border-light;
+  color: $text-disabled;
+  border: 1.5px solid $border-color;
+}
+
+.calendar-day.occupied:hover {
+  background: #d8d8d8;
+  color: $text-secondary;
+  border-color: $border-color;
+  opacity: 1;
 }
 
 .empty-day {

@@ -1,99 +1,183 @@
-<div class="standby-page">
+<div
+  class="standby-page"
+  [class.standby-page--panel-open]="showSidePanel"
+>
 
-  <div class="page-header">
+  <div class="standby-main">
 
-    <div class="page-info">
+    <div class="page-header">
 
-      <h1>Cartelera de Standby</h1>
+      <div class="page-info">
+        <h1>Cartelera de Standby</h1>
+        <p>
+          Selecciona aplicaciones y agrégalas al standby
+        </p>
+      </div>
 
-      <p>
-        Administra las programaciones de standby
-      </p>
+      <div class="page-actions">
+
+        @if (hasSelection) {
+          <button
+            type="button"
+            class="btn-add"
+            (click)="addToStandbyPanel()"
+          >
+            Agregar al standby
+          </button>
+        }
+
+      </div>
 
     </div>
 
-  </div>
+    <div class="filters">
 
-  <div class="filters">
+      <select>
+        <option>Todos los EVC</option>
+      </select>
 
-    <select>
-      <option>Todos los EVC</option>
-    </select>
-
-    <select>
-      <option>Todas las líneas</option>
-    </select>
-
-    <input
-      type="text"
-      placeholder="Buscar aplicación"
-    />
-
-  </div>
-
-  <div class="selection-row">
-
-    <div class="select-all">
+      <select>
+        <option>Todas las líneas</option>
+      </select>
 
       <input
-        #selectAll
-        type="checkbox"
-        (change)="toggleSelectAll(selectAll.checked)"
+        type="text"
+        placeholder="Buscar aplicación"
       />
-
-      <span>
-        Seleccionar todos
-      </span>
 
     </div>
 
-    <div class="selection-actions">
+    <div class="select-all-row">
 
-      @if (canViewStandby) {
+      <label class="select-all">
+        <input
+          type="checkbox"
+          [checked]="allSelected"
+          (change)="toggleSelectAll($any($event.target).checked)"
+        />
+        <span>Seleccionar todas</span>
+      </label>
 
-        <button
-          class="btn-secondary"
-          (click)="openViewModal()"
-        >
-          Ver standby
-        </button>
+      @if (hasSelection) {
+        <small>
+          {{ selectedApplications.length }} seleccionada(s)
+        </small>
+      }
+
+    </div>
+
+    <div class="cards-list">
+
+      @for (
+        application of applications;
+        track application.id
+      ) {
+
+        <app-standby-card
+          [application]="application"
+          (selected)="toggleCard($event)"
+          (view)="openViewForApp($event)"
+          (edit)="openEditForApp($event)"
+        />
 
       }
 
-      <app-standby-selection-bar
-        [visible]="hasSelection"
-        (addStandby)="openStandbyModal()">
-      </app-standby-selection-bar>
-
     </div>
 
   </div>
 
-  <div class="cards-grid">
+  @if (showSidePanel) {
 
-    @for (
-      application of applications;
-      track application.id
-    ) {
+    <aside class="standby-panel">
 
-      <app-standby-card
-        [application]="application"
-        (selected)="toggleCard($event)">
-      </app-standby-card>
+      <div class="standby-panel__header">
 
-    }
+        <div>
+          <h2>Agregadas al standby</h2>
+          <p>
+            {{ panelApplications.length }}
+            aplicación(es)
+          </p>
+        </div>
 
-  </div>
+        <button
+          type="button"
+          class="panel-close"
+          (click)="closeSidePanel()"
+          aria-label="Cerrar panel"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      <div class="standby-panel__list">
+
+        @for (
+          app of panelApplications;
+          track app.id
+        ) {
+
+          <div class="panel-item">
+
+            <div class="panel-item__info">
+              <strong>{{ app.codigoAplicacion }}</strong>
+              <span>{{ app.nombreAplicacion }}</span>
+              <small>
+                {{ app.evc }} · {{ app.responsable }}
+              </small>
+            </div>
+
+            <button
+              type="button"
+              class="panel-item__remove"
+              title="Quitar"
+              (click)="removeFromPanel(app.id)"
+            >
+              ✕
+            </button>
+
+          </div>
+
+        }
+
+        @if (panelApplications.length === 0) {
+          <p class="panel-empty">
+            No hay aplicaciones en el panel.
+          </p>
+        }
+
+      </div>
+
+      <div class="standby-panel__footer">
+
+        <button
+          type="button"
+          class="btn-add"
+          [disabled]="panelApplications.length === 0"
+          (click)="openStandbyModal()"
+        >
+          Continuar programación
+        </button>
+
+      </div>
+
+    </aside>
+
+  }
 
   <app-standby-modal
-  [visible]="showStandbyModal"
-  (closed)="closeStandbyModal()">
-</app-standby-modal>
+    [visible]="showStandbyModal"
+    [aplicaciones]="panelApplications"
+    (closed)="closeStandbyModal()"
+    (saved)="onStandbySaved()"
+  />
 
   <app-standby-view-modal
     [visible]="showViewModal"
-    [assignments]="savedAssignments"
-    (closed)="closeViewModal()">
-  </app-standby-view-modal>
+    [assignments]="viewAssignments"
+    [aplicacionCodigo]="viewAppCodigo"
+    (closed)="closeViewModal()"
+  />
 
 </div>

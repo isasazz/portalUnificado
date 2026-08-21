@@ -1,13 +1,49 @@
-// Abstracts
 @use './abstracts/colors';
 @use './abstracts/variables';
 @use './abstracts/mixins';
 
-// Base
 @use './base/reset';
 @use './base/typography';
 
-// Layout
 @use './layout/header';
 @use './layout/sidebar';
 @use './layout/footer';
+
+// ======================================================
+// TEMAS (gris corporativo en oscuro)
+// ======================================================
+
+:root,
+[data-theme='light'] {
+  --bg-body: #f7f8fa;
+  --surface: #ffffff;
+  --text-primary: #2c2a29;
+  --text-secondary: #6b7280;
+  --text-disabled: #a4acb9;
+  --border-color: #e5e7eb;
+  --border-light: #f0f2f5;
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --bg-body: #1f1e1d;
+  --surface: #2c2a29;
+  --text-primary: #f3f2f1;
+  --text-secondary: #b5b1ad;
+  --text-disabled: #8a8580;
+  --border-color: #4a4745;
+  --border-light: #3a3836;
+  color-scheme: dark;
+}
+
+[data-theme='dark'] {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] h1,
+[data-theme='dark'] h2,
+[data-theme='dark'] h3,
+[data-theme='dark'] h4,
+[data-theme='dark'] strong {
+  color: var(--text-primary);
+}

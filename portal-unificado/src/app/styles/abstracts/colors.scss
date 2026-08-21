@@ -2,7 +2,7 @@
 // PALETA CORPORATIVA BANCOLOMBIA
 // ======================================================
 
-// Primarios
+// Primarios (fijos de marca)
 
 $amarillo-macondo: #fdda24;
 $negro-cib: #2c2a29;
@@ -17,29 +17,21 @@ $rosa-flamenco: #f586cd;
 $azul-caribe: #59cbeb;
 
 // ======================================================
-// TEXTO
+// TOKENS SEMÁNTICOS (modo claro / oscuro vía CSS vars)
 // ======================================================
 
-$text-primary: $negro-cib;
-$text-secondary: #6b7280;
-$text-disabled: #a4acb9;
+$surface: var(--surface);
+$background-body: var(--bg-body);
+$background-surface: var(--surface);
+
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-secondary);
+$text-disabled: var(--text-disabled);
 
 $link-color: #0099d8;
 
-// ======================================================
-// FONDOS
-// ======================================================
-
-$background-body: #f7f8fa;
-$background-surface: $blanco;
-$background-sidebar: $negro-cib;
-
-// ======================================================
-// BORDES
-// ======================================================
-
-$border-color: #e5e7eb;
-$border-light: #f0f2f5;
+$border-color: var(--border-color);
+$border-light: var(--border-light);
 
 // ======================================================
 // ESTADOS

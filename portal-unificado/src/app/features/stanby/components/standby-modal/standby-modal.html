@@ -6,9 +6,29 @@
 
     <div class="modal-header">
 
-      <h2>Agregar Standby</h2>
+      <div class="modal-header__info">
+
+        <h2>Agregar Standby</h2>
+
+        @if (aplicaciones.length > 0) {
+
+          <div class="app-codes">
+            @for (
+              app of aplicaciones;
+              track app.codigoAplicacion
+            ) {
+              <span class="app-code-chip">
+                {{ app.codigoAplicacion }}
+              </span>
+            }
+          </div>
+
+        }
+
+      </div>
 
       <button
+        type="button"
         class="close-button"
         (click)="close()"
       >
@@ -23,22 +43,38 @@
 
         <h3>Responsables</h3>
 
-        @for (
-          user of users;
-          track user
-        ) {
+        <input
+          class="user-search"
+          type="text"
+          placeholder="Buscar contacto..."
+          [(ngModel)]="userSearch"
+          name="userSearch"
+        />
 
-          <div
-            class="user-card"
-            [class.selected]="selectedUser === user"
-            (click)="selectUser(user)"
-          >
+        <div class="users-list">
 
-            {{ user }}
+          @for (
+            user of filteredUsers;
+            track user
+          ) {
 
-          </div>
+            <div
+              class="user-card"
+              [class.selected]="selectedUser === user"
+              (click)="selectUser(user)"
+            >
+              {{ user }}
+            </div>
 
-        }
+          }
+
+          @if (filteredUsers.length === 0) {
+            <p class="users-empty">
+              No se encontraron contactos.
+            </p>
+          }
+
+        </div>
 
       </div>
 
@@ -68,7 +104,9 @@
 
         <app-standby-calendar
           [enabled]="!!selectedUser"
-          (selectionChange)="onSelectionChange($event)">
+          [occupiedRanges]="occupiedRanges"
+          (selectionChange)="onSelectionChange($event)"
+          (conflict)="onConflict($event)">
         </app-standby-calendar>
 
       </div>
@@ -109,6 +147,7 @@
           </ul>
 
           <button
+            type="button"
             class="btn-primary accept-button"
             (click)="acceptSelection()"
           >
@@ -133,7 +172,7 @@
 
       }
 
-      @if (acceptedAssignments.length > 0) {
+      @if (groupedAccepted.length > 0) {
 
         <div class="summary-card trace">
 
@@ -142,17 +181,50 @@
           <ul class="week-list">
 
             @for (
-              assignment of acceptedAssignments;
-              track assignment.id
+              group of groupedAccepted;
+              track group.responsable
             ) {
 
-              <li>
-                {{ assignment.responsable }}
-                ·
-                De
-                {{ assignment.fechaInicio | date:'dd/MM/yyyy' }}
-                a
-                {{ assignment.fechaFin | date:'dd/MM/yyyy' }}
+              <li class="trace-item">
+
+                <div class="trace-item__main">
+                  {{ group.responsable }}
+                </div>
+
+                <ul class="trace-weeks">
+                  @for (
+                    week of group.weeks;
+                    track week.start
+                  ) {
+                    <li>
+                      De
+                      {{ week.start | date:'dd/MM/yyyy' }}
+                      a
+                      {{ week.end | date:'dd/MM/yyyy' }}
+                    </li>
+                  }
+                </ul>
+
+                @if (group.aplicaciones.length > 0) {
+
+                  <div class="trace-apps">
+                    <span class="trace-apps__label">
+                      Aplicaciones asociadas
+                    </span>
+                    @for (
+                      app of group.aplicaciones;
+                      track app.codigoAplicacion
+                    ) {
+                      <span class="app-chip">
+                        {{ app.codigoAplicacion }}
+                        ·
+                        {{ app.nombreAplicacion }}
+                      </span>
+                    }
+                  </div>
+
+                }
+
               </li>
 
             }
@@ -168,13 +240,12 @@
     <div class="modal-footer">
 
       <button
+        type="button"
         class="btn-primary"
         [disabled]="!canSave"
         (click)="save()"
       >
-
         Guardar
-
       </button>
 
     </div>
@@ -190,6 +261,13 @@
   title="Selección aceptada"
   message="Continúa con otros usuarios para programar standby."
   (closed)="closeAcceptAlert()">
+</app-standby-alert>
+
+<app-standby-alert
+  [visible]="showConflictAlert"
+  title="Standby ocupado"
+  [message]="conflictMessage"
+  (closed)="closeConflictAlert()">
 </app-standby-alert>
 
 <app-standby-alert

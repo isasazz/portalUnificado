@@ -1,7 +1,67 @@
-<aside class="sidebar">
+<aside
+  class="sidebar"
+  [class.sidebar--collapsed]="collapsed"
+>
 
-  <div class="sidebar__logo">
-    Portal
+  <div class="sidebar__top">
+
+    <button
+      class="hamburger"
+      type="button"
+      (click)="onToggle()"
+      [attr.aria-label]="
+        collapsed
+          ? 'Mostrar menú'
+          : 'Ocultar menú'
+      "
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    @if (!collapsed) {
+      <div class="sidebar__logo">
+        Portal
+      </div>
+    }
+
+    <button
+      type="button"
+      class="theme-toggle"
+      (click)="onToggleTheme()"
+      [attr.aria-label]="
+        isDark
+          ? 'Activar modo claro'
+          : 'Activar modo oscuro'
+      "
+      [title]="
+        isDark
+          ? 'Modo claro'
+          : 'Modo oscuro'
+      "
+    >
+      @if (isDark) {
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" fill="currentColor" />
+          <path
+            d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </svg>
+      } @else {
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+            fill="currentColor"
+          />
+        </svg>
+      }
+    </button>
+
   </div>
 
   <nav class="sidebar__menu">
@@ -10,29 +70,46 @@
       class="menu-item"
       routerLink="/contactos"
       routerLinkActive="active"
+      title="Contactos"
     >
-      Contactos
+      <span class="menu-item__icon">C</span>
+      @if (!collapsed) {
+        <span class="menu-item__label">Contactos</span>
+      }
     </a>
 
     <a
       class="menu-item"
       routerLink="/standby"
       routerLinkActive="active"
+      title="Standby"
     >
-      Standby
+      <span class="menu-item__icon">S</span>
+      @if (!collapsed) {
+        <span class="menu-item__label">Standby</span>
+      }
     </a>
-    
 
     <a
       class="menu-item"
       routerLink="/mantenimiento"
       routerLinkActive="active"
+      title="Ventana de mantenimiento"
     >
-      Ventana 
+      <span class="menu-item__icon">V</span>
+      @if (!collapsed) {
+        <span class="menu-item__label">Ventana</span>
+      }
     </a>
 
-    <a class="menu-item">
-      Alertas
+    <a
+      class="menu-item"
+      title="Alertas"
+    >
+      <span class="menu-item__icon">A</span>
+      @if (!collapsed) {
+        <span class="menu-item__label">Alertas</span>
+      }
     </a>
 
   </nav>
@@ -41,16 +118,19 @@
     class="sidebar__user"
     routerLink="/perfil"
     routerLinkActive="active"
+    title="Mi perfil"
   >
 
     <div class="avatar">
       AM
     </div>
 
-    <div class="user-info">
-      <span>Ana Morales</span>
-      <small>admin@empresa.com</small>
-    </div>
+    @if (!collapsed) {
+      <div class="user-info">
+        <span>Ana Morales</span>
+        <small>admin@empresa.com</small>
+      </div>
+    }
 
   </a>
 

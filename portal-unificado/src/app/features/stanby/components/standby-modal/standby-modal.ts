@@ -6,8 +6,10 @@ import {
   ViewChild
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import {
+  OccupiedRange,
   StandbyCalendarComponent
 } from '../standby-calendar/standby-calendar';
 
@@ -17,13 +19,27 @@ from '../../services/standby-schedule.service';
 import { StandbyAlertComponent }
 from '../standby-alert/standby-alert';
 
+import { StandbyApplication }
+from '../../models/standby-application.model';
+
+import {
+  StandbyAssociatedApp
+} from '../../models/standby-assignment.model';
+
+interface GroupedAcceptance {
+  responsable: string;
+  weeks: { start: Date; end: Date }[];
+  aplicaciones: StandbyAssociatedApp[];
+}
+
 @Component({
   selector: 'app-standby-modal',
   standalone: true,
   imports: [
     StandbyCalendarComponent,
     DatePipe,
-    StandbyAlertComponent
+    StandbyAlertComponent,
+    FormsModule
   ],
   templateUrl: './standby-modal.html',
   styleUrls: ['./standby-modal.scss']
@@ -32,6 +48,9 @@ export class StandbyModalComponent {
 
   @Input()
   visible = false;
+
+  @Input()
+  aplicaciones: StandbyApplication[] = [];
 
   @Output()
   closed = new EventEmitter<void>();
@@ -46,9 +65,15 @@ export class StandbyModalComponent {
 
   selectedFridays: Date[] = [];
 
+  userSearch = '';
+
   showAcceptAlert = false;
 
   showSaveAlert = false;
+
+  showConflictAlert = false;
+
+  conflictMessage = '';
 
   users = [
     'Daniel Lopez Montes',
@@ -62,9 +87,81 @@ export class StandbyModalComponent {
     private scheduleService: StandbyScheduleService
   ) {}
 
+  get filteredUsers(): string[] {
+
+    const term = this.userSearch.trim().toLowerCase();
+
+    if (!term) {
+      return this.users;
+    }
+
+    return this.users.filter(user =>
+      user.toLowerCase().includes(term)
+    );
+
+  }
+
+  get occupiedRanges(): OccupiedRange[] {
+
+    return [
+      ...this.scheduleService.draftAssignments,
+      ...this.scheduleService.savedAssignments
+    ].map(assignment => ({
+      start: assignment.fechaInicio,
+      end: assignment.fechaFin,
+      responsable: assignment.responsable
+    }));
+
+  }
+
+  get groupedAccepted(): GroupedAcceptance[] {
+
+    const map =
+      new Map<string, GroupedAcceptance>();
+
+    this.scheduleService.draftAssignments.forEach(
+      assignment => {
+
+        let group =
+          map.get(assignment.responsable);
+
+        if (!group) {
+
+          group = {
+            responsable: assignment.responsable,
+            weeks: [],
+            aplicaciones:
+              assignment.aplicaciones ?? []
+          };
+
+          map.set(
+            assignment.responsable,
+            group
+          );
+
+        }
+
+        group.weeks.push({
+          start: assignment.fechaInicio,
+          end: assignment.fechaFin
+        });
+
+      }
+    );
+
+    return [...map.values()];
+
+  }
+
   selectUser(user: string): void {
 
+    if (this.selectedUser === user) {
+      return;
+    }
+
     this.selectedUser = user;
+    this.calendar?.clearSelection();
+    this.selectedFridays = [];
 
   }
 
@@ -74,6 +171,21 @@ export class StandbyModalComponent {
       (a, b) =>
         a.getTime() - b.getTime()
     );
+
+  }
+
+  onConflict(message: string): void {
+
+    this.conflictMessage = message;
+    this.showConflictAlert = true;
+    this.showAcceptAlert = false;
+    this.showSaveAlert = false;
+
+  }
+
+  closeConflictAlert(): void {
+
+    this.showConflictAlert = false;
 
   }
 
@@ -96,12 +208,6 @@ export class StandbyModalComponent {
 
       }
     );
-
-  }
-
-  get acceptedAssignments() {
-
-    return this.scheduleService.draftAssignments;
 
   }
 
@@ -128,7 +234,11 @@ export class StandbyModalComponent {
 
     this.scheduleService.acceptWeeks(
       this.selectedUser,
-      this.standbyWeeks
+      this.standbyWeeks,
+      this.aplicaciones.map(app => ({
+        codigoAplicacion: app.codigoAplicacion,
+        nombreAplicacion: app.nombreAplicacion
+      }))
     );
 
     this.calendar?.clearSelection();

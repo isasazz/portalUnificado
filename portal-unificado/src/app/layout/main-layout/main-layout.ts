@@ -12,4 +12,15 @@ import { SidebarComponent } from '../sidebar/sidebar';
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss'
 })
-export class MainLayoutComponent {}
+export class MainLayoutComponent {
+
+  sidebarCollapsed = false;
+
+  toggleSidebar(): void {
+
+    this.sidebarCollapsed =
+      !this.sidebarCollapsed;
+
+  }
+
+}

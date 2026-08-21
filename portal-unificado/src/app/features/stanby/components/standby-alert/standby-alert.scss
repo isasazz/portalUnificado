@@ -6,50 +6,46 @@
   position: fixed;
   inset: 0;
 
-  background: rgba(44, 42, 41, 0.62);
+  background: rgba(44, 42, 41, 0.45);
 
   display: flex;
   justify-content: center;
   align-items: center;
 
-  z-index: 1100;
+  z-index: 2000;
 }
 
 .alert-container {
   width: 480px;
   max-width: 90vw;
 
-  background: $blanco;
+  background: $surface;
 
   border-radius: $radius-md;
+  border: 1px solid $border-light;
 
   overflow: hidden;
 
   box-shadow: $shadow-lg;
 }
 
-.alert-accent {
-  height: 8px;
-  background: $amarillo-macondo;
-}
-
-.alert-success .alert-accent {
-  background: $verde-andino;
-}
-
 .alert-header {
-  background: $negro-cib;
-  color: $blanco;
+  background: $surface;
+  color: $text-primary;
 
   padding: $space-20 $space-24;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  border-bottom: 1px solid $border-light;
 }
 
 .alert-header h2 {
+  margin: 0;
   font-size: $font-size-h3;
+  color: $text-primary;
 }
 
 .close-button {
@@ -60,8 +56,8 @@
 
   border-radius: 50%;
 
-  background: $rosa-flamenco;
-  color: $negro-cib;
+  background: $amarillo-macondo;
+  color: $text-primary;
 
   cursor: pointer;
 
@@ -79,45 +75,26 @@
 
   text-align: center;
 
-  background: $background-body;
-}
-
-.alert-icon {
-  width: 64px;
-  height: 64px;
-
-  border-radius: 50%;
-
-  background: $violeta-orquidea;
-  color: $blanco;
-
-  font-size: $font-size-h2;
-  font-weight: $font-weight-bold;
-
-  @include flex-center;
-}
-
-.alert-success .alert-icon {
-  background: $rosa-flamenco;
-  color: $negro-cib;
+  background: $surface;
 }
 
 .alert-body p {
+  margin: 0;
   font-size: $font-size-md;
   font-weight: $font-weight-medium;
-  color: $negro-cib;
+  color: $text-primary;
 }
 
 .btn-corporate {
   @include button-base;
 
-  background: $amarillo-macondo;
-  color: $negro-cib;
+  background: $verde-andino;
+  color: $blanco;
+  border: 1px solid $verde-andino;
 
   min-width: 160px;
 }
 
 .btn-corporate:hover {
-  background: $violeta-orquidea;
-  color: $blanco;
+  filter: brightness(0.95);
 }

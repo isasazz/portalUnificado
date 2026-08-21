@@ -3,12 +3,22 @@
 @use 'abstracts/mixins' as *;
 
 .standby-page {
+  display: flex;
+  gap: $space-20;
+  align-items: stretch;
+
   padding: $space-32;
+  min-height: calc(100vh - 32px);
+}
+
+.standby-main {
+  flex: 1;
+  min-width: 0;
 }
 
 .page-header {
   @include flex-between;
-
+  gap: $space-16;
   margin-bottom: $space-24;
 }
 
@@ -18,49 +28,241 @@
   gap: $space-8;
 }
 
+.page-info h1 {
+  color: $text-primary;
+}
+
 .page-info p {
   color: $text-secondary;
 }
 
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: $space-12;
+  flex-shrink: 0;
+}
+
 .filters {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1.4fr;
   gap: $space-16;
-
-  margin-bottom: $space-20;
+  margin-bottom: $space-24;
 }
 
 .filters select,
 .filters input {
   @include input-base;
-
   width: 100%;
 }
 
-.selection-row {
+.select-all-row {
   @include flex-between;
-
-  margin-bottom: $space-24;
-}
-
-.selection-actions {
-  display: flex;
-  align-items: center;
-  gap: $space-12;
-}
-
-.btn-secondary {
-  @include button-secondary;
+  margin-bottom: $space-16;
 }
 
 .select-all {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: $space-8;
+
+  font-size: $font-size-sm;
+  color: $text-primary;
+  cursor: pointer;
+  user-select: none;
 }
 
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: $space-20;
+.select-all input {
+  width: 16px;
+  height: 16px;
+  accent-color: $violeta-orquidea;
+  cursor: pointer;
+}
+
+.select-all-row small {
+  color: $text-secondary;
+  font-size: $font-size-sm;
+}
+
+.cards-list {
+  @include flex-column;
+  gap: $space-12;
+}
+
+.btn-outline {
+  @include button-base;
+
+  background: $surface;
+  border: 1px solid $border-color;
+  color: $text-primary;
+}
+
+.btn-add {
+  @include button-base;
+
+  background: $verde-andino;
+  border: 1px solid $verde-andino;
+  color: $blanco;
+}
+
+.btn-add:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-add:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.standby-panel {
+  width: min(360px, 100%);
+  flex-shrink: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  background: $surface;
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+
+  padding: $space-20;
+  max-height: calc(100vh - 64px);
+  position: sticky;
+  top: $space-16;
+}
+
+.standby-panel .btn-add {
+  background: $violeta-orquidea;
+  border-color: $violeta-orquidea;
+  color: $blanco;
+}
+
+.standby-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $space-12;
+
+  padding-bottom: $space-16;
+  border-bottom: 1px solid $border-light;
+  margin-bottom: $space-16;
+}
+
+.standby-panel__header h2 {
+  margin: 0;
+  font-size: $font-size-lg;
+  color: $text-primary;
+}
+
+.standby-panel__header p {
+  margin: $space-4 0 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.panel-close {
+  width: 32px;
+  height: 32px;
+
+  border: none;
+  border-radius: 50%;
+  background: $background-body;
+
+  cursor: pointer;
+  color: $text-primary;
+}
+
+.standby-panel__list {
+  flex: 1;
+  overflow-y: auto;
+
+  @include flex-column;
+  gap: $space-12;
+}
+
+.panel-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-12;
+
+  padding: $space-16;
+
+  border: 1px solid $border-light;
+  border-left: 3px solid $violeta-orquidea;
+  border-radius: $radius-md;
+  background: $background-body;
+}
+
+.panel-item__info {
+  @include flex-column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.panel-item__info strong {
+  color: $violeta-orquidea;
+  font-size: $font-size-sm;
+}
+
+.panel-item__info span {
+  color: $text-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+}
+
+.panel-item__info small {
+  color: $text-secondary;
+  font-size: $font-size-xs;
+}
+
+.panel-item__remove {
+  width: 28px;
+  height: 28px;
+
+  border: none;
+  border-radius: 50%;
+  background: $surface;
+
+  color: $text-secondary;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.panel-item__remove:hover {
+  color: #e11d48;
+}
+
+.panel-empty {
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  text-align: center;
+  padding: $space-24 0;
+}
+
+.standby-panel__footer {
+  padding-top: $space-16;
+  border-top: 1px solid $border-light;
+  margin-top: $space-16;
+}
+
+.standby-panel__footer .btn-add {
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .standby-page {
+    flex-direction: column;
+  }
+
+  .standby-panel {
+    width: 100%;
+    position: static;
+    max-height: none;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
 }

@@ -55,7 +55,7 @@
   @include badge;
 
   background: $amarillo-macondo;
-  color: $negro-cib;
+  color: $text-primary;
 }
 
 .section-badge.purple {
@@ -65,7 +65,7 @@
 
 .section-badge.pink {
   background: $rosa-flamenco;
-  color: $negro-cib;
+  color: $text-primary;
 }
 
 .form-grid {
@@ -167,7 +167,7 @@
   width: 800px;
   max-width: 90vw;
 
-  background: $blanco;
+  background: $surface;
 
   border-radius: $radius-md;
 

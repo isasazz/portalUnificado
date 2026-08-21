@@ -67,9 +67,9 @@
 
   border: 1px solid $border-color;
 
-  border-radius: $radius-sm;
+  border-radius: $radius-pill;
 
-  background: $blanco;
+  background: $surface;
 
   padding: 0 $space-16;
 
@@ -118,7 +118,7 @@
 @mixin button-secondary {
   @include button-base;
 
-  background: $blanco;
+  background: $surface;
   color: $text-primary;
 
   &:hover {

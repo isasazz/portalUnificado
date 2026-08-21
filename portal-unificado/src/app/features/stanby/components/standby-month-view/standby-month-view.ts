@@ -22,9 +22,17 @@ export class StandbyMonthViewComponent implements OnInit, OnChanges {
   @Input()
   showPeopleList = true;
 
+  @Input()
+  outlineMode = false;
+
+  @Input()
+  hideAppChips = false;
+
   currentDate = new Date();
 
   calendarDays: CalendarDay[] = [];
+
+  private didFocusAssignments = false;
 
   readonly weekDays = [
     'Lun',
@@ -38,45 +46,95 @@ export class StandbyMonthViewComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
 
+    this.focusOnAssignments();
     this.buildCalendar();
 
   }
 
   ngOnChanges(): void {
 
+    this.didFocusAssignments = false;
+    this.focusOnAssignments();
     this.buildCalendar();
 
   }
 
   get monthPeople(): {
     responsable: string;
+    celular: string;
     color: string;
+    weeks: { start: Date; end: Date }[];
+    aplicaciones: {
+      codigoAplicacion: string;
+      nombreAplicacion: string;
+    }[];
   }[] {
 
     const people =
-      new Map<string, string>();
+      new Map<
+        string,
+        {
+          color: string;
+          celular: string;
+          weeks: { start: Date; end: Date }[];
+          apps: Map<string, string>;
+        }
+      >();
 
     this.monthAssignments.forEach(
       assignment => {
 
-        if (
-          !people.has(assignment.responsable)
-        ) {
+        let entry =
+          people.get(assignment.responsable);
+
+        if (!entry) {
+
+          entry = {
+            color: assignment.color,
+            celular: assignment.celular,
+            weeks: [],
+            apps: new Map()
+          };
 
           people.set(
             assignment.responsable,
-            assignment.color
+            entry
           );
 
         }
+
+        entry.weeks.push({
+          start: assignment.fechaInicio,
+          end: assignment.fechaFin
+        });
+
+        assignment.aplicaciones?.forEach(app => {
+
+          entry!.apps.set(
+            app.codigoAplicacion,
+            app.nombreAplicacion
+          );
+
+        });
 
       }
     );
 
     return [...people.entries()].map(
-      ([responsable, color]) => ({
+      ([responsable, entry]) => ({
         responsable,
-        color
+        celular: entry.celular,
+        color: entry.color,
+        weeks: entry.weeks.sort(
+          (a, b) =>
+            a.start.getTime() - b.start.getTime()
+        ),
+        aplicaciones: [...entry.apps.entries()].map(
+          ([codigoAplicacion, nombreAplicacion]) => ({
+            codigoAplicacion,
+            nombreAplicacion
+          })
+        )
       })
     );
 
@@ -87,14 +145,21 @@ export class StandbyMonthViewComponent implements OnInit, OnChanges {
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
 
-    const monthStart = new Date(year, month, 1);
-    const monthEnd = new Date(year, month + 1, 0);
+    const monthStart =
+      this.startOfDay(new Date(year, month, 1));
+    const monthEnd =
+      this.startOfDay(new Date(year, month + 1, 0));
 
-    return this.assignments.filter(
-      assignment =>
-        assignment.fechaInicio <= monthEnd &&
-        assignment.fechaFin >= monthStart
-    );
+    return this.assignments.filter(assignment => {
+
+      const start =
+        this.startOfDay(assignment.fechaInicio);
+      const end =
+        this.startOfDay(assignment.fechaFin);
+
+      return start <= monthEnd && end >= monthStart;
+
+    });
 
   }
 
@@ -141,6 +206,33 @@ export class StandbyMonthViewComponent implements OnInit, OnChanges {
     return this.calendarDays.filter(
       day => day.currentMonth
     ).length;
+
+  }
+
+  private focusOnAssignments(): void {
+
+    if (
+      this.didFocusAssignments ||
+      this.assignments.length === 0
+    ) {
+      return;
+    }
+
+    const sorted = [...this.assignments].sort(
+      (a, b) =>
+        a.fechaInicio.getTime() -
+        b.fechaInicio.getTime()
+    );
+
+    const first = sorted[0];
+
+    this.currentDate = new Date(
+      first.fechaInicio.getFullYear(),
+      first.fechaInicio.getMonth(),
+      1
+    );
+
+    this.didFocusAssignments = true;
 
   }
 
@@ -214,11 +306,26 @@ export class StandbyMonthViewComponent implements OnInit, OnChanges {
     date: Date
   ): StandbyAssignment | undefined {
 
+    const dayTime =
+      this.startOfDay(date);
+
     return this.monthAssignments.find(
       assignment =>
-        date >= assignment.fechaInicio &&
-        date <= assignment.fechaFin
+        dayTime >=
+          this.startOfDay(assignment.fechaInicio) &&
+        dayTime <=
+          this.startOfDay(assignment.fechaFin)
     );
+
+  }
+
+  private startOfDay(date: Date): number {
+
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    ).getTime();
 
   }
 

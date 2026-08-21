@@ -2,15 +2,12 @@
 @use '../../../../styles/abstracts/variables' as *;
 @use '../../../../styles/abstracts/mixins' as *;
 
-
-
 .contactos-page {
   padding: $space-32;
 }
 
 .page-header {
   @include flex-between;
-
   margin-bottom: $space-32;
 }
 
@@ -33,48 +30,23 @@
   gap: $space-12;
 }
 
-.btn-secondary {
-  @include button-secondary;
-}
-
 .btn-new-contact {
   @include button-base;
 
-  background: $blanco;
-
-  color: $negro-cib;
-
+  background: $surface;
+  color: $text-primary;
   border: 1px solid $border-color;
 }
 
 .btn-new-contact:hover {
   background: $amarillo-macondo;
-
-  color: $negro-cib;
-
+  color: $text-primary;
   border-color: $amarillo-macondo;
-}
-
-.table-card {
-  background: $background-surface;
-
-  border-radius: $radius-md;
-
-  overflow: hidden;
-
-  box-shadow: $shadow-sm;
-}
-
-.table-card::before {
-  content: '';
-  display: block;
-  @include corporate-strip;
 }
 
 .filters-container {
   display: flex;
   gap: $space-16;
-
   margin-bottom: $space-24;
 }
 
@@ -84,7 +56,6 @@
 
 .search-container input {
   @include input-base;
-
   width: 100%;
 }
 
@@ -94,83 +65,254 @@
 
 .filter-select select {
   @include input-base;
-
   width: 100%;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.contacts-list {
+  @include flex-column;
+  gap: $space-12;
+
+  background: $surface;
+  border-radius: $radius-lg;
+  border: 1px solid $border-light;
+  box-shadow: $shadow-sm;
+  padding: $space-16 $space-20;
 }
 
-.group-header .application-column {
-  background: $table-header-black;
-  color: $blanco;
+.contact-row {
+  display: grid;
+  grid-template-columns:
+    minmax(140px, 1.1fr)
+    minmax(160px, 1.2fr)
+    minmax(180px, 1.4fr)
+    minmax(90px, 0.7fr)
+    minmax(140px, 1fr)
+    auto;
+  gap: $space-16;
+  align-items: center;
+
+  padding: $space-16 $space-12;
+
+  border-radius: $radius-md;
+  background: $surface;
 }
 
-.group-header .production-column {
-  background: $table-header-yellow;
-  color: $negro-cib;
+.contact-row--header {
+  padding: $space-8 $space-12 $space-12;
+
+  border-bottom: 3px solid $amarillo-macondo;
+  border-radius: 0;
+
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-thead th {
-  padding: $space-16;
-  text-align: left;
+.contact-row--header:hover {
+  background: transparent;
+}
+
+.contact-row__actions-header {
+  text-align: right;
+}
+
+.contact-row:hover {
+  background: $background-body;
+}
+
+.contact-row__app,
+.contact-row__person,
+.contact-row__mail,
+.contact-row__schedule,
+.contact-row__meta {
+  @include flex-column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.contact-row strong {
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
-}
-
-tbody td {
-  padding: $space-16;
-  font-size: $font-size-md;
-}
-
-tbody tr {
-  border-bottom: 1px solid $border-light;
-}
-
-tbody tr:last-child {
-  border-bottom: none;
-}
-
-a {
-  color: $link-color;
-  font-weight: $font-weight-semibold;
-}
-
-.badge {
-  @include badge;
-}
-
-.badge-247 {
-  background: $badge-247-bg;
-  color: $badge-247-text;
-}
-
-.badge-personalizado {
-  background: $badge-personalizado-bg;
-  color: $badge-personalizado-text;
-}
-
-.badge-standby {
-  background: $badge-standby-bg;
-  color: $badge-standby-text;
+  color: $text-primary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .application-link {
   color: $link-color;
+  font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
   text-decoration: none;
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .application-link:hover {
   text-decoration: underline;
 }
 
-.today {
-  box-shadow:
-    0 0 0 2px $amarillo-macondo;
+.contact-row small {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  font-weight: $font-weight-bold;
+.contact-row__schedule {
+  align-items: flex-start;
+}
+
+.badge {
+  @include badge;
+  width: fit-content;
+}
+
+.badge-personalizado {
+  background: transparent;
+  color: $text-primary;
+  border: 1.5px solid $link-color;
+  border-radius: $radius-sm;
+}
+
+.contact-row__actions {
+  display: flex;
+  align-items: center;
+  gap: $space-8;
+  justify-content: flex-end;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: $border-light;
+  color: $text-secondary;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  @include transition;
+}
+
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.icon-btn:hover {
+  background: $border-color;
+  color: $text-primary;
+}
+
+.icon-btn--danger {
+  color: #e11d48;
+}
+
+.icon-btn--danger:hover {
+  background: rgba(225, 29, 72, 0.12);
+  color: #be123c;
+}
+
+.empty-list {
+  padding: $space-24;
+  text-align: center;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+}
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-dialog {
+  width: min(420px, 92vw);
+
+  padding: $space-24;
+
+  background: $surface;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+}
+
+.confirm-dialog h3 {
+  margin: 0 0 $space-12;
+  color: $text-primary;
+  font-size: $font-size-lg;
+}
+
+.confirm-dialog p {
+  margin: 0 0 $space-24;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  line-height: 1.5;
+}
+
+.confirm-dialog strong {
+  color: $text-primary;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-12;
+}
+
+.btn-outline {
+  @include button-base;
+
+  background: $surface;
+  border: 1px solid $border-color;
+  color: $text-primary;
+}
+
+.btn-danger {
+  @include button-base;
+
+  background: #e11d48;
+  border: 1px solid #e11d48;
+  color: $blanco;
+}
+
+.btn-danger:hover {
+  filter: brightness(0.95);
+}
+
+@media (max-width: 1100px) {
+  .contact-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .contact-row__actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .filters-container {
+    flex-wrap: wrap;
+  }
+
+  .filter-select {
+    min-width: 0;
+    flex: 1;
+  }
 }

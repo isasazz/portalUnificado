@@ -26,6 +26,9 @@ export class StandbyViewModalComponent {
   @Input()
   assignments: StandbyAssignment[] = [];
 
+  @Input()
+  aplicacionCodigo = '';
+
   @Output()
   closed = new EventEmitter<void>();
 

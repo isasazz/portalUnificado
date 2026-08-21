@@ -78,9 +78,9 @@
 
           <label>Celular</label>
 
-          <input
-            type="text"
-            placeholder="+57 300 000 0000"
+          <app-phone-input
+            [value]="celular"
+            (valueChange)="onCelularChange($event)"
           />
 
         </div>
@@ -132,7 +132,7 @@
 
     </div>
 
-    <<div class="modal-footer">
+    <div class="modal-footer">
 
   <button
     class="btn-secondary"

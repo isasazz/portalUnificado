@@ -6,9 +6,22 @@
 
     <div class="modal-header">
 
-      <h2>Ver Standby</h2>
+      <div class="modal-header__info">
+
+        <h2>Ver Standby</h2>
+
+        @if (aplicacionCodigo) {
+
+          <div class="app-under-title">
+            <span class="app-code">{{ aplicacionCodigo }}</span>
+          </div>
+
+        }
+
+      </div>
 
       <button
+        type="button"
         class="close-button"
         (click)="close()"
       >
@@ -22,6 +35,7 @@
       <app-standby-month-view
         [assignments]="assignments"
         [showPeopleList]="true"
+        [hideAppChips]="true"
       />
 
     </div>

@@ -7,8 +7,101 @@
   min-height: 500px;
 }
 
+.standby-layout--calendar-only {
+  min-height: 0;
+}
+
 .standby-layout--calendar-only .calendar-container {
   padding-left: 0;
+  width: 100%;
+}
+
+.standby-layout--outline .calendar-container {
+  padding: 0;
+}
+
+.standby-layout--outline .calendar-header {
+  margin-bottom: $space-16;
+}
+
+.standby-layout--outline .calendar-header h3 {
+  font-size: $font-size-md;
+}
+
+.standby-layout--outline .total-days {
+  display: none;
+}
+
+.standby-layout--outline .calendar-nav {
+  width: 32px;
+  height: 32px;
+}
+
+.standby-layout--outline .weekdays {
+  margin-bottom: $space-8;
+  font-size: $font-size-xs;
+}
+
+.standby-layout--outline .days-grid {
+  gap: 6px;
+}
+
+.standby-layout--outline .calendar-day {
+  height: 44px;
+  border-radius: $radius-sm;
+  background: $surface;
+  cursor: default;
+}
+
+.standby-layout--outline .empty-day {
+  height: 44px;
+}
+
+.standby-layout--outline .day-number {
+  font-size: $font-size-sm;
+}
+
+.standby-layout--outline .calendar-day:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.standby-layout--outline .calendar-day.has-assignment {
+  background: $surface;
+  border: 2px solid $verde-andino;
+  box-shadow: none;
+}
+
+.standby-layout--outline .calendar-day.has-assignment .day-number {
+  color: $text-primary;
+  font-weight: $font-weight-bold;
+}
+
+.person-apps {
+  @include flex-column;
+  gap: 4px;
+  margin-top: $space-4;
+}
+
+.person-apps__label {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.app-chip {
+  display: inline-flex;
+  width: fit-content;
+
+  padding: 2px 8px;
+
+  border-radius: $radius-sm;
+  border: 1px solid $border-color;
+
+  font-size: $font-size-xs;
+  color: $text-primary;
+  background: $background-body;
 }
 
 .sidebar {
@@ -51,6 +144,11 @@
   @include flex-column;
 
   gap: $space-4;
+}
+
+.phone-number {
+  font-size: $font-size-sm;
+  color: $text-secondary;
 }
 
 .assignment-dates {
@@ -104,7 +202,7 @@
 
   border-radius: $radius-sm;
 
-  background: $blanco;
+  background: $surface;
 
   cursor: pointer;
 
@@ -216,7 +314,7 @@
 
   gap: $space-4;
 
-  z-index: 10;
+  z-index: 20;
 }
 
 .tooltip small {

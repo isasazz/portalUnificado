@@ -4,24 +4,23 @@
 
     <div class="page-info">
       <h1>Administrador de Contactos</h1>
-
-      <p>10 contactos registrados</p>
+      <p>{{ contactos.length }} contactos registrados</p>
     </div>
 
     <div class="page-actions">
 
-
       <button
-  class="btn-new-contact"
-  (click)="openNewContactModal()"
->
-  + Nuevo contacto
-</button>
+        class="btn-new-contact"
+        type="button"
+        (click)="openNewContactModal()"
+      >
+        + Nuevo contacto
+      </button>
 
-    <app-nuevo-contacto-modal
-    [visible]="showNewContactModal"
-    (closed)="closeNewContactModal()">
-  </app-nuevo-contacto-modal>
+      <app-nuevo-contacto-modal
+        [visible]="showNewContactModal"
+        (closed)="closeNewContactModal()"
+      />
 
     </div>
 
@@ -29,157 +28,171 @@
 
   <div class="filters-container">
 
-  <div class="search-container">
-    <input
-      type="text"
-      placeholder="Buscar contacto..."
-    />
+    <div class="search-container">
+      <input
+        type="text"
+        placeholder="Buscar contacto..."
+      />
+    </div>
+
+    <div class="filter-select">
+      <select>
+        <option>Todos los EVC</option>
+      </select>
+    </div>
+
+    <div class="filter-select">
+      <select>
+        <option>Todas las líneas</option>
+      </select>
+    </div>
+
+    <div class="filter-select">
+      <select>
+        <option>Todas las aplicaciones</option>
+      </select>
+    </div>
+
   </div>
 
-  <div class="filter-select">
-    <select>
-      <option>Todos los EVC</option>
-    </select>
+  <div class="contacts-list">
+
+    <div class="contact-row contact-row--header">
+      <div>Aplicación</div>
+      <div>Contacto</div>
+      <div>Correo</div>
+      <div>Horario</div>
+      <div>EVC / Línea</div>
+      <div class="contact-row__actions-header">Acciones</div>
+    </div>
+
+    @for (contacto of contactos; track contacto.id) {
+
+      <div class="contact-row">
+
+        <div class="contact-row__app">
+          <a
+            class="application-link"
+            (click)="openEditModal(contacto)"
+          >
+            {{ contacto.codigoAplicacion }}
+          </a>
+          <small>{{ contacto.nombreAplicacion }}</small>
+        </div>
+
+        <div class="contact-row__person">
+          <strong>{{ contacto.nombre }}</strong>
+          <small>{{ contacto.celular }}</small>
+        </div>
+
+        <div class="contact-row__mail">
+          <strong>{{ contacto.correo }}</strong>
+          <small>Correo</small>
+        </div>
+
+        <div class="contact-row__schedule">
+          @if (contacto.horario === '24/7') {
+            <strong>{{ contacto.horario }}</strong>
+          } @else {
+            <span class="badge badge-personalizado">
+              {{ contacto.horario }}
+            </span>
+          }
+          <small>Horario</small>
+        </div>
+
+        <div class="contact-row__meta">
+          <strong>{{ contacto.evc }}</strong>
+          <small>{{ contacto.linea }}</small>
+        </div>
+
+        <div class="contact-row__actions">
+
+          <button
+            type="button"
+            class="icon-btn"
+            title="Editar"
+            (click)="openEditModal(contacto)"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+              />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            class="icon-btn icon-btn--danger"
+            title="Eliminar"
+            (click)="askDeleteContacto(contacto)"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+              />
+            </svg>
+          </button>
+
+        </div>
+
+      </div>
+
+    }
+
+    @if (contactos.length === 0) {
+      <p class="empty-list">No hay contactos registrados.</p>
+    }
+
   </div>
-
-  <div class="filter-select">
-    <select>
-      <option>Todas las líneas</option>
-    </select>
-  </div>
-
-  <div class="filter-select">
-    <select>
-      <option>Todas las aplicaciones</option>
-    </select>
-  </div>
-
-</div>
-
-<div class="table-card">
-
-  <table>
-
-    <thead>
-
-      <tr class="group-header">
-
-        <th class="application-column">
-          APLICACIÓN
-        </th>
-
-        <th colspan="5" class="production-column">
-          PRODUCCIÓN
-        </th>
-
-      </tr>
-
-      <tr>
-
-        <th>
-          Código / Nombre Aplicación
-        </th>
-
-        <th>
-          Celular
-        </th>
-
-        <th>
-          Nombre
-        </th>
-
-        <th>
-          Correo
-        </th>
-
-        <th>
-          Horario
-        </th>
-
-        
-
-      </tr>
-
-    </thead>
-
-    <tbody>
-
-  <tr>
-
-    <td>
-      <a
-  class="application-link"
-  (click)="openEditModal()"
->
-  NU0113001
-</a>
-    </td>
-
-    <td>
-      +57 310 539 0611
-    </td>
-
-    <td>
-      Daniel Lopez Montes
-    </td>
-
-    <td>
-      dlmontes@bancolombia.com.co
-    </td>
-
-    <td>
-      <span class="badge badge-247">
-        24/7
-      </span>
-    </td>
-
-    
-
-
-
-  </tr>
-
-  <tr>
-
-    <td>
-      <a
-  class="application-link"
-  (click)="openEditModal()"
->
-  NU0113001
-</a>
-    </td>
-
-    <td>
-      +57 320 111 2233
-    </td>
-
-    <td>
-      María Pérez
-    </td>
-
-    <td>
-      mperez@bancolombia.com.co
-    </td>
-
-    <td>
-      <span class="badge badge-247">
-        24/7
-      </span>
-    </td>
-
-    
-
-  </tr>
-
-</tbody>
-
-  </table>
 
   <app-contacto-modal
-  [visible]="showModal"
-  (closed)="closeEditModal()">
-</app-contacto-modal>
+    [visible]="showModal"
+    [contacto]="selectedContacto"
+    [editMode]="true"
+    (closed)="closeEditModal()"
+  />
 
-</div>
+  @if (showDeleteConfirm && contactoToDelete) {
+
+    <div class="confirm-backdrop">
+
+      <div class="confirm-dialog">
+
+        <h3>Eliminar contacto</h3>
+
+        <p>
+          ¿Seguro que deseas eliminar a
+          <strong>{{ contactoToDelete.nombre }}</strong>
+          de
+          <strong>{{ contactoToDelete.codigoAplicacion }}</strong>?
+          Esta acción no se puede deshacer.
+        </p>
+
+        <div class="confirm-dialog__actions">
+
+          <button
+            type="button"
+            class="btn-outline"
+            (click)="cancelDelete()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="btn-danger"
+            (click)="confirmDelete()"
+          >
+            Eliminar
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
 </div>

@@ -19,30 +19,31 @@
   width: 1200px;
   max-width: 95vw;
 
-  min-height: 650px;
+  height: min(780px, 92vh);
 
-  background: $blanco;
+  display: flex;
+  flex-direction: column;
+
+  background: $surface;
 
   border-radius: $radius-md;
 
   overflow: hidden;
-}
-
-.modal-container::before {
-  content: '';
-  display: block;
-  @include corporate-strip;
+  border: 1px solid $border-light;
 }
 
 .modal-header {
-  background: $negro-cib;
-  color: $blanco;
+  background: $surface;
+  color: $text-primary;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   padding: $space-24;
+  flex-shrink: 0;
+
+  border-bottom: 1px solid $border-light;
 }
 
 .codigo-app {
@@ -51,7 +52,7 @@
 
   font-size: $font-size-md;
   font-weight: $font-weight-regular;
-  color: $amarillo-macondo;
+  color: $link-color;
 }
 
 .close-button {
@@ -64,7 +65,7 @@
 
   cursor: pointer;
 
-  color: $negro-cib;
+  color: $text-primary;
 
   background: $amarillo-macondo;
 
@@ -77,7 +78,10 @@
 
   padding: $space-16 $space-24;
 
-  background: $negro-cib;
+  background: $surface;
+  flex-shrink: 0;
+
+  border-bottom: 1px solid $border-light;
 }
 
 .tab {
@@ -90,7 +94,7 @@
   cursor: pointer;
 
   background: transparent;
-  color: $blanco;
+  color: $text-secondary;
 
   font-family: $font-family-base;
   font-size: $font-size-lg;
@@ -99,12 +103,15 @@
 
 .tab.active {
   background: $amarillo-macondo;
-  color: $negro-cib;
+  color: $text-primary;
 
   font-weight: $font-weight-semibold;
 }
 
 .modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   padding: $space-32;
 }
 
@@ -169,6 +176,7 @@
 
 .distribution-card {
   border: 1px solid $border-light;
+  border-left: 3px solid rgba(0, 153, 216, 0.45);
 
   border-radius: $radius-md;
 
@@ -176,30 +184,14 @@
 }
 
 .distribution-header {
-  display: inline-block;
+  display: block;
 
-  padding: 6px 12px;
+  margin: 0 0 $space-16;
 
-  border-radius: $radius-sm;
+  color: $text-primary;
 
-  color: $blanco;
-
-  font-size: $font-size-sm;
+  font-size: $font-size-md;
   font-weight: $font-weight-semibold;
-
-  margin-bottom: $space-16;
-}
-
-.pdn {
-  background: $violeta-orquidea;
-}
-
-.qa {
-  background: $naranja-alba;
-}
-
-.dev {
-  background: $verde-andino;
 }
 
 .footer-actions {
@@ -211,6 +203,38 @@
 
 .btn-primary {
   @include button-primary;
+}
+
+.btn-save {
+  background: $verde-andino;
+  border-color: $verde-andino;
+  color: $blanco;
+}
+
+.btn-save:hover {
+  filter: brightness(0.95);
+}
+
+.field-locked,
+input.field-locked,
+select:disabled {
+  background: $background-body;
+  color: $text-secondary;
+  cursor: not-allowed;
+}
+
+.locked-hint {
+  margin-top: $space-16;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.standby-panel--locked {
+  opacity: 1;
+}
+
+.standby-panel--locked app-standby-calendar {
+  pointer-events: auto;
 }
 
 .btn-secondary {
@@ -240,20 +264,18 @@
   padding: $space-24;
 
   border: 1px solid $border-light;
+  border-left: 3px solid rgba(0, 153, 216, 0.45);
 }
 
-.maintenance-badge {
-  @include badge;
+.maintenance-title {
+  display: block;
 
-  background: $amarillo-macondo;
+  margin: 0 0 $space-16;
 
-  color: $negro-cib;
+  color: $text-primary;
 
-  margin-bottom: $space-16;
-}
-
-.maintenance-badge.history {
-  background: $rosa-flamenco;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
 }
 
 .maintenance-grid {

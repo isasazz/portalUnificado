@@ -1,6 +1,7 @@
 <div
   class="standby-layout"
   [class.standby-layout--calendar-only]="!showPeopleList"
+  [class.standby-layout--outline]="outlineMode"
 >
 
   @if (showPeopleList) {
@@ -28,6 +29,41 @@
             <strong>
               {{ person.responsable }}
             </strong>
+
+            <span class="phone-number">
+              {{ person.celular }}
+            </span>
+
+            @for (
+              week of person.weeks;
+              track $index
+            ) {
+
+              <span class="assignment-dates">
+                {{ week.start | date:'dd/MM/yyyy' }}
+                →
+                {{ week.end | date:'dd/MM/yyyy' }}
+              </span>
+
+            }
+
+            @if (person.aplicaciones.length > 0 && !hideAppChips) {
+
+              <div class="person-apps">
+                <span class="person-apps__label">
+                  Aplicaciones asociadas
+                </span>
+                @for (
+                  app of person.aplicaciones;
+                  track app.codigoAplicacion
+                ) {
+                  <span class="app-chip">
+                    {{ app.codigoAplicacion }}
+                  </span>
+                }
+              </div>
+
+            }
 
           </div>
 
@@ -112,14 +148,14 @@
             [class.is-range-start]="day.isRangeStart"
             [class.is-range-end]="day.isRangeEnd"
             [style.background]="
-              day.assignment
+              !outlineMode && day.assignment
                 ? day.assignment.color + '22'
-                : ''
+                : null
             "
             [style.borderColor]="
-              day.assignment
+              !outlineMode && day.assignment
                 ? day.assignment.color
-                : ''
+                : null
             "
           >
 
@@ -127,13 +163,17 @@
               {{ day.dayNumber }}
             </span>
 
-            @if (day.assignment) {
+            @if (day.assignment && !outlineMode) {
 
               <div class="tooltip">
 
                 <strong>
                   {{ day.assignment.responsable }}
                 </strong>
+
+                <small>
+                  {{ day.assignment.celular }}
+                </small>
 
                 <small>
                   {{ day.assignment.fechaInicio | date:'dd/MM/yyyy' }}

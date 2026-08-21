@@ -1,137 +1,441 @@
 <div class="perfil-page">
 
-  <section class="hero">
+  <div class="page-toolbar">
 
-    <span class="hero__orb hero__orb--rosa"></span>
-    <span class="hero__orb hero__orb--violeta"></span>
+    <h1>Mi perfil</h1>
 
-    <div class="hero__identity">
+    <div class="page-toolbar__actions">
 
-      <div class="hero__avatar">
-        {{ profile.initials }}
-      </div>
+      @if (!editing) {
 
-      <div class="hero__copy">
-
-        <span class="hero__badge">
-          Mi perfil
-        </span>
-
-        <h1>{{ profile.nombre }}</h1>
-
-        <p>{{ profile.cargo }}</p>
-
-      </div>
-
-    </div>
-
-    <div class="hero__meta">
-
-      <div class="meta-chip meta-chip--violeta">
-        <label>Correo</label>
-        <span>{{ profile.correo }}</span>
-      </div>
-
-      <div class="meta-chip meta-chip--rosa">
-        <label>Celular</label>
-        <span>{{ profile.celular }}</span>
-      </div>
-
-    </div>
-
-  </section>
-
-  <section class="stats">
-
-    <article class="stat-card stat-card--azul">
-      <label>EVC</label>
-      <strong>{{ profile.evc }}</strong>
-    </article>
-
-    <article class="stat-card stat-card--violeta">
-      <label>Línea</label>
-      <strong>{{ profile.linea }}</strong>
-    </article>
-
-    <article class="stat-card stat-card--amarillo">
-      <label>Próximo standby</label>
-      @if (nextStandby) {
-        <strong>
-          {{ nextStandby.fechaInicio | date:'dd/MM' }}
-          →
-          {{ nextStandby.fechaFin | date:'dd/MM' }}
-        </strong>
-      } @else {
-        <strong>Sin turnos</strong>
-      }
-    </article>
-
-    <article class="stat-card stat-card--rosa">
-      <label>Turnos programados</label>
-      <strong>{{ myStandby.length }}</strong>
-    </article>
-
-  </section>
-
-  <section class="perfil-grid">
-
-    <div class="upcoming-card">
-
-      <h2>Mis standby</h2>
-
-      <p class="upcoming-card__hint">
-        Cada turno va de viernes a jueves
-      </p>
-
-      @for (
-        assignment of upcomingStandby;
-        track assignment.id
-      ) {
-
-        <div
-          class="week-item"
-          [class.week-item--rosa]="$odd"
+        <button
+          class="btn-primary"
+          type="button"
+          (click)="startEdit()"
         >
+          Editar
+        </button>
 
-          <span class="week-item__dot"></span>
+      } @else {
 
-          <div>
+        <button
+          class="btn-outline"
+          type="button"
+          (click)="cancelEdit()"
+        >
+          Cancelar
+        </button>
 
-            <strong>
-              De
-              {{ assignment.fechaInicio | date:'dd/MM/yyyy' }}
-              a
-              {{ assignment.fechaFin | date:'dd/MM/yyyy' }}
-            </strong>
-
-            <small>Turno asignado a ti</small>
-
-          </div>
-
-        </div>
+        <button
+          class="btn-save"
+          type="button"
+          (click)="saveEdit()"
+        >
+          Guardar
+        </button>
 
       }
 
-      @if (upcomingStandby.length === 0) {
+    </div>
 
-        <p class="empty">
-          Aún no tienes standby programado.
+  </div>
+
+  <section class="top-grid">
+
+    <article class="card identity-card">
+
+      <div class="identity-card__avatar">
+        {{ editing ? draftInitials : profile.initials }}
+      </div>
+
+      @if (editing) {
+
+        <label class="field-label">Nombre</label>
+        <input
+          class="field-input field-input--center"
+          type="text"
+          [(ngModel)]="draft.nombre"
+          name="nombre"
+        />
+
+        <label class="field-label">Celular</label>
+        <input
+          class="field-input field-input--center"
+          type="text"
+          [(ngModel)]="draft.celular"
+          name="celular"
+        />
+
+        <label class="field-label">Correo</label>
+        <input
+          class="field-input field-input--center"
+          type="email"
+          [(ngModel)]="draft.correo"
+          name="correo"
+        />
+
+      } @else {
+
+        <h2>{{ profile.nombre }}</h2>
+
+        <a class="identity-card__phone">
+          {{ profile.celular }}
+        </a>
+
+        <p class="identity-card__email">
+          {{ profile.correo }}
         </p>
 
       }
 
-    </div>
+    </article>
 
-    <div class="calendar-card">
+    <article class="card info-card">
 
-      <h2>Calendario personal</h2>
+      <div class="card__header">
+        <h3>Información general</h3>
+      </div>
+
+      <div class="info-row">
+        <label>Cargo</label>
+        @if (editing) {
+          <input
+            class="field-input"
+            type="text"
+            [(ngModel)]="draft.cargo"
+            name="cargo"
+          />
+        } @else {
+          <span>{{ profile.cargo }}</span>
+        }
+      </div>
+
+      <div class="info-row">
+        <label>Área</label>
+        @if (editing) {
+          <input
+            class="field-input"
+            type="text"
+            [(ngModel)]="draft.area"
+            name="area"
+          />
+        } @else {
+          <span>{{ profile.area }}</span>
+        }
+      </div>
+
+      <div class="info-row">
+        <label>Ubicación</label>
+        @if (editing) {
+          <input
+            class="field-input"
+            type="text"
+            [(ngModel)]="draft.ubicacion"
+            name="ubicacion"
+          />
+        } @else {
+          <span>{{ profile.ubicacion }}</span>
+        }
+      </div>
+
+      <div class="info-row">
+        <label>Fecha de ingreso</label>
+        @if (editing) {
+          <input
+            class="field-input"
+            type="text"
+            [(ngModel)]="draft.fechaIngreso"
+            name="fechaIngreso"
+          />
+        } @else {
+          <span>{{ profile.fechaIngreso }}</span>
+        }
+      </div>
+
+      <div class="info-row info-row--locked">
+        <label>Líder</label>
+        <span>{{ profile.lider }}</span>
+      </div>
+
+    </article>
+
+    <article class="card info-card">
+
+      <div class="card__header">
+        <h3>Datos operativos</h3>
+      </div>
+
+      <div class="info-row info-row--locked">
+        <label>EVC</label>
+        <span>{{ profile.evc }}</span>
+      </div>
+
+      <div class="info-row info-row--locked">
+        <label>Línea</label>
+        <span>{{ profile.linea }}</span>
+      </div>
+
+      <div class="info-row info-row--locked">
+        <label>Próximo standby</label>
+        @if (nextStandby) {
+          <span>
+            {{ nextStandby.fechaInicio | date:'dd/MM/yyyy' }}
+            →
+            {{ nextStandby.fechaFin | date:'dd/MM/yyyy' }}
+          </span>
+        } @else {
+          <span>Sin turnos</span>
+        }
+      </div>
+
+      <div class="info-row info-row--locked">
+        <label>Turnos programados</label>
+        <span>{{ myStandby.length }}</span>
+      </div>
+
+    </article>
+
+  </section>
+
+  <section class="bottom-grid">
+
+    <article class="card activity-card">
+
+      <div class="tabs">
+
+        <button
+          type="button"
+          class="tab"
+          [class.active]="activeTab === 'proximos'"
+          (click)="selectTab('proximos')"
+        >
+          Próximos standby ({{ upcomingStandby.length }})
+        </button>
+
+        <button
+          type="button"
+          class="tab"
+          [class.active]="activeTab === 'historial'"
+          (click)="selectTab('historial')"
+        >
+          Historial ({{ pastStandby.length }})
+        </button>
+
+      </div>
+
+      <div class="activity-body">
+
+        @if (activeTab === 'proximos') {
+
+          <div class="visit-list">
+
+            @for (
+              assignment of pagedUpcoming;
+              track assignment.id
+            ) {
+
+              <div class="visit-row">
+
+                <div class="visit-row__date">
+                  <strong>
+                    {{ assignment.fechaInicio | date:'dd/MM/yyyy' }}
+                  </strong>
+                  <small>
+                    → {{ assignment.fechaFin | date:'dd/MM/yyyy' }}
+                  </small>
+                </div>
+
+                <div class="visit-row__service">
+                  Turno standby
+                </div>
+
+                <div class="visit-row__doctor">
+                  {{ profile.nombre }}
+                </div>
+
+                <span class="status-pill">
+                  Programado
+                </span>
+
+                @if (
+                  assignment.aplicaciones &&
+                  assignment.aplicaciones.length > 0
+                ) {
+
+                  <div class="visit-row__apps">
+                    <span class="visit-row__apps-label">
+                      Aplicaciones asociadas
+                    </span>
+                    @for (
+                      app of assignment.aplicaciones;
+                      track app.codigoAplicacion
+                    ) {
+                      <span class="visit-app-chip">
+                        {{ app.codigoAplicacion }}
+                        ·
+                        {{ app.nombreAplicacion }}
+                      </span>
+                    }
+                  </div>
+
+                }
+
+              </div>
+
+            }
+
+            @if (upcomingStandby.length === 0) {
+              <p class="empty">No hay standby próximos.</p>
+            }
+
+          </div>
+
+          @if (upcomingStandby.length > pageSize) {
+
+            <div class="pager">
+
+              <button
+                type="button"
+                class="pager__btn"
+                [disabled]="proximosPage <= 1"
+                (click)="previousProximosPage()"
+              >
+                ‹
+              </button>
+
+              <span class="pager__label">
+                {{ proximosPage }} / {{ upcomingTotalPages }}
+              </span>
+
+              <button
+                type="button"
+                class="pager__btn"
+                [disabled]="proximosPage >= upcomingTotalPages"
+                (click)="nextProximosPage()"
+              >
+                ›
+              </button>
+
+            </div>
+
+          }
+
+        }
+
+        @if (activeTab === 'historial') {
+
+          <div class="visit-list">
+
+            @for (
+              assignment of pagedPast;
+              track assignment.id
+            ) {
+
+              <div class="visit-row">
+
+                <div class="visit-row__date">
+                  <strong>
+                    {{ assignment.fechaInicio | date:'dd/MM/yyyy' }}
+                  </strong>
+                  <small>
+                    → {{ assignment.fechaFin | date:'dd/MM/yyyy' }}
+                  </small>
+                </div>
+
+                <div class="visit-row__service">
+                  Turno standby
+                </div>
+
+                <div class="visit-row__doctor">
+                  {{ profile.nombre }}
+                </div>
+
+                <span class="status-pill status-pill--muted">
+                  Finalizado
+                </span>
+
+                @if (
+                  assignment.aplicaciones &&
+                  assignment.aplicaciones.length > 0
+                ) {
+
+                  <div class="visit-row__apps">
+                    <span class="visit-row__apps-label">
+                      Aplicaciones asociadas
+                    </span>
+                    @for (
+                      app of assignment.aplicaciones;
+                      track app.codigoAplicacion
+                    ) {
+                      <span class="visit-app-chip">
+                        {{ app.codigoAplicacion }}
+                        ·
+                        {{ app.nombreAplicacion }}
+                      </span>
+                    }
+                  </div>
+
+                }
+
+              </div>
+
+            }
+
+            @if (pastStandby.length === 0) {
+              <p class="empty">Sin historial aún.</p>
+            }
+
+          </div>
+
+          @if (pastStandby.length > pageSize) {
+
+            <div class="pager">
+
+              <button
+                type="button"
+                class="pager__btn"
+                [disabled]="historialPage <= 1"
+                (click)="previousHistorialPage()"
+              >
+                ‹
+              </button>
+
+              <span class="pager__label">
+                {{ historialPage }} / {{ historialTotalPages }}
+              </span>
+
+              <button
+                type="button"
+                class="pager__btn"
+                [disabled]="historialPage >= historialTotalPages"
+                (click)="nextHistorialPage()"
+              >
+                ›
+              </button>
+
+            </div>
+
+          }
+
+        }
+
+      </div>
+
+    </article>
+
+    <article class="card calendar-side-card">
+
+      <div class="card__header">
+        <h3>Mi calendario</h3>
+      </div>
 
       <app-standby-month-view
         [assignments]="myStandby"
         [showPeopleList]="false"
+        [outlineMode]="true"
       />
 
-    </div>
+    </article>
 
   </section>
 

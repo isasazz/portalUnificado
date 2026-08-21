@@ -21,29 +21,58 @@
 
   min-height: 700px;
 
-  background: $blanco;
+  background: $surface;
 
   border-radius: $radius-md;
+  border: 1px solid $border-light;
 
   overflow-y: auto;
   max-height: 95vh;
 }
 
-.modal-container::before {
-  content: '';
-  display: block;
-  @include corporate-strip;
-}
-
 .modal-header {
-  background: $negro-cib;
-  color: $blanco;
+  background: $surface;
+  color: $text-primary;
 
   padding: $space-24;
 
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+
+  border-bottom: 1px solid $border-light;
+}
+
+.modal-header__info {
+  @include flex-column;
+  gap: $space-12;
+  min-width: 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: $text-primary;
+}
+
+.app-codes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-8;
+}
+
+.app-code-chip {
+  display: inline-flex;
   align-items: center;
+
+  padding: 4px 10px;
+
+  border-radius: $radius-pill;
+  border: 1px solid rgba(0, 153, 216, 0.35);
+  background: rgba(0, 153, 216, 0.08);
+
+  color: $link-color;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
 }
 
 .close-button {
@@ -56,11 +85,12 @@
 
   background: $amarillo-macondo;
 
-  color: $negro-cib;
+  color: $text-primary;
 
   cursor: pointer;
 
   font-size: $font-size-lg;
+  flex-shrink: 0;
 }
 
 .modal-content {
@@ -74,10 +104,31 @@
   padding: $space-24;
 
   border-right: 1px solid $border-color;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .users-section h3 {
+  margin-bottom: $space-12;
+}
+
+.user-search {
+  @include input-base;
+  width: 100%;
   margin-bottom: $space-16;
+}
+
+.users-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.users-empty {
+  margin: $space-16 0 0;
+  color: $text-secondary;
+  font-size: $font-size-sm;
 }
 
 .calendar-section {
@@ -85,12 +136,13 @@
 }
 
 .info-message {
-  background: $amarillo-macondo;
-  color: $negro-cib;
+  background: transparent;
+  color: $text-primary;
 
   padding: $space-16;
 
   border-radius: $radius-sm;
+  border: 1.5px solid $amarillo-macondo;
 
   margin-bottom: $space-24;
 
@@ -99,8 +151,9 @@
 }
 
 .info-message.success {
-  background: $verde-andino;
-  color: $blanco;
+  background: transparent;
+  color: $text-primary;
+  border-color: $verde-andino;
 }
 
 .user-card {
@@ -124,27 +177,36 @@
 }
 
 .user-card.selected {
-  background: $amarillo-macondo;
-  color: $negro-cib;
-  border-color: $amarillo-macondo;
+  background: $surface;
+  color: $text-primary;
+  border: 2px solid $amarillo-macondo;
+}
+
+.selection-summary {
+  padding: 0 $space-24 $space-8;
+
+  display: flex;
+  flex-direction: column;
+  gap: $space-16;
+  width: 100%;
 }
 
 .summary-card {
   @include card;
 
+  width: 100%;
+
   padding: $space-16 $space-24;
 
-  border: 1px solid $border-color;
-  border-top: 4px solid $amarillo-macondo;
+  border: 1.5px solid $amarillo-macondo;
+  border-top: 1.5px solid $amarillo-macondo;
+  background: $surface;
 }
 
 .trace {
-  margin-top: $space-16;
+  margin-top: 0;
+  border-color: $violeta-orquidea;
   border-top-color: $violeta-orquidea;
-}
-
-.selection-summary {
-  padding: 0 $space-24;
 }
 
 .summary-card label {
@@ -189,8 +251,68 @@
   margin-top: $space-16;
 }
 
-.trace {
-  margin-top: $space-16;
+.trace-item {
+  @include flex-column;
+  gap: $space-8;
+
+  padding: $space-12;
+
+  border: 1px solid $border-light;
+  border-radius: $radius-sm;
+  background: $background-body;
+}
+
+.trace-item__main {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.trace-weeks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include flex-column;
+  gap: 4px;
+}
+
+.trace-weeks li {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+}
+
+.trace-apps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-8;
+}
+
+.trace-apps__label {
+  width: 100%;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.app-chip {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 4px 8px;
+
+  border-radius: $radius-sm;
+  border: 1px solid $border-color;
+
+  background: $surface;
+
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
 }
 
 .summary-card.empty p {

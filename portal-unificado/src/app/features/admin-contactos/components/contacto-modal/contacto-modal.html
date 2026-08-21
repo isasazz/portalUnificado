@@ -11,13 +11,14 @@
         <h2>Información de Aplicación</h2>
 
         <span class="codigo-app">
-          NU0113001
+          {{ contacto?.codigoAplicacion || '—' }}
         </span>
 
       </div>
 
       <button
         class="close-button"
+        type="button"
         (click)="close()"
       >
         ✕
@@ -28,6 +29,7 @@
     <div class="tabs">
 
       <button
+        type="button"
         class="tab"
         [class.active]="activeTab === 'detalle'"
         (click)="selectTab('detalle')"
@@ -36,6 +38,7 @@
       </button>
 
       <button
+        type="button"
         class="tab"
         [class.active]="activeTab === 'contacto'"
         (click)="selectTab('contacto')"
@@ -44,6 +47,7 @@
       </button>
 
       <button
+        type="button"
         class="tab"
         [class.active]="activeTab === 'standby'"
         (click)="selectTab('standby')"
@@ -52,6 +56,7 @@
       </button>
 
       <button
+        type="button"
         class="tab"
         [class.active]="activeTab === 'mantenimiento'"
         (click)="selectTab('mantenimiento')"
@@ -63,46 +68,45 @@
 
     <div class="modal-body">
 
-      <!-- DETALLE -->
-
       @if (activeTab === 'detalle') {
 
         <div class="detalle-container">
 
           <div class="detalle-item">
             <label>TÍTULO DE APP</label>
-            <span>Núcleo Único</span>
+            <span>{{ contacto?.nombreAplicacion || '—' }}</span>
           </div>
 
           <div class="detalle-item">
             <label>CÓDIGO DE APP</label>
-            <span>NU0113001</span>
+            <span>{{ contacto?.codigoAplicacion || '—' }}</span>
           </div>
 
           <div class="detalle-item">
             <label>EVC</label>
-            <span>EVC Core Bancario</span>
+            <span>{{ contacto?.evc || '—' }}</span>
           </div>
 
           <div class="detalle-item">
             <label>LÍNEA</label>
-            <span>Aplicaciones</span>
+            <span>{{ contacto?.linea || '—' }}</span>
           </div>
 
           <div class="detalle-item">
             <label>RESPONSABLE</label>
-            <span>Daniel Lopez Montes</span>
+            <span>{{ contacto?.nombre || '—' }}</span>
           </div>
 
         </div>
 
       }
 
-      <!-- CONTACTO -->
-
       @if (activeTab === 'contacto') {
 
-        <div class="contacto-container">
+        <div
+          class="contacto-container"
+          [class.contacto-container--readonly]="!canEditContactoTab"
+        >
 
           <div class="form-row">
 
@@ -112,7 +116,9 @@
 
               <input
                 type="text"
-                value="Daniel Lopez Montes"
+                [value]="contacto?.nombre || ''"
+                readonly
+                class="field-locked"
               />
 
             </div>
@@ -121,22 +127,21 @@
 
               <label>CELULAR</label>
 
-              <input
-                type="text"
-                value="+573105390611"
+              <app-phone-input
+                [value]="celular"
+                [disabled]="!canEditContactoTab"
+                (valueChange)="onCelularChange($event)"
               />
 
             </div>
 
           </div>
 
-          <!-- PDN -->
-
           <div class="distribution-card">
 
-            <div class="distribution-header pdn">
+            <h4 class="distribution-header">
               PDN
-            </div>
+            </h4>
 
             <div class="distribution-content">
 
@@ -144,9 +149,9 @@
 
                 <label>LISTA DE DISTRIBUCIÓN</label>
 
-                <select>
+                <select [disabled]="!canEditContactoTab">
                   <option>
-                    dlmontes@bancolombia.com.co
+                    {{ contacto?.correo || '—' }}
                   </option>
                 </select>
 
@@ -158,7 +163,10 @@
 
                 <input
                   type="text"
-                  value="nu0113001@bancolombia.com.co"
+                  [(ngModel)]="correoTeams"
+                  name="correoTeamsPdn"
+                  [readonly]="!canEditContactoTab"
+                  [class.field-locked]="!canEditContactoTab"
                 />
 
               </div>
@@ -167,13 +175,11 @@
 
           </div>
 
-          <!-- QA -->
-
           <div class="distribution-card">
 
-            <div class="distribution-header qa">
+            <h4 class="distribution-header">
               QA
-            </div>
+            </h4>
 
             <div class="distribution-content">
 
@@ -181,9 +187,9 @@
 
                 <label>LISTA DE DISTRIBUCIÓN</label>
 
-                <select>
+                <select [disabled]="!canEditContactoTab">
                   <option>
-                    dlmontes@bancolombia.com.co
+                    {{ contacto?.correo || '—' }}
                   </option>
                 </select>
 
@@ -195,7 +201,9 @@
 
                 <input
                   type="text"
-                  value="nu0113001@bancolombia.com.co"
+                  [value]="correoTeams"
+                  [readonly]="!canEditContactoTab"
+                  [class.field-locked]="!canEditContactoTab"
                 />
 
               </div>
@@ -203,14 +211,12 @@
             </div>
 
           </div>
-
-          <!-- DEV -->
 
           <div class="distribution-card">
 
-            <div class="distribution-header dev">
+            <h4 class="distribution-header">
               DEV
-            </div>
+            </h4>
 
             <div class="distribution-content">
 
@@ -218,9 +224,9 @@
 
                 <label>LISTA DE DISTRIBUCIÓN</label>
 
-                <select>
+                <select [disabled]="!canEditContactoTab">
                   <option>
-                    dlmontes@bancolombia.com.co
+                    {{ contacto?.correo || '—' }}
                   </option>
                 </select>
 
@@ -232,7 +238,9 @@
 
                 <input
                   type="text"
-                  value="nu0113001@bancolombia.com.co"
+                  [value]="correoTeams"
+                  [readonly]="!canEditContactoTab"
+                  [class.field-locked]="!canEditContactoTab"
                 />
 
               </div>
@@ -241,124 +249,159 @@
 
           </div>
 
-          <div class="footer-actions">
+          @if (canEditContactoTab) {
 
-            <button class="btn-primary">
-              Guardar
-            </button>
+            <div class="footer-actions">
 
-          </div>
+              <button
+                type="button"
+                class="btn-primary btn-save"
+                (click)="close()"
+              >
+                Guardar
+              </button>
+
+            </div>
+
+          }
 
         </div>
 
       }
 
-      <!-- STANDBY -->
-
       @if (activeTab === 'standby') {
 
-  <app-standby-calendar />
+        <div
+          class="standby-panel"
+          [class.standby-panel--locked]="editMode"
+        >
 
-  <div class="standby-actions">
+          <app-standby-calendar />
 
-    <button
-      class="btn-standby"
-      (click)="goToStandby()"
-    >
-      Programar Standby
-    </button>
+          @if (!editMode) {
 
-  </div>
+            <div class="standby-actions">
 
-}
+              <button
+                type="button"
+                class="btn-standby"
+                (click)="goToStandby()"
+              >
+                Programar Standby
+              </button>
 
-   @if (activeTab === 'mantenimiento') {
+            </div>
 
-  <div class="mantenimiento-container">
+          } @else {
 
-    <div class="maintenance-section">
+            <p class="locked-hint">
+              Desde edición solo puedes modificar la pestaña Contacto.
+            </p>
 
-      <span class="maintenance-badge">
-        Ventana activa
-      </span>
+          }
 
-      <div class="maintenance-grid">
-
-        <div class="maintenance-item">
-          <label>Estado</label>
-          <span>Programada</span>
         </div>
 
-        <div class="maintenance-item">
-          <label>Frecuencia</label>
-          <span>Semanal</span>
+      }
+
+      @if (activeTab === 'mantenimiento') {
+
+        <div class="mantenimiento-container">
+
+          <div class="maintenance-section">
+
+            <h4 class="maintenance-title">
+              Ventana activa
+            </h4>
+
+            <div class="maintenance-grid">
+
+              <div class="maintenance-item">
+                <label>Estado</label>
+                <span>Programada</span>
+              </div>
+
+              <div class="maintenance-item">
+                <label>Frecuencia</label>
+                <span>Semanal</span>
+              </div>
+
+              <div class="maintenance-item">
+                <label>Fecha inicio</label>
+                <span>20/08/2026 22:00</span>
+              </div>
+
+              <div class="maintenance-item">
+                <label>Fecha fin</label>
+                <span>21/08/2026 02:00</span>
+              </div>
+
+              <div class="maintenance-item">
+                <label>Zona horaria</label>
+                <span>América / Bogotá</span>
+              </div>
+
+              <div class="maintenance-item">
+                <label>Aplicación</label>
+                <span>{{ contacto?.codigoAplicacion || '—' }}</span>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="maintenance-section">
+
+            <h4 class="maintenance-title">
+              Historial
+            </h4>
+
+            <div class="maintenance-history">
+
+              <div class="history-item">
+                <strong>20/08/2026</strong>
+                <span>Ventana programada</span>
+              </div>
+
+              <div class="history-item">
+                <strong>10/07/2026</strong>
+                <span>Ventana ejecutada</span>
+              </div>
+
+              <div class="history-item">
+                <strong>15/06/2026</strong>
+                <span>Ventana ejecutada</span>
+              </div>
+
+            </div>
+
+          </div>
+
+          @if (!editMode) {
+
+            <div class="maintenance-actions">
+
+              <button
+                type="button"
+                class="btn-maintenance"
+                (click)="goToMaintenance()"
+              >
+                Programar ventana
+              </button>
+
+            </div>
+
+          } @else {
+
+            <p class="locked-hint">
+              Desde edición solo puedes modificar la pestaña Contacto.
+            </p>
+
+          }
+
         </div>
 
-        <div class="maintenance-item">
-          <label>Fecha inicio</label>
-          <span>20/08/2026 22:00</span>
-        </div>
-
-        <div class="maintenance-item">
-          <label>Fecha fin</label>
-          <span>21/08/2026 02:00</span>
-        </div>
-
-        <div class="maintenance-item">
-          <label>Zona horaria</label>
-          <span>América / Bogotá</span>
-        </div>
-
-        <div class="maintenance-item">
-          <label>Aplicación</label>
-          <span>NU0113001</span>
-        </div>
-
-      </div>
-
-    </div>
-
-    <div class="maintenance-section">
-
-      <span class="maintenance-badge history">
-        Historial
-      </span>
-
-      <div class="maintenance-history">
-
-        <div class="history-item">
-          <strong>20/08/2026</strong>
-          <span>Ventana programada</span>
-        </div>
-
-        <div class="history-item">
-          <strong>10/07/2026</strong>
-          <span>Ventana ejecutada</span>
-        </div>
-
-        <div class="history-item">
-          <strong>15/06/2026</strong>
-          <span>Ventana ejecutada</span>
-        </div>
-
-      </div>
-
-    </div>
-
-    <div class="maintenance-actions">
-
-      <button
-        class="btn-maintenance"
-        (click)="goToMaintenance()"
-      >
-        Programar ventana
-      </button>
-
-    </div>
-
-  </div>
-
-}
+      }
 
     </div>
 

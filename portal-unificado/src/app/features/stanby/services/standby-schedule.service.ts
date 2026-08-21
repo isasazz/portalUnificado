@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { StandbyAssignment }
-from '../models/standby-assignment.model';
+import {
+  StandbyAssignment,
+  StandbyAssociatedApp
+} from '../models/standby-assignment.model';
+
+import { STANDBY_USER_PHONES }
+from '../mocks/standby-user-phones.mock';
 
 @Injectable({
   providedIn: 'root'
@@ -25,11 +30,16 @@ export class StandbyScheduleService {
 
   acceptWeeks(
     responsable: string,
-    weeks: { start: Date; end: Date }[]
+    weeks: { start: Date; end: Date }[],
+    aplicaciones: StandbyAssociatedApp[] = []
   ): void {
 
     const color =
       this.getColor(responsable);
+
+    const celular =
+      STANDBY_USER_PHONES[responsable] ??
+      '+57 300 000 0000';
 
     weeks.forEach(week => {
 
@@ -38,9 +48,11 @@ export class StandbyScheduleService {
         {
           id: this.nextId++,
           responsable,
+          celular,
           fechaInicio: week.start,
           fechaFin: week.end,
-          color
+          color,
+          aplicaciones: [...aplicaciones]
         }
       ];
 

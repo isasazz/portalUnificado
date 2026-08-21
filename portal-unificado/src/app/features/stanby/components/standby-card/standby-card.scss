@@ -3,128 +3,151 @@
 @use 'abstracts/mixins' as *;
 
 .standby-card {
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-16;
 
-  @include card;
+  padding: $space-20 $space-24;
 
-  padding: $space-24 $space-20 $space-32;
-
-  border: 1px solid $border-color;
+  background: $surface;
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
 
   cursor: pointer;
-
-  min-height: 280px;
-
-  overflow: hidden;
+  text-align: left;
 
   @include transition;
 }
 
-.standby-card::before {
-  content: '';
-
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-
-  @include corporate-strip;
-  height: 6px;
-}
-
 .standby-card:hover {
-  transform: translateY(-4px);
-  box-shadow: $shadow-lg;
-  border-color: $amarillo-macondo;
+  border-color: $border-color;
+  box-shadow: $shadow-sm;
 }
 
 .standby-card.selected {
-  border-color: $amarillo-macondo;
-  background: rgba(253, 218, 36, 0.12);
+  transform: translateY(-4px);
+  border-color: $link-color;
+  box-shadow: 0 10px 28px rgba(0, 153, 216, 0.18);
 }
 
-.standby-card.selected::before {
-  background: $amarillo-macondo;
+.standby-card.programmed {
+  cursor: default;
+  border-color: rgba(144, 99, 205, 0.45);
+  box-shadow: none;
+  transform: none;
 }
 
-.card-check {
-  display: flex;
-  justify-content: flex-end;
+.standby-card.programmed:hover {
+  border-color: $violeta-orquidea;
+  box-shadow: $shadow-sm;
 }
 
-.card-check input {
-  width: 18px;
-  height: 18px;
-}
-
-.card-body {
+.standby-card__main {
   @include flex-column;
-  align-items: center;
-  text-align: center;
-
   gap: $space-8;
-
-  margin-top: $space-8;
+  min-width: 0;
+  flex: 1;
 }
 
-.card-body h3 {
-  font-size: $font-size-h3;
+.standby-card__title-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: $space-12;
 }
 
 .app-code {
-  font-size: 28px;
-
+  font-size: $font-size-md;
   font-weight: $font-weight-bold;
-
-  color: $azul-caribe;
-
-  letter-spacing: 0.04em;
-
-  line-height: 1;
+  color: $link-color;
+  letter-spacing: 0.02em;
 }
 
 .app-name {
+  margin: 0;
   font-size: $font-size-lg;
-
   font-weight: $font-weight-semibold;
-
-  color: $negro-cib;
+  color: $text-primary;
 }
 
-.card-fields {
-  width: 100%;
-
-  @include flex-column;
+.standby-card__meta {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-
-  gap: $space-16;
-
-  margin-top: $space-20;
-}
-
-.card-field {
-  @include flex-column;
-  align-items: center;
-
   gap: $space-4;
+
+  font-size: $font-size-sm;
+  color: $text-secondary;
 }
 
-.card-field:nth-child(1) label {
+.dot {
+  opacity: 0.6;
+}
+
+.standby-card__side {
+  flex-shrink: 0;
+}
+
+.selected-pill {
+  @include badge;
+
+  background: rgba(0, 153, 216, 0.12);
+  color: $link-color;
+  border: 1px solid rgba(0, 153, 216, 0.35);
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: $space-8;
+}
+
+.btn-view {
+  @include button-base;
+
+  padding: $space-8 $space-16;
+  min-height: 36px;
+
+  background: $surface;
+  color: $text-primary;
+  border: 1px solid $border-color;
+
+  font-size: $font-size-sm;
+  white-space: nowrap;
+}
+
+.btn-view:hover {
+  border-color: $violeta-orquidea;
   color: $violeta-orquidea;
 }
 
-.card-field:nth-child(2) label {
-  color: $rosa-flamenco;
+.icon-btn {
+  width: 36px;
+  height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid $border-color;
+  border-radius: $radius-sm;
+
+  background: $surface;
+  color: $text-primary;
+
+  cursor: pointer;
+
+  @include transition;
 }
 
-.card-field:nth-child(3) label {
-  color: $naranja-alba;
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
 }
 
-.card-field label {
-  @include text-label;
-}
-
-.card-field span {
-  @include text-value;
+.icon-btn:hover {
+  border-color: $violeta-orquidea;
+  color: $violeta-orquidea;
 }

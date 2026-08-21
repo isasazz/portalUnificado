@@ -1,49 +1,65 @@
 <div
   class="standby-card"
-  [class.selected]="application.selected"
+  [class.selected]="application.selected && !application.programmed"
+  [class.programmed]="application.programmed"
   (click)="toggleSelection()"
 >
 
-  <div class="card-check">
+  <div class="standby-card__main">
 
-    <input
-      type="checkbox"
-      [checked]="application.selected"
-    >
+    <div class="standby-card__title-row">
+      <strong class="app-code">
+        {{ application.codigoAplicacion }}
+      </strong>
+      <h3 class="app-name">
+        {{ application.nombreAplicacion }}
+      </h3>
+    </div>
+
+    <div class="standby-card__meta">
+      <span>{{ application.evc }}</span>
+      <span class="dot">·</span>
+      <span>{{ application.linea }}</span>
+      <span class="dot">·</span>
+      <span>{{ application.responsable }}</span>
+    </div>
 
   </div>
 
-  <div class="card-body">
-<div class="app-code">
+  <div class="standby-card__side">
 
-  {{ application.codigoAplicacion }}
+    @if (application.programmed) {
 
-</div>
+      <div class="card-actions">
 
-<h3 class="app-name">
+        <button
+          type="button"
+          class="btn-view"
+          (click)="onView($event)"
+        >
+          Ver standby
+        </button>
 
-  {{ application.nombreAplicacion }}
+        <button
+          type="button"
+          class="icon-btn"
+          title="Editar standby"
+          (click)="onEdit($event)"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+            />
+          </svg>
+        </button>
 
-</h3>
-
-    <div class="card-fields">
-
-      <div class="card-field">
-        <label>EVC</label>
-        <span>{{ application.evc }}</span>
       </div>
 
-      <div class="card-field">
-        <label>Línea</label>
-        <span>{{ application.linea }}</span>
-      </div>
+    } @else if (application.selected) {
 
-      <div class="card-field">
-        <label>Responsable</label>
-        <span>{{ application.responsable }}</span>
-      </div>
+      <span class="selected-pill">Seleccionada</span>
 
-    </div>
+    }
 
   </div>
 
