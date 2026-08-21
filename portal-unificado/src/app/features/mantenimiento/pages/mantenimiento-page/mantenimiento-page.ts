@@ -287,22 +287,6 @@ export class MantenimientoPageComponent {
 
   }
 
-  clearListFilters(): void {
-
-    this.listFilterEvc = '';
-    this.listFilterLinea = '';
-    this.listSearchApp = '';
-
-  }
-
-  clearFilters(): void {
-
-    this.filterEvc = '';
-    this.filterLinea = '';
-    this.searchApp = '';
-
-  }
-
   openEditPanel(
     window: MaintenanceWindow,
     event: Event

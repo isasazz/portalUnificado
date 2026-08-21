@@ -266,17 +266,13 @@
 }
 
 .filters-actions {
-  @include flex-between;
+  display: flex;
+  justify-content: flex-end;
 }
 
-.btn-link {
-  border: none;
-  background: transparent;
-  color: $link-color;
-  cursor: pointer;
+.filters-actions small {
+  color: $text-secondary;
   font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
-  padding: 0;
 }
 
 .field {
