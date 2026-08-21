@@ -484,49 +484,84 @@
 
         </div>
 
-        @if (selectedApp) {
+        <div class="summary-card">
 
-          <div class="preview-card">
+          <h3>Resumen</h3>
+          <p class="summary-card__hint">
+            Así quedará la ventana con lo que has diligenciado.
+          </p>
 
-            <h3>Ventana activa</h3>
+          <div class="preview-grid">
 
-            <div class="preview-grid">
+            <div class="preview-item">
+              <label>Aplicación</label>
+              <span>
+                @if (selectedApp) {
+                  {{ selectedApp.codigoAplicacion }}
+                  ·
+                  {{ selectedApp.nombreAplicacion }}
+                } @else {
+                  Sin seleccionar
+                }
+              </span>
+            </div>
 
-              <div class="preview-item">
-                <label>Estado</label>
-                <span>{{ estado }}</span>
-              </div>
+            <div class="preview-item">
+              <label>EVC / Línea</label>
+              <span>
+                @if (selectedApp) {
+                  {{ selectedApp.evc }} · {{ selectedApp.linea }}
+                } @else {
+                  —
+                }
+              </span>
+            </div>
 
-              <div class="preview-item">
-                <label>Frecuencia</label>
-                <span>{{ frecuencia }}</span>
-              </div>
+            <div class="preview-item">
+              <label>Estado</label>
+              <span>{{ estado || '—' }}</span>
+            </div>
 
-              <div class="preview-item">
-                <label>Fecha inicio</label>
-                <span>{{ formatPreview(fechaInicio) }}</span>
-              </div>
+            <div class="preview-item">
+              <label>Frecuencia</label>
+              <span>{{ frecuencia || '—' }}</span>
+            </div>
 
-              <div class="preview-item">
-                <label>Fecha fin</label>
-                <span>{{ formatPreview(fechaFin) }}</span>
-              </div>
+            <div class="preview-item">
+              <label>Fecha inicio</label>
+              <span>
+                {{
+                  fechaInicio
+                    ? formatPreview(fechaInicio)
+                    : '—'
+                }}
+              </span>
+            </div>
 
-              <div class="preview-item">
-                <label>Zona horaria</label>
-                <span>{{ zonaHoraria }}</span>
-              </div>
+            <div class="preview-item">
+              <label>Fecha fin</label>
+              <span>
+                {{
+                  fechaFin
+                    ? formatPreview(fechaFin)
+                    : '—'
+                }}
+              </span>
+            </div>
 
-              <div class="preview-item">
-                <label>Aplicación</label>
-                <span>{{ selectedApp.codigoAplicacion }}</span>
-              </div>
+            <div class="preview-item">
+              <label>Zona horaria</label>
+              <span>{{ zonaHoraria || '—' }}</span>
+            </div>
 
+            <div class="preview-item">
+              <label>Impacto</label>
+              <span>{{ impacto || '—' }}</span>
             </div>
 
           </div>
 
-        }
+        </div>
 
       </div>
 

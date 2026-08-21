@@ -10,8 +10,15 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'contactos',
+        redirectTo: 'inicio',
         pathMatch: 'full'
+      },
+      {
+        path: 'inicio',
+        loadComponent: () =>
+          import(
+            './features/inicio/pages/inicio-page/inicio-page'
+          ).then(m => m.InicioPageComponent)
       },
       {
         path: 'contactos',

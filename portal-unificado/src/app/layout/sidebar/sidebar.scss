@@ -77,6 +77,14 @@
   text-align: left;
   flex: 1;
   min-width: 0;
+
+  text-decoration: none;
+  cursor: pointer;
+  @include transition;
+}
+
+.sidebar__logo:hover {
+  opacity: 0.85;
 }
 
 .theme-toggle {

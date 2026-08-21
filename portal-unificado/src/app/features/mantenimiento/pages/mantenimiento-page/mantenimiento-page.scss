@@ -375,7 +375,8 @@
   padding: $space-16 0;
 }
 
-.preview-card {
+.preview-card,
+.summary-card {
   padding: $space-24;
 
   border: 1px solid $border-color;
@@ -383,9 +384,16 @@
   background: $background-body;
 }
 
-.preview-card h3 {
-  margin-bottom: $space-20;
+.preview-card h3,
+.summary-card h3 {
+  margin: 0 0 $space-8;
   color: $text-primary;
+}
+
+.summary-card__hint {
+  margin: 0 0 $space-20;
+  font-size: $font-size-sm;
+  color: $text-secondary;
 }
 
 .preview-grid {
