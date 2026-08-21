@@ -5,18 +5,12 @@
 
   <div class="standby-main">
 
-    <div class="page-header">
+    @if (hasSelection) {
 
-      <div class="page-info">
-        <h1 class="page-title-tab">Cartelera de Standby</h1>
-        <p>
-          Selecciona aplicaciones y agrégalas al standby
-        </p>
-      </div>
+      <div class="page-header">
 
-      <div class="page-actions">
+        <div class="page-actions">
 
-        @if (hasSelection) {
           <button
             type="button"
             class="btn-add"
@@ -24,11 +18,12 @@
           >
             Agregar al standby
           </button>
-        }
+
+        </div>
 
       </div>
 
-    </div>
+    }
 
     <div class="filters">
 

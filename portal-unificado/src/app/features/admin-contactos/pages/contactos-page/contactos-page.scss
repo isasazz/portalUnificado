@@ -8,22 +8,8 @@
 
 .page-header {
   @include flex-between;
-  margin-bottom: $space-32;
-}
-
-.page-info {
-  display: flex;
-  flex-direction: column;
-  gap: $space-8;
-}
-
-.page-info h1,
-.page-info .page-title-tab {
-  @include page-title-tab;
-}
-
-.page-info p {
-  color: $text-secondary;
+  margin-bottom: $space-24;
+  justify-content: flex-end;
 }
 
 .page-actions {

@@ -20,21 +20,8 @@
   @include flex-between;
   gap: $space-16;
   margin-bottom: $space-24;
-}
-
-.page-info {
-  display: flex;
-  flex-direction: column;
-  gap: $space-8;
-}
-
-.page-info h1,
-.page-info .page-title-tab {
-  @include page-title-tab;
-}
-
-.page-info p {
-  color: $text-secondary;
+  justify-content: flex-end;
+  min-height: 0;
 }
 
 .page-actions {
@@ -86,8 +73,22 @@
 }
 
 .cards-list {
-  @include flex-column;
-  gap: $space-12;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-20;
+  align-items: stretch;
+}
+
+@media (max-width: 1100px) {
+  .cards-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .cards-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 .btn-outline {

@@ -9,11 +9,7 @@
 .page-toolbar {
   @include flex-between;
   margin-bottom: $space-24;
-}
-
-.page-toolbar h1,
-.page-toolbar .page-title-tab {
-  @include page-title-tab;
+  justify-content: flex-end;
 }
 
 .page-toolbar__actions {

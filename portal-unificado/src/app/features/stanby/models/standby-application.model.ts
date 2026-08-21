@@ -6,6 +6,8 @@ export interface StandbyApplication {
 
   nombreAplicacion: string;
 
+  descripcion: string;
+
   evc: string;
 
   linea: string;

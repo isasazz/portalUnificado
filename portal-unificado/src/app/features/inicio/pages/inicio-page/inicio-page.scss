@@ -25,19 +25,13 @@
   margin-bottom: $space-48;
 }
 
-.inicio-hero__brand {
-  margin: 0 0 $space-12;
+.inicio-hero h1 {
+  margin: 0 0 $space-20;
 
-  font-size: $font-size-sm;
+  font-size: $font-size-h1;
   font-weight: $font-weight-bold;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: $amarillo-macondo;
-}
-
-.inicio-hero .page-title-tab {
-  @include page-title-tab;
-  margin-bottom: $space-20;
+  color: $text-primary;
+  line-height: 1.2;
 }
 
 .inicio-hero__lead {
