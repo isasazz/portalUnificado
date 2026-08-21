@@ -40,10 +40,16 @@
   color: var(--text-primary);
 }
 
-[data-theme='dark'] h1,
+[data-theme='dark'] h1:not(.page-title-tab),
 [data-theme='dark'] h2,
 [data-theme='dark'] h3,
 [data-theme='dark'] h4,
 [data-theme='dark'] strong {
   color: var(--text-primary);
+}
+
+/* Tabs activos / títulos de vista: sin forzar negro sobre amarillo */
+.page-title-tab,
+h1.page-title-tab {
+  color: var(--text-primary) !important;
 }

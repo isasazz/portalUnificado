@@ -17,8 +17,9 @@
   gap: $space-8;
 }
 
-.page-info h1 {
-  color: $text-primary;
+.page-info h1,
+.page-info .page-title-tab {
+  @include page-title-tab;
 }
 
 .page-info p {

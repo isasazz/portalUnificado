@@ -1,121 +1,537 @@
-<div class="mantenimiento-page">
+<div
+  class="mantenimiento-page"
+  [class.mantenimiento-page--panel-open]="showEditPanel"
+>
 
-  <div class="page-header">
+  <div class="mantenimiento-main">
 
-    <div class="page-info">
+    <div class="page-header">
 
-      <h1>Ventanas de mantenimiento</h1>
+      <div class="page-info">
 
-      <p>
-        Programa y administra ventanas de mantenimiento
-        para aplicaciones y servicios.
-      </p>
+        <h1 class="page-title-tab">Ventanas de mantenimiento</h1>
 
-    </div>
+        <p>
+          @if (viewMode === 'list') {
+            Ventanas ya programadas para aplicaciones y servicios.
+          } @else {
+            Completa los datos para programar una nueva ventana.
+          }
+        </p>
 
-    <div class="header-actions">
+      </div>
 
-      <button
-        class="btn-secondary"
-        (click)="openWindowsModal()"
-      >
-        Ver ventanas
-      </button>
+      <div class="header-actions">
 
-      <button
-        class="btn-save"
-        (click)="saveMaintenanceWindow()"
-      >
-        Guardar ventana
-      </button>
-
-    </div>
-
-  </div>
-
-  <div class="maintenance-form">
-
-    <!-- Aquí dejas TODO tu formulario actual -->
-    <!-- Programación -->
-    <!-- Alcance -->
-    <!-- Impacto -->
-
-  </div>
-
-  @if (showWindowsModal) {
-
-    <div class="modal-backdrop">
-
-      <div class="modal-container">
-
-        <div class="modal-header-popup">
-
-          <h2>
-            Ventanas programadas
-          </h2>
+        @if (viewMode === 'list') {
 
           <button
-            class="btn-secondary"
-            (click)="closeWindowsModal()"
+            type="button"
+            class="btn-save"
+            (click)="openForm()"
           >
-            Cerrar
+            Agregar ventana
           </button>
 
-        </div>
+        } @else {
 
-        <div class="modal-body-popup">
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="cancelForm()"
+          >
+            Cancelar
+          </button>
 
-          @if (maintenanceWindows.length === 0) {
+          <button
+            type="button"
+            class="btn-save"
+            [disabled]="!canSave"
+            (click)="saveMaintenanceWindow()"
+          >
+            Guardar ventana
+          </button>
 
-            <div class="empty-windows">
-
-              No hay ventanas registradas.
-
-            </div>
-
-          }
-
-          @for (
-            window of maintenanceWindows;
-            track window.id
-          ) {
-
-            <div class="window-card">
-
-              <div class="window-info">
-
-                <strong>
-                  {{ window.aplicacion }}
-                </strong>
-
-                <span>
-                  {{ window.frecuencia }}
-                </span>
-
-                <span>
-                  {{ window.fechaInicio }}
-                  →
-                  {{ window.fechaFin }}
-                </span>
-
-              </div>
-
-              <div class="window-status">
-
-                {{ window.estado }}
-
-              </div>
-
-            </div>
-
-          }
-
-        </div>
+        }
 
       </div>
 
     </div>
 
-  }
+    @if (viewMode === 'list') {
+
+      <div class="list-filters">
+
+        <div class="filters-grid">
+
+          <select [(ngModel)]="listFilterEvc">
+            <option value="">Todos los EVC</option>
+            @for (evc of listEvcOptions; track evc) {
+              <option [value]="evc">{{ evc }}</option>
+            }
+          </select>
+
+          <select [(ngModel)]="listFilterLinea">
+            <option value="">Todas las líneas</option>
+            @for (linea of listLineaOptions; track linea) {
+              <option [value]="linea">{{ linea }}</option>
+            }
+          </select>
+
+          <input
+            type="text"
+            placeholder="Buscar aplicación (código o nombre)"
+            [(ngModel)]="listSearchApp"
+          />
+
+        </div>
+
+        <div class="filters-actions">
+          <button
+            type="button"
+            class="btn-link"
+            (click)="clearListFilters()"
+          >
+            Limpiar filtros
+          </button>
+          <small>
+            {{ filteredWindows.length }} ventana(s)
+          </small>
+        </div>
+
+      </div>
+
+      @if (filteredWindows.length === 0) {
+
+        <div class="empty-list">
+          <p>
+            @if (maintenanceWindows.length === 0) {
+              No hay ventanas programadas.
+            } @else {
+              No hay ventanas con esos filtros.
+            }
+          </p>
+          @if (maintenanceWindows.length === 0) {
+            <button
+              type="button"
+              class="btn-save"
+              (click)="openForm()"
+            >
+              Agregar ventana
+            </button>
+          }
+        </div>
+
+      } @else {
+
+        <div class="list-content">
+
+          <div class="windows-grid">
+
+            @for (
+              window of filteredWindows;
+              track window.id
+            ) {
+
+              <article
+                class="window-tile"
+                [class.window-tile--editing]="
+                  showEditPanel &&
+                  editingWindow?.id === window.id
+                "
+              >
+
+                <div class="window-tile__top">
+
+                  <span
+                    class="status-pill"
+                    [ngClass]="statusClass(window.estado)"
+                  >
+                    {{ window.estado }}
+                  </span>
+
+                  <div class="window-tile__actions">
+
+                    <span class="window-tile__freq">
+                      {{ window.frecuencia }}
+                    </span>
+
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      title="Editar ventana"
+                      (click)="openEditPanel(window, $event)"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        />
+                      </svg>
+                    </button>
+
+                  </div>
+
+                </div>
+
+                <div class="window-tile__body">
+
+                  <span class="window-tile__code">
+                    {{ window.aplicacion }}
+                  </span>
+
+                  <h3 class="window-tile__name">
+                    {{ window.nombreAplicacion }}
+                  </h3>
+
+                  <p class="window-tile__meta">
+                    {{ window.evc }} · {{ window.linea }}
+                  </p>
+
+                  <p class="window-tile__impact">
+                    {{ window.impacto }}
+                  </p>
+
+                </div>
+
+                <div class="window-tile__footer">
+
+                  <div class="window-tile__dates">
+                    <span>{{ window.fechaInicio }}</span>
+                    <span class="arrow">→</span>
+                    <span>{{ window.fechaFin }}</span>
+                  </div>
+
+                  <span class="window-tile__zone">
+                    {{ window.zonaHoraria }}
+                  </span>
+
+                </div>
+
+              </article>
+
+            }
+
+          </div>
+
+          @if (showEditPanel && editingWindow) {
+
+            <aside class="edit-panel">
+
+              <div class="edit-panel__header">
+
+                <div>
+                  <h2>Editar ventana</h2>
+                  <p>
+                    {{ editAplicacion }} · {{ editNombreAplicacion }}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  class="panel-close"
+                  (click)="closeEditPanel()"
+                  aria-label="Cerrar panel"
+                >
+                  ✕
+                </button>
+
+              </div>
+
+              <div class="edit-panel__body">
+
+                <div class="field">
+                  <label>Estado</label>
+                  <select [(ngModel)]="editEstado">
+                    <option>Programada</option>
+                    <option>En ejecución</option>
+                    <option>Finalizada</option>
+                    <option>Cancelada</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label>Frecuencia</label>
+                  <select [(ngModel)]="editFrecuencia">
+                    <option>Una vez</option>
+                    <option>Diaria</option>
+                    <option>Semanal</option>
+                    <option>Mensual</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label>Fecha inicio</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editFechaInicio"
+                    placeholder="dd/MM/yyyy HH:mm"
+                  />
+                </div>
+
+                <div class="field">
+                  <label>Fecha fin</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editFechaFin"
+                    placeholder="dd/MM/yyyy HH:mm"
+                  />
+                </div>
+
+                <div class="field">
+                  <label>Zona horaria</label>
+                  <select [(ngModel)]="editZonaHoraria">
+                    <option>América / Bogotá</option>
+                    <option>América / Lima</option>
+                    <option>UTC</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label>Aplicación</label>
+                  <input
+                    type="text"
+                    [value]="editAplicacion"
+                    readonly
+                  />
+                </div>
+
+                <div class="field">
+                  <label>Impacto</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editImpacto"
+                  />
+                </div>
+
+              </div>
+
+              <div class="edit-panel__footer">
+
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="closeEditPanel()"
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-save"
+                  [disabled]="!canSaveEdit"
+                  (click)="saveEdit()"
+                >
+                  Guardar cambios
+                </button>
+
+              </div>
+
+            </aside>
+
+          }
+
+        </div>
+
+      }
+
+    } @else {
+
+      <div class="maintenance-form">
+
+        <div class="filters-grid">
+
+          <select [(ngModel)]="filterEvc">
+            <option value="">Todos los EVC</option>
+            @for (evc of evcOptions; track evc) {
+              <option [value]="evc">{{ evc }}</option>
+            }
+          </select>
+
+          <select [(ngModel)]="filterLinea">
+            <option value="">Todas las líneas</option>
+            @for (linea of lineaOptions; track linea) {
+              <option [value]="linea">{{ linea }}</option>
+            }
+          </select>
+
+          <input
+            type="text"
+            placeholder="Buscar aplicación (código o nombre)"
+            [(ngModel)]="searchApp"
+          />
+
+        </div>
+
+        <div class="filters-actions">
+          <button
+            type="button"
+            class="btn-link"
+            (click)="clearFilters()"
+          >
+            Limpiar filtros
+          </button>
+          <small>
+            {{ filteredApplications.length }} aplicación(es)
+          </small>
+        </div>
+
+        <div class="apps-list">
+
+          @for (
+            app of filteredApplications;
+            track app.id
+          ) {
+
+            <button
+              type="button"
+              class="app-row"
+              [class.app-row--selected]="
+                selectedApp?.id === app.id
+              "
+              (click)="selectApp(app)"
+            >
+
+              <div class="app-row__main">
+                <strong>{{ app.codigoAplicacion }}</strong>
+                <span>{{ app.nombreAplicacion }}</span>
+              </div>
+
+              <div class="app-row__meta">
+                {{ app.evc }} · {{ app.linea }}
+              </div>
+
+            </button>
+
+          }
+
+          @if (filteredApplications.length === 0) {
+            <p class="empty-apps">
+              No hay aplicaciones con esos filtros.
+            </p>
+          }
+
+        </div>
+
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Estado</label>
+            <select [(ngModel)]="estado">
+              <option>Programada</option>
+              <option>En ejecución</option>
+              <option>Finalizada</option>
+              <option>Cancelada</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Frecuencia</label>
+            <select [(ngModel)]="frecuencia">
+              <option>Una vez</option>
+              <option>Diaria</option>
+              <option>Semanal</option>
+              <option>Mensual</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Fecha inicio</label>
+            <input
+              type="datetime-local"
+              [(ngModel)]="fechaInicio"
+            />
+          </div>
+
+          <div class="field">
+            <label>Fecha fin</label>
+            <input
+              type="datetime-local"
+              [(ngModel)]="fechaFin"
+            />
+          </div>
+
+          <div class="field">
+            <label>Zona horaria</label>
+            <select [(ngModel)]="zonaHoraria">
+              <option>América / Bogotá</option>
+              <option>América / Lima</option>
+              <option>UTC</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Aplicación</label>
+            <input
+              type="text"
+              [value]="
+                selectedApp
+                  ? selectedApp.codigoAplicacion
+                  : ''
+              "
+              placeholder="Selecciona una app arriba"
+              readonly
+            />
+          </div>
+
+          <div class="field field--full">
+            <label>Impacto</label>
+            <input
+              type="text"
+              [(ngModel)]="impacto"
+              placeholder="Describe el impacto esperado"
+            />
+          </div>
+
+        </div>
+
+        @if (selectedApp) {
+
+          <div class="preview-card">
+
+            <h3>Ventana activa</h3>
+
+            <div class="preview-grid">
+
+              <div class="preview-item">
+                <label>Estado</label>
+                <span>{{ estado }}</span>
+              </div>
+
+              <div class="preview-item">
+                <label>Frecuencia</label>
+                <span>{{ frecuencia }}</span>
+              </div>
+
+              <div class="preview-item">
+                <label>Fecha inicio</label>
+                <span>{{ formatPreview(fechaInicio) }}</span>
+              </div>
+
+              <div class="preview-item">
+                <label>Fecha fin</label>
+                <span>{{ formatPreview(fechaFin) }}</span>
+              </div>
+
+              <div class="preview-item">
+                <label>Zona horaria</label>
+                <span>{{ zonaHoraria }}</span>
+              </div>
+
+              <div class="preview-item">
+                <label>Aplicación</label>
+                <span>{{ selectedApp.codigoAplicacion }}</span>
+              </div>
+
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+    }
+
+  </div>
 
 </div>

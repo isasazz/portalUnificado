@@ -74,22 +74,22 @@
 
 .tabs {
   display: flex;
-  gap: $space-12;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $space-8;
 
   padding: $space-16 $space-24;
 
-  background: $surface;
+  background: $background-body;
   flex-shrink: 0;
 
   border-bottom: 1px solid $border-light;
 }
 
 .tab {
-  border: none;
+  border: 2px solid transparent;
 
-  padding: $space-12 $space-24;
-
-  border-radius: $radius-pill;
+  padding: $space-12 $space-20;
 
   cursor: pointer;
 
@@ -97,15 +97,30 @@
   color: $text-secondary;
 
   font-family: $font-family-base;
-  font-size: $font-size-lg;
+  font-size: $font-size-md;
   font-weight: $font-weight-medium;
+
+  border-radius: $radius-pill;
+
+  @include transition;
+}
+
+.tab:hover {
+  color: $text-primary;
+  background: rgba(253, 218, 36, 0.18);
 }
 
 .tab.active {
-  background: $amarillo-macondo;
-  color: $text-primary;
+  background: $surface;
+  color: $text-primary !important;
+  font-weight: $font-weight-bold;
+  border: 2px solid $amarillo-macondo;
+}
 
-  font-weight: $font-weight-semibold;
+.tab.active:hover {
+  background: $surface;
+  color: $text-primary !important;
+  border-color: $amarillo-macondo;
 }
 
 .modal-body {
@@ -113,6 +128,7 @@
   min-height: 0;
   overflow-y: auto;
   padding: $space-32;
+  background: $surface;
 }
 
 .placeholder {
