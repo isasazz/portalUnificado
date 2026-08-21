@@ -166,15 +166,26 @@
   font-weight: $font-weight-semibold;
 }
 
-.menu-item.active .menu-item__icon {
+.menu-item__icon {
+  width: 24px;
+  height: 24px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
   color: $amarillo-macondo;
 }
 
-.menu-item__icon {
-  width: 24px;
-  text-align: center;
-  font-weight: $font-weight-bold;
-  flex-shrink: 0;
+.menu-item__icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.menu-item.active .menu-item__icon {
+  color: $amarillo-macondo;
 }
 
 .sidebar__user {
