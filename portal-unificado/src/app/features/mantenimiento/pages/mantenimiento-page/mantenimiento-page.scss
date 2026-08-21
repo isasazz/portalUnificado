@@ -30,6 +30,76 @@
   margin-bottom: $space-24;
 }
 
+.list-title {
+  position: relative;
+  margin: 0 auto $space-24;
+  padding-bottom: $space-16;
+  width: fit-content;
+
+  text-align: center;
+  font-size: $font-size-h2;
+  font-weight: $font-weight-bold;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: $text-primary;
+}
+
+.list-title::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 4px;
+  margin: $space-12 auto 0;
+
+  background: $amarillo-macondo;
+  border-radius: $radius-pill;
+}
+
+.list-filters .filters-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-16;
+}
+
+.estado-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $space-12;
+  margin-top: $space-16;
+}
+
+.estado-chip {
+  @include button-base;
+
+  padding: $space-8 $space-20;
+  min-height: 40px;
+
+  background: $surface;
+  color: $text-secondary;
+  border: 1.5px solid $border-color;
+
+  font-size: $font-size-sm;
+  border-radius: $radius-pill;
+}
+
+.estado-chip:hover {
+  border-color: $link-color;
+  color: $link-color;
+}
+
+.estado-chip--active {
+  border-color: $link-color;
+  background: rgba(0, 153, 216, 0.12);
+  color: $link-color;
+  font-weight: $font-weight-semibold;
+}
+
+.estado-chip--active:hover {
+  border-color: $link-color;
+  color: $link-color;
+}
+
 .page-header {
   @include flex-between;
   gap: $space-16;
@@ -259,7 +329,7 @@
   grid-column: 1 / -1;
 }
 
-.filters-grid {
+.maintenance-form .filters-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: $space-16;

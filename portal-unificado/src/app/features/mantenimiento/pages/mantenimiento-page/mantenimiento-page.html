@@ -5,11 +5,13 @@
 
   <div class="mantenimiento-main">
 
-    <div class="page-header">
+    @if (viewMode === 'list') {
 
-      <div class="header-actions">
+      <h2 class="list-title">Ventanas activas</h2>
 
-        @if (viewMode === 'list') {
+      <div class="page-header">
+
+        <div class="header-actions">
 
           <button
             type="button"
@@ -19,32 +21,9 @@
             Agregar ventana
           </button>
 
-        } @else {
-
-          <button
-            type="button"
-            class="btn-secondary"
-            (click)="cancelForm()"
-          >
-            Cancelar
-          </button>
-
-          <button
-            type="button"
-            class="btn-save"
-            [disabled]="!canSave"
-            (click)="saveMaintenanceWindow()"
-          >
-            Guardar ventana
-          </button>
-
-        }
+        </div>
 
       </div>
-
-    </div>
-
-    @if (viewMode === 'list') {
 
       <div class="list-filters">
 
@@ -69,6 +48,37 @@
             placeholder="Buscar aplicación (código o nombre)"
             [(ngModel)]="listSearchApp"
           />
+
+        </div>
+
+        <div class="estado-filters">
+
+          <button
+            type="button"
+            class="estado-chip"
+            [class.estado-chip--active]="listFilterEstado === 'Programada'"
+            (click)="toggleEstadoFilter('Programada')"
+          >
+            Programada
+          </button>
+
+          <button
+            type="button"
+            class="estado-chip"
+            [class.estado-chip--active]="listFilterEstado === 'En ejecución'"
+            (click)="toggleEstadoFilter('En ejecución')"
+          >
+            En ejecución
+          </button>
+
+          <button
+            type="button"
+            class="estado-chip"
+            [class.estado-chip--active]="listFilterEstado === 'Finalizada'"
+            (click)="toggleEstadoFilter('Finalizada')"
+          >
+            Finalizada
+          </button>
 
         </div>
 
@@ -314,6 +324,31 @@
       }
 
     } @else {
+
+      <div class="page-header">
+
+        <div class="header-actions">
+
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="cancelForm()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="btn-save"
+            [disabled]="!canSave"
+            (click)="saveMaintenanceWindow()"
+          >
+            Guardar ventana
+          </button>
+
+        </div>
+
+      </div>
 
       <div class="maintenance-form">
 

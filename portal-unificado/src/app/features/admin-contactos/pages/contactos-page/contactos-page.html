@@ -26,7 +26,8 @@
     <div class="search-container">
       <input
         type="text"
-        placeholder="Buscar contacto..."
+        placeholder="Buscar aplicación (código o nombre)"
+        [(ngModel)]="searchApp"
       />
     </div>
 
@@ -61,7 +62,7 @@
       <div class="contact-row__actions-header">Acciones</div>
     </div>
 
-    @for (contacto of contactos; track contacto.id) {
+    @for (contacto of filteredContactos; track contacto.id) {
 
       <div class="contact-row">
 
@@ -135,8 +136,14 @@
 
     }
 
-    @if (contactos.length === 0) {
-      <p class="empty-list">No hay contactos registrados.</p>
+    @if (filteredContactos.length === 0) {
+      <p class="empty-list">
+        @if (contactos.length === 0) {
+          No hay contactos registrados.
+        } @else {
+          No hay aplicaciones con esa búsqueda.
+        }
+      </p>
     }
 
   </div>

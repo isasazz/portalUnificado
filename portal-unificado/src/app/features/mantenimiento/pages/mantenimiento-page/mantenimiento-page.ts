@@ -39,6 +39,7 @@ export class MantenimientoPageComponent {
   /** Filtros del listado de ventanas */
   listFilterEvc = '';
   listFilterLinea = '';
+  listFilterEstado = '';
   listSearchApp = '';
 
   /** Filtros del formulario (selección de app) */
@@ -204,6 +205,10 @@ export class MantenimientoPageComponent {
         !this.listFilterLinea ||
         window.linea === this.listFilterLinea;
 
+      const matchEstado =
+        !this.listFilterEstado ||
+        window.estado === this.listFilterEstado;
+
       const matchSearch =
         !term ||
         window.aplicacion.toLowerCase().includes(term) ||
@@ -211,7 +216,12 @@ export class MantenimientoPageComponent {
           .toLowerCase()
           .includes(term);
 
-      return matchEvc && matchLinea && matchSearch;
+      return (
+        matchEvc &&
+        matchLinea &&
+        matchEstado &&
+        matchSearch
+      );
 
     });
 
@@ -284,6 +294,15 @@ export class MantenimientoPageComponent {
   selectApp(app: StandbyApplication): void {
 
     this.selectedApp = app;
+
+  }
+
+  toggleEstadoFilter(estado: string): void {
+
+    this.listFilterEstado =
+      this.listFilterEstado === estado
+        ? ''
+        : estado;
 
   }
 

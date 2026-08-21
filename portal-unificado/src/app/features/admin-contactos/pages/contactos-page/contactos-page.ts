@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { ContactoModalComponent }
 from '../../components/contacto-modal/contacto-modal';
@@ -16,6 +17,7 @@ from '../../mocks/contactos.mock';
   selector: 'app-contactos-page',
   standalone: true,
   imports: [
+    FormsModule,
     ContactoModalComponent,
     NuevoContactoModalComponent
   ],
@@ -26,6 +28,8 @@ export class ContactosPageComponent {
 
   contactos: Contacto[] = [...CONTACTOS_MOCK];
 
+  searchApp = '';
+
   showModal = false;
 
   showNewContactModal = false;
@@ -35,6 +39,25 @@ export class ContactosPageComponent {
   contactoToDelete: Contacto | null = null;
 
   showDeleteConfirm = false;
+
+  get filteredContactos(): Contacto[] {
+
+    const term = this.searchApp.trim().toLowerCase();
+
+    if (!term) {
+      return this.contactos;
+    }
+
+    return this.contactos.filter(contacto =>
+      contacto.codigoAplicacion
+        .toLowerCase()
+        .includes(term) ||
+      contacto.nombreAplicacion
+        .toLowerCase()
+        .includes(term)
+    );
+
+  }
 
   openEditModal(contacto: Contacto): void {
 
