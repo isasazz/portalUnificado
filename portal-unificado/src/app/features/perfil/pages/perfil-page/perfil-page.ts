@@ -1,15 +1,19 @@
-import { Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-import { CURRENT_USER }
-from '../../mocks/current-user.mock';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 
 import { PERFIL_STANDBY_MOCK }
 from '../../mocks/perfil-standby.mock';
-
-import { UserProfile }
-from '../../models/user-profile.model';
 
 import { StandbyAssignment }
 from '../../../stanby/models/standby-assignment.model';
@@ -20,6 +24,9 @@ from '../../../stanby/services/standby-schedule.service';
 import { StandbyMonthViewComponent }
 from '../../../stanby/components/standby-month-view/standby-month-view';
 
+import { UserProfileService }
+from '../../services/user-profile.service';
+
 type PerfilTab =
   | 'proximos'
   | 'historial';
@@ -29,72 +36,45 @@ type PerfilTab =
   standalone: true,
   imports: [
     DatePipe,
-    FormsModule,
+    ReactiveFormsModule,
     StandbyMonthViewComponent
   ],
   templateUrl: './perfil-page.html',
-  styleUrl: './perfil-page.scss'
+  styleUrl: './perfil-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PerfilPageComponent {
 
+  private readonly fb = inject(FormBuilder);
+
+  readonly profileService = inject(UserProfileService);
+
+  private readonly scheduleService =
+    inject(StandbyScheduleService);
+
   readonly pageSize = 2;
 
-  profile: UserProfile = { ...CURRENT_USER };
+  readonly activeTab = signal<PerfilTab>('proximos');
 
-  draft: UserProfile = { ...CURRENT_USER };
+  readonly proximosPage = signal(1);
 
-  editing = false;
+  readonly historialPage = signal(1);
 
-  activeTab: PerfilTab = 'proximos';
+  readonly profileForm = this.fb.group({
+    nombre: ['', Validators.required],
+    celular: [''],
+    correo: ['', Validators.email],
+    cargo: [''],
+    area: [''],
+    ubicacion: [''],
+    fechaIngreso: ['']
+  });
 
-  proximosPage = 1;
-
-  historialPage = 1;
-
-  constructor(
-    private scheduleService: StandbyScheduleService
-  ) {}
-
-  selectTab(tab: PerfilTab): void {
-
-    this.activeTab = tab;
-
-  }
-
-  startEdit(): void {
-
-    this.draft = { ...this.profile };
-    this.editing = true;
-
-  }
-
-  cancelEdit(): void {
-
-    this.draft = { ...this.profile };
-    this.editing = false;
-
-  }
-
-  saveEdit(): void {
-
-    this.profile = {
-      ...this.draft,
-      lider: this.profile.lider,
-      evc: this.profile.evc,
-      linea: this.profile.linea,
-      initials: this.buildInitials(this.draft.nombre)
-    };
-
-    this.draft = { ...this.profile };
-    this.editing = false;
-
-  }
-
-  get myStandby(): StandbyAssignment[] {
+  readonly myStandby = computed(() => {
 
     const saved =
       this.scheduleService.getByResponsable(
-        this.profile.nombre
+        this.profileService.profile().nombre
       );
 
     if (saved.length > 0) {
@@ -103,116 +83,138 @@ export class PerfilPageComponent {
 
     return PERFIL_STANDBY_MOCK;
 
-  }
+  });
 
-  get upcomingStandby(): StandbyAssignment[] {
+  readonly upcomingStandby = computed(() => {
 
     const today = new Date();
-
     today.setHours(0, 0, 0, 0);
 
-    return this.myStandby
-      .filter(
-        assignment =>
-          assignment.fechaFin >= today
-      )
+    return this.myStandby()
+      .filter(assignment => assignment.fechaFin >= today)
       .sort(
         (a, b) =>
           a.fechaInicio.getTime() -
           b.fechaInicio.getTime()
       );
 
-  }
+  });
 
-  get pastStandby(): StandbyAssignment[] {
+  readonly pastStandby = computed(() => {
 
     const today = new Date();
-
     today.setHours(0, 0, 0, 0);
 
-    return this.myStandby
-      .filter(
-        assignment =>
-          assignment.fechaFin < today
-      )
+    return this.myStandby()
+      .filter(assignment => assignment.fechaFin < today)
       .sort(
         (a, b) =>
           b.fechaInicio.getTime() -
           a.fechaInicio.getTime()
       );
 
+  });
+
+  readonly pagedUpcoming = computed(() =>
+    this.pageItems(this.upcomingStandby(), this.proximosPage())
+  );
+
+  readonly pagedPast = computed(() =>
+    this.pageItems(this.pastStandby(), this.historialPage())
+  );
+
+  readonly upcomingTotalPages = computed(() =>
+    this.totalPages(this.upcomingStandby().length)
+  );
+
+  readonly historialTotalPages = computed(() =>
+    this.totalPages(this.pastStandby().length)
+  );
+
+  readonly nextStandby = computed(() =>
+    this.upcomingStandby()[0]
+  );
+
+  constructor() {
+
+    this.profileForm.valueChanges.subscribe(values => {
+
+      if (!this.profileService.editing()) {
+        return;
+      }
+
+      this.profileService.updateDraft({
+        nombre: values.nombre ?? '',
+        celular: values.celular ?? '',
+        correo: values.correo ?? '',
+        cargo: values.cargo ?? '',
+        area: values.area ?? '',
+        ubicacion: values.ubicacion ?? '',
+        fechaIngreso: values.fechaIngreso ?? ''
+      });
+
+    });
+
   }
 
-  get pagedUpcoming(): StandbyAssignment[] {
+  selectTab(tab: PerfilTab): void {
 
-    return this.pageItems(
-      this.upcomingStandby,
-      this.proximosPage
-    );
+    this.activeTab.set(tab);
 
   }
 
-  get pagedPast(): StandbyAssignment[] {
+  startEdit(): void {
 
-    return this.pageItems(
-      this.pastStandby,
-      this.historialPage
-    );
+    this.profileService.startEdit();
+    this.profileForm.patchValue(this.profileService.draft());
 
   }
 
-  get upcomingTotalPages(): number {
+  cancelEdit(): void {
 
-    return this.totalPages(this.upcomingStandby.length);
-
-  }
-
-  get historialTotalPages(): number {
-
-    return this.totalPages(this.pastStandby.length);
+    this.profileService.cancelEdit();
+    this.profileForm.patchValue(this.profileService.profile());
 
   }
 
-  get nextStandby(): StandbyAssignment | undefined {
+  saveEdit(): void {
 
-    return this.upcomingStandby[0];
+    if (this.profileForm.invalid) {
+      return;
+    }
 
-  }
-
-  get draftInitials(): string {
-
-    return this.buildInitials(this.draft.nombre);
+    this.profileService.saveEdit();
 
   }
 
   previousProximosPage(): void {
 
-    if (this.proximosPage > 1) {
-      this.proximosPage -= 1;
+    if (this.proximosPage() > 1) {
+      this.proximosPage.update(page => page - 1);
     }
 
   }
 
   nextProximosPage(): void {
 
-    if (this.proximosPage < this.upcomingTotalPages) {
-      this.proximosPage += 1;
+    if (this.proximosPage() < this.upcomingTotalPages()) {
+      this.proximosPage.update(page => page + 1);
     }
 
   }
 
   previousHistorialPage(): void {
 
-    if (this.historialPage > 1) {
-      this.historialPage -= 1;
+    if (this.historialPage() > 1) {
+      this.historialPage.update(page => page - 1);
     }
 
   }
 
   nextHistorialPage(): void {
 
-    if (this.historialPage < this.historialTotalPages) {
-      this.historialPage += 1;
+    if (this.historialPage() < this.historialTotalPages()) {
+      this.historialPage.update(page => page + 1);
     }
 
   }
@@ -237,28 +239,6 @@ export class PerfilPageComponent {
       1,
       Math.ceil(count / this.pageSize)
     );
-
-  }
-
-  private buildInitials(nombre: string): string {
-
-    const parts = nombre
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean);
-
-    if (parts.length === 0) {
-      return '';
-    }
-
-    if (parts.length === 1) {
-      return parts[0].slice(0, 2).toUpperCase();
-    }
-
-    return (
-      parts[0][0] +
-      parts[parts.length - 1][0]
-    ).toUpperCase();
 
   }
 

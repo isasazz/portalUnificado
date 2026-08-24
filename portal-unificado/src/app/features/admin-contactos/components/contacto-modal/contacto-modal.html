@@ -1,4 +1,4 @@
-@if (visible) {
+@if (visible()) {
 
 <div class="modal-backdrop">
 
@@ -11,7 +11,7 @@
         <h2>Información de Aplicación</h2>
 
         <span class="codigo-app">
-          {{ contacto?.codigoAplicacion || '—' }}
+          {{ contacto()?.codigoAplicacion || '—' }}
         </span>
 
       </div>
@@ -74,27 +74,27 @@
 
           <div class="detalle-item">
             <label>TÍTULO DE APP</label>
-            <span>{{ contacto?.nombreAplicacion || '—' }}</span>
+            <span>{{ contacto()?.nombreAplicacion || '—' }}</span>
           </div>
 
           <div class="detalle-item">
             <label>CÓDIGO DE APP</label>
-            <span>{{ contacto?.codigoAplicacion || '—' }}</span>
+            <span>{{ contacto()?.codigoAplicacion || '—' }}</span>
           </div>
 
           <div class="detalle-item">
             <label>EVC</label>
-            <span>{{ contacto?.evc || '—' }}</span>
+            <span>{{ contacto()?.evc || '—' }}</span>
           </div>
 
           <div class="detalle-item">
             <label>LÍNEA</label>
-            <span>{{ contacto?.linea || '—' }}</span>
+            <span>{{ contacto()?.linea || '—' }}</span>
           </div>
 
           <div class="detalle-item">
             <label>RESPONSABLE</label>
-            <span>{{ contacto?.nombre || '—' }}</span>
+            <span>{{ contacto()?.nombre || '—' }}</span>
           </div>
 
         </div>
@@ -106,6 +106,7 @@
         <div
           class="contacto-container"
           [class.contacto-container--readonly]="!canEditContactoTab"
+          [formGroup]="contactoForm"
         >
 
           <div class="form-row">
@@ -116,7 +117,7 @@
 
               <input
                 type="text"
-                [value]="contacto?.nombre || ''"
+                [value]="contacto()?.nombre || ''"
                 readonly
                 class="field-locked"
               />
@@ -128,9 +129,7 @@
               <label>CELULAR</label>
 
               <app-phone-input
-                [value]="celular"
-                [disabled]="!canEditContactoTab"
-                (valueChange)="onCelularChange($event)"
+                formControlName="celular"
               />
 
             </div>
@@ -151,7 +150,7 @@
 
                 <select [disabled]="!canEditContactoTab">
                   <option>
-                    {{ contacto?.correo || '—' }}
+                    {{ contacto()?.correo || '—' }}
                   </option>
                 </select>
 
@@ -163,8 +162,7 @@
 
                 <input
                   type="text"
-                  [(ngModel)]="correoTeams"
-                  name="correoTeamsPdn"
+                  formControlName="correoTeams"
                   [readonly]="!canEditContactoTab"
                   [class.field-locked]="!canEditContactoTab"
                 />
@@ -189,7 +187,7 @@
 
                 <select [disabled]="!canEditContactoTab">
                   <option>
-                    {{ contacto?.correo || '—' }}
+                    {{ contacto()?.correo || '—' }}
                   </option>
                 </select>
 
@@ -201,7 +199,7 @@
 
                 <input
                   type="text"
-                  [value]="correoTeams"
+                  formControlName="correoTeams"
                   [readonly]="!canEditContactoTab"
                   [class.field-locked]="!canEditContactoTab"
                 />
@@ -226,7 +224,7 @@
 
                 <select [disabled]="!canEditContactoTab">
                   <option>
-                    {{ contacto?.correo || '—' }}
+                    {{ contacto()?.correo || '—' }}
                   </option>
                 </select>
 
@@ -238,7 +236,7 @@
 
                 <input
                   type="text"
-                  [value]="correoTeams"
+                  formControlName="correoTeams"
                   [readonly]="!canEditContactoTab"
                   [class.field-locked]="!canEditContactoTab"
                 />
@@ -273,12 +271,16 @@
 
         <div
           class="standby-panel"
-          [class.standby-panel--locked]="editMode"
+          [class.standby-panel--locked]="editMode()"
         >
 
-          <app-standby-calendar />
+          <app-standby-month-view
+            [assignments]="standbyAssignments"
+            [showPeopleList]="false"
+            [outlineMode]="true"
+          />
 
-          @if (!editMode) {
+          @if (!editMode()) {
 
             <div class="standby-actions">
 
@@ -343,7 +345,7 @@
 
               <div class="maintenance-item">
                 <label>Aplicación</label>
-                <span>{{ contacto?.codigoAplicacion || '—' }}</span>
+                <span>{{ contacto()?.codigoAplicacion || '—' }}</span>
               </div>
 
               <div class="maintenance-item maintenance-item--full">
@@ -382,7 +384,7 @@
 
           </div>
 
-          @if (!editMode) {
+          @if (!editMode()) {
 
             <div class="maintenance-actions">
 

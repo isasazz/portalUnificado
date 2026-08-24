@@ -1,32 +1,28 @@
 import {
+  ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Input,
-  Output
+  input,
+  output
 } from '@angular/core';
 
 @Component({
   selector: 'app-standby-alert',
   standalone: true,
   templateUrl: './standby-alert.html',
-  styleUrl: './standby-alert.scss'
+  styleUrl: './standby-alert.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StandbyAlertComponent {
 
-  @Input()
-  visible = false;
+  readonly visible = input(false);
 
-  @Input()
-  title = 'Confirmación';
+  readonly title = input('Confirmación');
 
-  @Input()
-  message = '';
+  readonly message = input('');
 
-  @Input()
-  variant: 'info' | 'success' = 'info';
+  readonly variant = input<'info' | 'success'>('info');
 
-  @Output()
-  closed = new EventEmitter<void>();
+  readonly closed = output<void>();
 
   close(): void {
 

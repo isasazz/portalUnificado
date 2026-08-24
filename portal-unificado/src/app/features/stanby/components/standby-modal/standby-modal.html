@@ -1,4 +1,4 @@
-@if (visible) {
+@if (visible()) {
 
 <div class="modal-backdrop">
 
@@ -10,11 +10,11 @@
 
         <h2>Agregar Standby</h2>
 
-        @if (aplicaciones.length > 0) {
+        @if (aplicaciones().length > 0) {
 
           <div class="app-codes">
             @for (
-              app of aplicaciones;
+              app of aplicaciones();
               track app.codigoAplicacion
             ) {
               <span class="app-code-chip">

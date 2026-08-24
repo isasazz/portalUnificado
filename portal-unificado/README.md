@@ -1,6 +1,25 @@
-# PortalUnificado
+# Portal Unificado
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.21.
+Portal admin Bancolombia (Angular 21). Mock data en memoria para demo/UI.
+
+## Requisitos
+
+- **Node.js 20 o 22** (Node 21 no es compatible con Angular CLI en este entorno)
+
+```powershell
+$env:Path = "..\node22\node-v22.14.0-win-x64;" + $env:Path
+node -v
+npm start
+```
+
+## Arquitectura (Angular moderno)
+
+- **Standalone components** + lazy routes (`loadComponent`)
+- **Signals** en servicios de dominio y estado de UI
+- **`input()` / `output()`** en componentes hijos
+- **`ChangeDetectionStrategy.OnPush`** en todos los componentes
+- **Reactive Forms** en mantenimiento, contactos, perfil y modales
+- **Servicios** con estado: `ContactosService`, `MantenimientoService`, `UserProfileService`, `StandbyScheduleService`, `ThemeService`
 
 ## Development server
 

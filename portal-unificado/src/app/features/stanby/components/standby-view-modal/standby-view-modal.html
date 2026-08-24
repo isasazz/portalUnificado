@@ -1,4 +1,4 @@
-@if (visible) {
+@if (visible()) {
 
 <div class="modal-backdrop">
 
@@ -8,12 +8,15 @@
 
       <div class="modal-header__info">
 
-        <h2>Ver Standby</h2>
+        <h2>Detalle de standby</h2>
 
-        @if (aplicacionCodigo) {
+        @if (aplicacionCodigo()) {
 
           <div class="app-under-title">
-            <span class="app-code">{{ aplicacionCodigo }}</span>
+            <span class="app-code">{{ aplicacionCodigo() }}</span>
+            @if (aplicacionNombre()) {
+              <span class="app-name">{{ aplicacionNombre() }}</span>
+            }
           </div>
 
         }
@@ -32,11 +35,23 @@
 
     <div class="modal-body">
 
-      <app-standby-month-view
-        [assignments]="assignments"
-        [showPeopleList]="true"
-        [hideAppChips]="true"
-      />
+      @if (assignments().length === 0) {
+
+        <div class="empty-detail">
+          <p>
+            No hay standby registrado para esta aplicación.
+          </p>
+        </div>
+
+      } @else {
+
+        <app-standby-month-view
+          [assignments]="assignments()"
+          [showPeopleList]="true"
+          [hideAppChips]="false"
+        />
+
+      }
 
     </div>
 

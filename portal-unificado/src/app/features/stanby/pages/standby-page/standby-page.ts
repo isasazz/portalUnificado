@@ -1,4 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnInit
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { STANDBY_APPLICATIONS }
@@ -31,9 +37,14 @@ from '../../services/standby-schedule.service';
     StandbyViewModalComponent
   ],
   templateUrl: './standby-page.html',
-  styleUrl: './standby-page.scss'
+  styleUrl: './standby-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StandbyPageComponent implements OnInit {
+
+  private readonly route = inject(ActivatedRoute);
+  private readonly scheduleService = inject(StandbyScheduleService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   applications: StandbyApplication[] =
     [...STANDBY_APPLICATIONS];
@@ -50,10 +61,7 @@ export class StandbyPageComponent implements OnInit {
 
   viewAppCodigo = '';
 
-  constructor(
-    private route: ActivatedRoute,
-    private scheduleService: StandbyScheduleService
-  ) {}
+  viewAppNombre = '';
 
   ngOnInit(): void {
 
@@ -71,7 +79,10 @@ export class StandbyPageComponent implements OnInit {
             app.codigoAplicacion === appCode
         );
 
-      if (!application || application.programmed) {
+      if (
+        !application ||
+        this.hasAppStandby(application.codigoAplicacion)
+      ) {
         return;
       }
 
@@ -82,10 +93,19 @@ export class StandbyPageComponent implements OnInit {
 
   }
 
+  hasAppStandby(codigoAplicacion: string): boolean {
+
+    return this.scheduleService.isAppProgrammed(
+      codigoAplicacion
+    );
+
+  }
+
   get selectableApplications(): StandbyApplication[] {
 
     return this.applications.filter(
-      app => !app.programmed
+      app =>
+        !this.hasAppStandby(app.codigoAplicacion)
     );
 
   }
@@ -98,7 +118,10 @@ export class StandbyPageComponent implements OnInit {
           application.id === id
       );
 
-    if (!app || app.programmed) {
+    if (
+      !app ||
+      this.hasAppStandby(app.codigoAplicacion)
+    ) {
       return;
     }
 
@@ -199,22 +222,15 @@ export class StandbyPageComponent implements OnInit {
 
   onStandbySaved(): void {
 
-    this.panelApplications.forEach(panelApp => {
-
-      const app = this.applications.find(
-        item => item.id === panelApp.id
-      );
-
-      if (app) {
-        app.programmed = true;
-        app.selected = false;
-      }
-
+    this.applications.forEach(app => {
+      app.selected = false;
     });
 
     this.panelApplications = [];
     this.showSidePanel = false;
     this.showStandbyModal = false;
+    this.applications = [...this.applications];
+    this.cdr.markForCheck();
 
   }
 
@@ -224,23 +240,23 @@ export class StandbyPageComponent implements OnInit {
       item => item.id === id
     );
 
-    if (!app) {
+    if (
+      !app ||
+      !this.hasAppStandby(app.codigoAplicacion)
+    ) {
       return;
     }
 
     this.viewAppCodigo = app.codigoAplicacion;
+    this.viewAppNombre = app.nombreAplicacion;
 
     this.viewAssignments =
-      this.scheduleService.savedAssignments.filter(
-        assignment =>
-          assignment.aplicaciones?.some(
-            linked =>
-              linked.codigoAplicacion ===
-              app.codigoAplicacion
-          )
+      this.scheduleService.getByAppCodigo(
+        app.codigoAplicacion
       );
 
     this.showViewModal = true;
+    this.cdr.markForCheck();
 
   }
 
@@ -265,6 +281,7 @@ export class StandbyPageComponent implements OnInit {
     this.showViewModal = false;
     this.viewAssignments = [];
     this.viewAppCodigo = '';
+    this.viewAppNombre = '';
 
   }
 

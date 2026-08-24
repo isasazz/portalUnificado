@@ -1,5 +1,15 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal
+} from '@angular/core';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 
 import { ContactoModalComponent }
 from '../../components/contacto-modal/contacto-modal';
@@ -13,90 +23,90 @@ from '../../../../shared/components/phone-input/phone-input';
 import { Contacto }
 from '../../models/contacto.model';
 
-import { CONTACTOS_MOCK }
-from '../../mocks/contactos.mock';
+import { ContactosService }
+from '../../services/contactos.service';
 
 @Component({
   selector: 'app-contactos-page',
   standalone: true,
   imports: [
-    FormsModule,
+    ReactiveFormsModule,
     ContactoModalComponent,
     NuevoContactoModalComponent,
     PhoneInputComponent
   ],
   templateUrl: './contactos-page.html',
-  styleUrl: './contactos-page.scss'
+  styleUrl: './contactos-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContactosPageComponent {
 
-  contactos: Contacto[] = [...CONTACTOS_MOCK];
+  private readonly fb = inject(FormBuilder);
 
-  searchApp = '';
+  readonly contactosService = inject(ContactosService);
 
-  showModal = false;
+  readonly searchForm = this.fb.group({
+    searchApp: ['']
+  });
 
-  showNewContactModal = false;
+  readonly bulkForm = this.fb.group({
+    celular: [''],
+    correo: ['', Validators.email]
+  });
 
-  selectedContacto: Contacto | null = null;
+  readonly showModal = signal(false);
+  readonly showNewContactModal = signal(false);
+  readonly selectedContacto = signal<Contacto | null>(null);
+  readonly contactoToDelete = signal<Contacto | null>(null);
+  readonly showDeleteConfirm = signal(false);
+  readonly selectedIds = signal(new Set<number>());
+  readonly showBulkEdit = signal(false);
 
-  contactoToDelete: Contacto | null = null;
+  readonly selectedCount = computed(() =>
+    this.selectedIds().size
+  );
 
-  showDeleteConfirm = false;
+  readonly allFilteredSelected = computed(() => {
 
-  selectedIds = new Set<number>();
-
-  showBulkEdit = false;
-
-  bulkCelular = '';
-
-  bulkCorreo = '';
-
-  get filteredContactos(): Contacto[] {
-
-    const term = this.searchApp.trim().toLowerCase();
-
-    if (!term) {
-      return this.contactos;
-    }
-
-    return this.contactos.filter(contacto =>
-      contacto.codigoAplicacion
-        .toLowerCase()
-        .includes(term) ||
-      contacto.nombreAplicacion
-        .toLowerCase()
-        .includes(term)
-    );
-
-  }
-
-  get selectedCount(): number {
-
-    return this.selectedIds.size;
-
-  }
-
-  get allFilteredSelected(): boolean {
-
-    const list = this.filteredContactos;
+    const list = this.contactosService.filteredContactos();
 
     return (
       list.length > 0 &&
-      list.every(c => this.selectedIds.has(c.id))
+      list.every(c => this.selectedIds().has(c.id))
+    );
+
+  });
+
+  readonly canSaveBulk = computed(() => {
+
+    const values = this.bulkForm.getRawValue();
+
+    return Boolean(
+      values.celular?.trim() ||
+      values.correo?.trim()
+    );
+
+  });
+
+  constructor() {
+
+    this.searchForm.controls.searchApp.valueChanges.subscribe(
+      value => {
+        this.contactosService.searchApp.set(value ?? '');
+      }
     );
 
   }
 
   isSelected(id: number): boolean {
 
-    return this.selectedIds.has(id);
+    return this.selectedIds().has(id);
 
   }
 
   toggleContacto(id: number): void {
 
-    const next = new Set(this.selectedIds);
+    const next = new Set(this.selectedIds());
 
     if (next.has(id)) {
       next.delete(id);
@@ -104,16 +114,16 @@ export class ContactosPageComponent {
       next.add(id);
     }
 
-    this.selectedIds = next;
+    this.selectedIds.set(next);
 
   }
 
   toggleSelectAll(): void {
 
-    const list = this.filteredContactos;
-    const next = new Set(this.selectedIds);
+    const list = this.contactosService.filteredContactos();
+    const next = new Set(this.selectedIds());
 
-    if (this.allFilteredSelected) {
+    if (this.allFilteredSelected()) {
       for (const contacto of list) {
         next.delete(contacto.id);
       }
@@ -123,120 +133,95 @@ export class ContactosPageComponent {
       }
     }
 
-    this.selectedIds = next;
+    this.selectedIds.set(next);
 
   }
 
   clearSelection(): void {
 
-    this.selectedIds = new Set();
+    this.selectedIds.set(new Set());
 
   }
 
   openBulkEdit(): void {
 
-    if (this.selectedCount === 0) {
+    if (this.selectedCount() === 0) {
       return;
     }
 
-    this.bulkCelular = '';
-    this.bulkCorreo = '';
-    this.showBulkEdit = true;
+    this.bulkForm.reset({ celular: '', correo: '' });
+    this.showBulkEdit.set(true);
 
   }
 
   closeBulkEdit(): void {
 
-    this.showBulkEdit = false;
-
-  }
-
-  onBulkCelularChange(value: string): void {
-
-    this.bulkCelular = value;
-
-  }
-
-  get canSaveBulk(): boolean {
-
-    return Boolean(
-      this.bulkCelular.trim() ||
-      this.bulkCorreo.trim()
-    );
+    this.showBulkEdit.set(false);
 
   }
 
   saveBulkEdit(): void {
 
-    if (!this.canSaveBulk) {
+    if (!this.canSaveBulk()) {
       return;
     }
 
-    const celular = this.bulkCelular.trim();
-    const correo = this.bulkCorreo.trim();
+    const values = this.bulkForm.getRawValue();
 
-    this.contactos = this.contactos.map(contacto => {
-
-      if (!this.selectedIds.has(contacto.id)) {
-        return contacto;
+    this.contactosService.bulkUpdate(
+      this.selectedIds(),
+      {
+        celular: values.celular?.trim(),
+        correo: values.correo?.trim()
       }
+    );
 
-      return {
-        ...contacto,
-        ...(celular ? { celular } : {}),
-        ...(correo ? { correo } : {})
-      };
-
-    });
-
-    this.showBulkEdit = false;
+    this.showBulkEdit.set(false);
     this.clearSelection();
 
   }
 
   openEditModal(contacto: Contacto): void {
 
-    this.selectedContacto = contacto;
-    this.showModal = true;
+    this.selectedContacto.set(contacto);
+    this.showModal.set(true);
 
   }
 
   closeEditModal(): void {
 
-    this.showModal = false;
-    this.selectedContacto = null;
+    this.showModal.set(false);
+    this.selectedContacto.set(null);
 
   }
 
   askDeleteContacto(contacto: Contacto): void {
 
-    this.contactoToDelete = contacto;
-    this.showDeleteConfirm = true;
+    this.contactoToDelete.set(contacto);
+    this.showDeleteConfirm.set(true);
 
   }
 
   cancelDelete(): void {
 
-    this.showDeleteConfirm = false;
-    this.contactoToDelete = null;
+    this.showDeleteConfirm.set(false);
+    this.contactoToDelete.set(null);
 
   }
 
   confirmDelete(): void {
 
-    if (!this.contactoToDelete) {
+    const contacto = this.contactoToDelete();
+
+    if (!contacto) {
       return;
     }
 
-    const deletedId = this.contactoToDelete.id;
+    this.contactosService.deleteContacto(contacto.id);
 
-    this.contactos = this.contactos.filter(
-      item => item.id !== deletedId
-    );
-
-    const next = new Set(this.selectedIds);
-    next.delete(deletedId);
-    this.selectedIds = next;
+    const next = new Set(this.selectedIds());
+    next.delete(contacto.id);
+    this.selectedIds.set(next);
 
     this.cancelDelete();
 
@@ -244,13 +229,13 @@ export class ContactosPageComponent {
 
   openNewContactModal(): void {
 
-    this.showNewContactModal = true;
+    this.showNewContactModal.set(true);
 
   }
 
   closeNewContactModal(): void {
 
-    this.showNewContactModal = false;
+    this.showNewContactModal.set(false);
 
   }
 

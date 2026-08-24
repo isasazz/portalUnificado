@@ -4,7 +4,7 @@
 
     <div class="page-toolbar__actions">
 
-      @if (!editing) {
+      @if (!profileService.editing()) {
 
         <button
           class="btn-primary"
@@ -43,45 +43,50 @@
     <article class="card identity-card">
 
       <div class="identity-card__avatar">
-        {{ editing ? draftInitials : profile.initials }}
+        {{
+          profileService.editing()
+            ? profileService.draftInitials()
+            : profileService.profile().initials
+        }}
       </div>
 
-      @if (editing) {
+      @if (profileService.editing()) {
 
-        <label class="field-label">Nombre</label>
-        <input
-          class="field-input field-input--center"
-          type="text"
-          [(ngModel)]="draft.nombre"
-          name="nombre"
-        />
+        <form [formGroup]="profileForm">
 
-        <label class="field-label">Celular</label>
-        <input
-          class="field-input field-input--center"
-          type="text"
-          [(ngModel)]="draft.celular"
-          name="celular"
-        />
+          <label class="field-label">Nombre</label>
+          <input
+            class="field-input field-input--center"
+            type="text"
+            formControlName="nombre"
+          />
 
-        <label class="field-label">Correo</label>
-        <input
-          class="field-input field-input--center"
-          type="email"
-          [(ngModel)]="draft.correo"
-          name="correo"
-        />
+          <label class="field-label">Celular</label>
+          <input
+            class="field-input field-input--center"
+            type="text"
+            formControlName="celular"
+          />
+
+          <label class="field-label">Correo</label>
+          <input
+            class="field-input field-input--center"
+            type="email"
+            formControlName="correo"
+          />
+
+        </form>
 
       } @else {
 
-        <h2>{{ profile.nombre }}</h2>
+        <h2>{{ profileService.profile().nombre }}</h2>
 
         <a class="identity-card__phone">
-          {{ profile.celular }}
+          {{ profileService.profile().celular }}
         </a>
 
         <p class="identity-card__email">
-          {{ profile.correo }}
+          {{ profileService.profile().correo }}
         </p>
 
       }
@@ -94,65 +99,75 @@
         <h3>Información general</h3>
       </div>
 
-      <div class="info-row">
-        <label>Cargo</label>
-        @if (editing) {
-          <input
-            class="field-input"
-            type="text"
-            [(ngModel)]="draft.cargo"
-            name="cargo"
-          />
-        } @else {
-          <span>{{ profile.cargo }}</span>
-        }
-      </div>
+      @if (profileService.editing()) {
 
-      <div class="info-row">
-        <label>Área</label>
-        @if (editing) {
-          <input
-            class="field-input"
-            type="text"
-            [(ngModel)]="draft.area"
-            name="area"
-          />
-        } @else {
-          <span>{{ profile.area }}</span>
-        }
-      </div>
+        <form [formGroup]="profileForm">
 
-      <div class="info-row">
-        <label>Ubicación</label>
-        @if (editing) {
-          <input
-            class="field-input"
-            type="text"
-            [(ngModel)]="draft.ubicacion"
-            name="ubicacion"
-          />
-        } @else {
-          <span>{{ profile.ubicacion }}</span>
-        }
-      </div>
+          <div class="info-row">
+            <label>Cargo</label>
+            <input
+              class="field-input"
+              type="text"
+              formControlName="cargo"
+            />
+          </div>
 
-      <div class="info-row">
-        <label>Fecha de ingreso</label>
-        @if (editing) {
-          <input
-            class="field-input"
-            type="text"
-            [(ngModel)]="draft.fechaIngreso"
-            name="fechaIngreso"
-          />
-        } @else {
-          <span>{{ profile.fechaIngreso }}</span>
-        }
-      </div>
+          <div class="info-row">
+            <label>Área</label>
+            <input
+              class="field-input"
+              type="text"
+              formControlName="area"
+            />
+          </div>
+
+          <div class="info-row">
+            <label>Ubicación</label>
+            <input
+              class="field-input"
+              type="text"
+              formControlName="ubicacion"
+            />
+          </div>
+
+          <div class="info-row">
+            <label>Fecha de ingreso</label>
+            <input
+              class="field-input"
+              type="text"
+              formControlName="fechaIngreso"
+            />
+          </div>
+
+        </form>
+
+      } @else {
+
+        <div class="info-row">
+          <label>Cargo</label>
+          <span>{{ profileService.profile().cargo }}</span>
+        </div>
+
+        <div class="info-row">
+          <label>Área</label>
+          <span>{{ profileService.profile().area }}</span>
+        </div>
+
+        <div class="info-row">
+          <label>Ubicación</label>
+          <span>{{ profileService.profile().ubicacion }}</span>
+        </div>
+
+        <div class="info-row">
+          <label>Fecha de ingreso</label>
+          <span>{{ profileService.profile().fechaIngreso }}</span>
+        </div>
+
+      }
 
       <div class="info-row info-row--locked">
         <label>Líder</label>
-        <span>{{ profile.lider }}</span>
+        <span>{{ profileService.profile().lider }}</span>
       </div>
 
     </article>
@@ -165,21 +180,21 @@
 
       <div class="info-row info-row--locked">
         <label>EVC</label>
-        <span>{{ profile.evc }}</span>
+        <span>{{ profileService.profile().evc }}</span>
       </div>
 
       <div class="info-row info-row--locked">
         <label>Línea</label>
-        <span>{{ profile.linea }}</span>
+        <span>{{ profileService.profile().linea }}</span>
       </div>
 
       <div class="info-row info-row--locked">
         <label>Próximo standby</label>
-        @if (nextStandby) {
+        @if (nextStandby()) {
           <span>
-            {{ nextStandby.fechaInicio | date:'dd/MM/yyyy' }}
+            {{ nextStandby()!.fechaInicio | date:'dd/MM/yyyy' }}
             →
-            {{ nextStandby.fechaFin | date:'dd/MM/yyyy' }}
+            {{ nextStandby()!.fechaFin | date:'dd/MM/yyyy' }}
           </span>
         } @else {
           <span>Sin turnos</span>
@@ -188,7 +203,7 @@
 
       <div class="info-row info-row--locked">
         <label>Turnos programados</label>
-        <span>{{ myStandby.length }}</span>
+        <span>{{ myStandby().length }}</span>
       </div>
 
     </article>
@@ -204,31 +219,31 @@
         <button
           type="button"
           class="tab"
-          [class.active]="activeTab === 'proximos'"
+          [class.active]="activeTab() === 'proximos'"
           (click)="selectTab('proximos')"
         >
-          Próximos standby ({{ upcomingStandby.length }})
+          Próximos standby ({{ upcomingStandby().length }})
         </button>
 
         <button
           type="button"
           class="tab"
-          [class.active]="activeTab === 'historial'"
+          [class.active]="activeTab() === 'historial'"
           (click)="selectTab('historial')"
         >
-          Historial ({{ pastStandby.length }})
+          Historial ({{ pastStandby().length }})
         </button>
 
       </div>
 
       <div class="activity-body">
 
-        @if (activeTab === 'proximos') {
+        @if (activeTab() === 'proximos') {
 
           <div class="visit-list">
 
             @for (
-              assignment of pagedUpcoming;
+              assignment of pagedUpcoming();
               track assignment.id
             ) {
 
@@ -248,7 +263,7 @@
                 </div>
 
                 <div class="visit-row__doctor">
-                  {{ profile.nombre }}
+                  {{ profileService.profile().nombre }}
                 </div>
 
                 <span class="status-pill">
@@ -282,33 +297,33 @@
 
             }
 
-            @if (upcomingStandby.length === 0) {
+            @if (upcomingStandby().length === 0) {
               <p class="empty">No hay standby próximos.</p>
             }
 
           </div>
 
-          @if (upcomingStandby.length > pageSize) {
+          @if (upcomingStandby().length > pageSize) {
 
             <div class="pager">
 
               <button
                 type="button"
                 class="pager__btn"
-                [disabled]="proximosPage <= 1"
+                [disabled]="proximosPage() <= 1"
                 (click)="previousProximosPage()"
               >
                 ‹
               </button>
 
               <span class="pager__label">
-                {{ proximosPage }} / {{ upcomingTotalPages }}
+                {{ proximosPage() }} / {{ upcomingTotalPages() }}
               </span>
 
               <button
                 type="button"
                 class="pager__btn"
-                [disabled]="proximosPage >= upcomingTotalPages"
+                [disabled]="proximosPage() >= upcomingTotalPages()"
                 (click)="nextProximosPage()"
               >
                 ›
@@ -320,12 +335,12 @@
 
         }
 
-        @if (activeTab === 'historial') {
+        @if (activeTab() === 'historial') {
 
           <div class="visit-list">
 
             @for (
-              assignment of pagedPast;
+              assignment of pagedPast();
               track assignment.id
             ) {
 
@@ -345,7 +360,7 @@
                 </div>
 
                 <div class="visit-row__doctor">
-                  {{ profile.nombre }}
+                  {{ profileService.profile().nombre }}
                 </div>
 
                 <span class="status-pill status-pill--muted">
@@ -379,33 +394,33 @@
 
             }
 
-            @if (pastStandby.length === 0) {
+            @if (pastStandby().length === 0) {
               <p class="empty">Sin historial aún.</p>
             }
 
           </div>
 
-          @if (pastStandby.length > pageSize) {
+          @if (pastStandby().length > pageSize) {
 
             <div class="pager">
 
               <button
                 type="button"
                 class="pager__btn"
-                [disabled]="historialPage <= 1"
+                [disabled]="historialPage() <= 1"
                 (click)="previousHistorialPage()"
               >
                 ‹
               </button>
 
               <span class="pager__label">
-                {{ historialPage }} / {{ historialTotalPages }}
+                {{ historialPage() }} / {{ historialTotalPages() }}
               </span>
 
               <button
                 type="button"
                 class="pager__btn"
-                [disabled]="historialPage >= historialTotalPages"
+                [disabled]="historialPage() >= historialTotalPages()"
                 (click)="nextHistorialPage()"
               >
                 ›
@@ -428,7 +443,7 @@
       </div>
 
       <app-standby-month-view
-        [assignments]="myStandby"
+        [assignments]="myStandby()"
         [showPeopleList]="false"
         [outlineMode]="true"
       />

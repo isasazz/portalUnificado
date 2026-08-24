@@ -1,9 +1,14 @@
 import {
+  ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Input,
-  Output
+  inject,
+  input,
+  output
 } from '@angular/core';
+import {
+  FormBuilder,
+  ReactiveFormsModule
+} from '@angular/forms';
 
 import { PhoneInputComponent }
 from '../../../../shared/components/phone-input/phone-input';
@@ -13,23 +18,23 @@ from '../../../../shared/components/phone-input/phone-input';
   standalone: true,
   templateUrl: './nuevo-contacto-modal.html',
   styleUrl: './nuevo-contacto-modal.scss',
-  imports: [PhoneInputComponent]
+  imports: [
+    ReactiveFormsModule,
+    PhoneInputComponent
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NuevoContactoModalComponent {
 
-  @Input()
-  visible = false;
+  private readonly fb = inject(FormBuilder);
 
-  @Output()
-  closed = new EventEmitter<void>();
+  readonly visible = input(false);
 
-  celular = '+57';
+  readonly closed = output<void>();
 
-  onCelularChange(value: string): void {
-
-    this.celular = value;
-
-  }
+  readonly form = this.fb.group({
+    celular: ['+57']
+  });
 
   close(): void {
 

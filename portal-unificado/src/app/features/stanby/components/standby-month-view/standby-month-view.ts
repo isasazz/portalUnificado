@@ -1,4 +1,9 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { CalendarDay }
@@ -12,21 +17,18 @@ from '../../models/standby-assignment.model';
   standalone: true,
   imports: [DatePipe],
   templateUrl: './standby-month-view.html',
-  styleUrl: './standby-month-view.scss'
+  styleUrl: './standby-month-view.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StandbyMonthViewComponent implements OnInit, OnChanges {
+export class StandbyMonthViewComponent {
 
-  @Input()
-  assignments: StandbyAssignment[] = [];
+  readonly assignments = input<StandbyAssignment[]>([]);
 
-  @Input()
-  showPeopleList = true;
+  readonly showPeopleList = input(true);
 
-  @Input()
-  outlineMode = false;
+  readonly outlineMode = input(false);
 
-  @Input()
-  hideAppChips = false;
+  readonly hideAppChips = input(false);
 
   currentDate = new Date();
 
@@ -44,18 +46,14 @@ export class StandbyMonthViewComponent implements OnInit, OnChanges {
     'Dom'
   ];
 
-  ngOnInit(): void {
+  constructor() {
 
-    this.focusOnAssignments();
-    this.buildCalendar();
-
-  }
-
-  ngOnChanges(): void {
-
-    this.didFocusAssignments = false;
-    this.focusOnAssignments();
-    this.buildCalendar();
+    effect(() => {
+      this.assignments();
+      this.didFocusAssignments = false;
+      this.focusOnAssignments();
+      this.buildCalendar();
+    });
 
   }
 
@@ -150,7 +148,7 @@ export class StandbyMonthViewComponent implements OnInit, OnChanges {
     const monthEnd =
       this.startOfDay(new Date(year, month + 1, 0));
 
-    return this.assignments.filter(assignment => {
+    return this.assignments().filter(assignment => {
 
       const start =
         this.startOfDay(assignment.fechaInicio);
@@ -211,14 +209,16 @@ export class StandbyMonthViewComponent implements OnInit, OnChanges {
 
   private focusOnAssignments(): void {
 
+    const assignments = this.assignments();
+
     if (
       this.didFocusAssignments ||
-      this.assignments.length === 0
+      assignments.length === 0
     ) {
       return;
     }
 
-    const sorted = [...this.assignments].sort(
+    const sorted = [...assignments].sort(
       (a, b) =>
         a.fechaInicio.getTime() -
         b.fechaInicio.getTime()

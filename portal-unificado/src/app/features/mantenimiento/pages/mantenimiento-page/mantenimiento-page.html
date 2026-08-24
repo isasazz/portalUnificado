@@ -1,11 +1,11 @@
 <div
   class="mantenimiento-page"
-  [class.mantenimiento-page--panel-open]="showEditPanel"
+  [class.mantenimiento-page--panel-open]="showEditPanel()"
 >
 
   <div class="mantenimiento-main">
 
-    @if (viewMode === 'list') {
+    @if (viewMode() === 'list') {
 
       <h2 class="list-title">Ventanas activas</h2>
 
@@ -29,16 +29,22 @@
 
         <div class="filters-grid">
 
-          <select [(ngModel)]="listFilterEvc">
+          <select
+            [value]="mantenimiento.listFilterEvc()"
+            (change)="mantenimiento.listFilterEvc.set($any($event.target).value)"
+          >
             <option value="">Todos los EVC</option>
-            @for (evc of listEvcOptions; track evc) {
+            @for (evc of mantenimiento.listEvcOptions(); track evc) {
               <option [value]="evc">{{ evc }}</option>
             }
           </select>
 
-          <select [(ngModel)]="listFilterLinea">
+          <select
+            [value]="mantenimiento.listFilterLinea()"
+            (change)="mantenimiento.listFilterLinea.set($any($event.target).value)"
+          >
             <option value="">Todas las líneas</option>
-            @for (linea of listLineaOptions; track linea) {
+            @for (linea of mantenimiento.listLineaOptions(); track linea) {
               <option [value]="linea">{{ linea }}</option>
             }
           </select>
@@ -46,7 +52,8 @@
           <input
             type="text"
             placeholder="Buscar aplicación (código o nombre)"
-            [(ngModel)]="listSearchApp"
+            [value]="mantenimiento.listSearchApp()"
+            (input)="mantenimiento.listSearchApp.set($any($event.target).value)"
           />
 
         </div>
@@ -56,7 +63,7 @@
           <button
             type="button"
             class="estado-chip"
-            [class.estado-chip--active]="listFilterEstado === 'Programada'"
+            [class.estado-chip--active]="mantenimiento.listFilterEstado() === 'Programada'"
             (click)="toggleEstadoFilter('Programada')"
           >
             Programada
@@ -65,7 +72,7 @@
           <button
             type="button"
             class="estado-chip"
-            [class.estado-chip--active]="listFilterEstado === 'En ejecución'"
+            [class.estado-chip--active]="mantenimiento.listFilterEstado() === 'En ejecución'"
             (click)="toggleEstadoFilter('En ejecución')"
           >
             En ejecución
@@ -74,7 +81,7 @@
           <button
             type="button"
             class="estado-chip"
-            [class.estado-chip--active]="listFilterEstado === 'Finalizada'"
+            [class.estado-chip--active]="mantenimiento.listFilterEstado() === 'Finalizada'"
             (click)="toggleEstadoFilter('Finalizada')"
           >
             Finalizada
@@ -84,23 +91,23 @@
 
         <div class="filters-actions">
           <small>
-            {{ filteredWindows.length }} ventana(s)
+            {{ mantenimiento.filteredWindows().length }} ventana(s)
           </small>
         </div>
 
       </div>
 
-      @if (filteredWindows.length === 0) {
+      @if (mantenimiento.filteredWindows().length === 0) {
 
         <div class="empty-list">
           <p>
-            @if (maintenanceWindows.length === 0) {
+            @if (mantenimiento.windows().length === 0) {
               No hay ventanas programadas.
             } @else {
               No hay ventanas con esos filtros.
             }
           </p>
-          @if (maintenanceWindows.length === 0) {
+          @if (mantenimiento.windows().length === 0) {
             <button
               type="button"
               class="btn-save"
@@ -118,15 +125,15 @@
           <div class="windows-grid">
 
             @for (
-              window of filteredWindows;
+              window of mantenimiento.filteredWindows();
               track window.id
             ) {
 
               <article
                 class="window-tile"
                 [class.window-tile--editing]="
-                  showEditPanel &&
-                  editingWindow?.id === window.id
+                  showEditPanel() &&
+                  editingWindow()?.id === window.id
                 "
               >
 
@@ -208,7 +215,7 @@
 
           </div>
 
-          @if (showEditPanel && editingWindow) {
+          @if (showEditPanel() && editingWindow(); as window) {
 
             <aside class="edit-panel">
 
@@ -217,7 +224,7 @@
                 <div>
                   <h2>Editar ventana</h2>
                   <p>
-                    {{ editAplicacion }} · {{ editNombreAplicacion }}
+                    {{ window.aplicacion }} · {{ window.nombreAplicacion }}
                   </p>
                 </div>
 
@@ -232,11 +239,14 @@
 
               </div>
 
-              <div class="edit-panel__body">
+              <div
+                class="edit-panel__body"
+                [formGroup]="editForm"
+              >
 
                 <div class="field">
                   <label>Estado</label>
-                  <select [(ngModel)]="editEstado">
+                  <select formControlName="estado">
                     <option>Programada</option>
                     <option>En ejecución</option>
                     <option>Finalizada</option>
@@ -246,7 +256,7 @@
 
                 <div class="field">
                   <label>Frecuencia</label>
-                  <select [(ngModel)]="editFrecuencia">
+                  <select formControlName="frecuencia">
                     <option>Una vez</option>
                     <option>Diaria</option>
                     <option>Semanal</option>
@@ -258,7 +268,7 @@
                   <label>Fecha inicio</label>
                   <input
                     type="text"
-                    [(ngModel)]="editFechaInicio"
+                    formControlName="fechaInicio"
                     placeholder="dd/MM/yyyy HH:mm"
                   />
                 </div>
@@ -267,14 +277,14 @@
                   <label>Fecha fin</label>
                   <input
                     type="text"
-                    [(ngModel)]="editFechaFin"
+                    formControlName="fechaFin"
                     placeholder="dd/MM/yyyy HH:mm"
                   />
                 </div>
 
                 <div class="field">
                   <label>Zona horaria</label>
-                  <select [(ngModel)]="editZonaHoraria">
+                  <select formControlName="zonaHoraria">
                     <option>América / Bogotá</option>
                     <option>América / Lima</option>
                     <option>UTC</option>
@@ -285,7 +295,7 @@
                   <label>Aplicación</label>
                   <input
                     type="text"
-                    [value]="editAplicacion"
+                    formControlName="aplicacion"
                     readonly
                   />
                 </div>
@@ -294,7 +304,7 @@
                   <label>Impacto</label>
                   <input
                     type="text"
-                    [(ngModel)]="editImpacto"
+                    formControlName="impacto"
                   />
                 </div>
 
@@ -302,7 +312,7 @@
                   <label>Observación</label>
                   <textarea
                     rows="3"
-                    [(ngModel)]="editObservacion"
+                    formControlName="observacion"
                     placeholder="Notas de la ventana"
                   ></textarea>
                 </div>
@@ -322,7 +332,7 @@
                 <button
                   type="button"
                   class="btn-save"
-                  [disabled]="!canSaveEdit"
+                  [disabled]="!canSaveEdit()"
                   (click)="saveEdit()"
                 >
                   Guardar cambios
@@ -355,7 +365,7 @@
           <button
             type="button"
             class="btn-save"
-            [disabled]="!canSave"
+            [disabled]="!canSave()"
             (click)="saveMaintenanceWindow()"
           >
             Guardar ventana
@@ -381,7 +391,7 @@
             <button
               type="button"
               class="tipo-chip"
-              [class.tipo-chip--active]="isVentanaProgramada"
+              [class.tipo-chip--active]="isVentanaProgramada()"
               (click)="selectTipoVentana('programada')"
             >
               Ventana programada
@@ -390,7 +400,7 @@
             <button
               type="button"
               class="tipo-chip"
-              [class.tipo-chip--active]="isPromesaServicio"
+              [class.tipo-chip--active]="isPromesaServicio()"
               (click)="selectTipoVentana('promesa')"
             >
               Promesa de servicio
@@ -398,18 +408,21 @@
 
           </div>
 
-          @if (isVentanaProgramada) {
+          @if (isVentanaProgramada()) {
 
-            <div class="field field--crq">
+            <div
+              class="field field--crq"
+              [formGroup]="createForm"
+            >
               <label>CRQ</label>
               <input
                 type="text"
-                [(ngModel)]="crq"
+                formControlName="crq"
                 placeholder="Ingresa el número de CRQ"
               />
             </div>
 
-            @if (!canFillFormFields) {
+            @if (!canFillFormFields()) {
               <p class="form-section__hint">
                 Ingresa el CRQ para habilitar el resto del formulario.
               </p>
@@ -417,7 +430,7 @@
 
           }
 
-          @if (!tipoVentana) {
+          @if (!hasTipoVentana()) {
             <p class="form-section__hint">
               Selecciona el tipo de ventana para continuar.
             </p>
@@ -425,7 +438,7 @@
 
         </section>
 
-        @if (canFillFormFields) {
+        @if (canFillFormFields()) {
 
         <section class="form-section form-section--apps">
 
@@ -438,16 +451,22 @@
 
           <div class="filters-grid">
 
-            <select [(ngModel)]="filterEvc">
+            <select
+              [value]="filterEvc()"
+              (change)="updateAppFilter('evc', $any($event.target).value)"
+            >
               <option value="">Todos los EVC</option>
-              @for (evc of evcOptions; track evc) {
+              @for (evc of evcOptions(); track evc) {
                 <option [value]="evc">{{ evc }}</option>
               }
             </select>
 
-            <select [(ngModel)]="filterLinea">
+            <select
+              [value]="filterLinea()"
+              (change)="updateAppFilter('linea', $any($event.target).value)"
+            >
               <option value="">Todas las líneas</option>
-              @for (linea of lineaOptions; track linea) {
+              @for (linea of lineaOptions(); track linea) {
                 <option [value]="linea">{{ linea }}</option>
               }
             </select>
@@ -455,23 +474,24 @@
             <input
               type="text"
               placeholder="Buscar aplicación (código o nombre)"
-              [(ngModel)]="searchApp"
+              [value]="searchApp()"
+              (input)="updateAppFilter('searchApp', $any($event.target).value)"
             />
 
           </div>
 
-          @if (hasActiveAppFilters) {
+          @if (hasActiveAppFilters()) {
 
             <div class="filters-actions">
               <small>
-                {{ filteredApplications.length }} aplicación(es)
+                {{ filteredApplications().length }} aplicación(es)
               </small>
             </div>
 
             <div class="apps-list">
 
               @for (
-                app of filteredApplications;
+                app of filteredApplications();
                 track app.id
               ) {
 
@@ -479,7 +499,7 @@
                   type="button"
                   class="app-row"
                   [class.app-row--selected]="
-                    selectedApp?.id === app.id
+                    selectedApp()?.id === app.id
                   "
                   (click)="selectApp(app)"
                 >
@@ -497,7 +517,7 @@
 
               }
 
-              @if (filteredApplications.length === 0) {
+              @if (filteredApplications().length === 0) {
                 <p class="empty-apps">
                   No hay aplicaciones con esos filtros.
                 </p>
@@ -516,7 +536,10 @@
 
         </section>
 
-        <section class="form-section form-section--details">
+        <section
+          class="form-section form-section--details"
+          [formGroup]="createForm"
+        >
 
           <header class="form-section__header">
             <h3>Datos de la ventana</h3>
@@ -529,7 +552,7 @@
 
             <div class="field">
               <label>Estado</label>
-              <select [(ngModel)]="estado">
+              <select formControlName="estado">
                 <option>Programada</option>
                 <option>En ejecución</option>
                 <option>Finalizada</option>
@@ -539,7 +562,7 @@
 
             <div class="field">
               <label>Frecuencia</label>
-              <select [(ngModel)]="frecuencia">
+              <select formControlName="frecuencia">
                 <option>Una vez</option>
                 <option>Diaria</option>
                 <option>Semanal</option>
@@ -551,7 +574,7 @@
               <label>Fecha inicio</label>
               <input
                 type="datetime-local"
-                [(ngModel)]="fechaInicio"
+                formControlName="fechaInicio"
               />
             </div>
 
@@ -559,13 +582,13 @@
               <label>Fecha fin</label>
               <input
                 type="datetime-local"
-                [(ngModel)]="fechaFin"
+                formControlName="fechaFin"
               />
             </div>
 
             <div class="field">
               <label>Zona horaria</label>
-              <select [(ngModel)]="zonaHoraria">
+              <select formControlName="zonaHoraria">
                 <option>América / Bogotá</option>
                 <option>América / Lima</option>
                 <option>UTC</option>
@@ -576,11 +599,7 @@
               <label>Aplicación</label>
               <input
                 type="text"
-                [value]="
-                  selectedApp
-                    ? selectedApp.codigoAplicacion
-                    : ''
-                "
+                [value]="selectedApp()?.codigoAplicacion ?? ''"
                 placeholder="Selecciona una app arriba"
                 readonly
               />
@@ -590,7 +609,7 @@
               <label>Impacto</label>
               <input
                 type="text"
-                [(ngModel)]="impacto"
+                formControlName="impacto"
                 placeholder="Describe el impacto esperado"
               />
             </div>
@@ -599,7 +618,7 @@
               <label>Observación</label>
               <textarea
                 rows="3"
-                [(ngModel)]="observacion"
+                formControlName="observacion"
                 placeholder="Notas adicionales de la ventana"
               ></textarea>
             </div>
@@ -621,27 +640,27 @@
               <label>Tipo</label>
               <span>
                 {{
-                  isVentanaProgramada
+                  isVentanaProgramada()
                     ? 'Ventana programada'
                     : 'Promesa de servicio'
                 }}
               </span>
             </div>
 
-            @if (isVentanaProgramada) {
+            @if (isVentanaProgramada()) {
               <div class="preview-item">
                 <label>CRQ</label>
-                <span>{{ crq || '—' }}</span>
+                <span>{{ createPreview().crq || '—' }}</span>
               </div>
             }
 
             <div class="preview-item">
               <label>Aplicación</label>
               <span>
-                @if (selectedApp) {
-                  {{ selectedApp.codigoAplicacion }}
+                @if (selectedApp(); as app) {
+                  {{ app.codigoAplicacion }}
                   ·
-                  {{ selectedApp.nombreAplicacion }}
+                  {{ app.nombreAplicacion }}
                 } @else {
                   Sin seleccionar
                 }
@@ -651,8 +670,8 @@
             <div class="preview-item">
               <label>EVC / Línea</label>
               <span>
-                @if (selectedApp) {
-                  {{ selectedApp.evc }} · {{ selectedApp.linea }}
+                @if (selectedApp(); as app) {
+                  {{ app.evc }} · {{ app.linea }}
                 } @else {
                   —
                 }
@@ -661,20 +680,20 @@
 
             <div class="preview-item">
               <label>Estado</label>
-              <span>{{ estado || '—' }}</span>
+              <span>{{ createPreview().estado || '—' }}</span>
             </div>
 
             <div class="preview-item">
               <label>Frecuencia</label>
-              <span>{{ frecuencia || '—' }}</span>
+              <span>{{ createPreview().frecuencia || '—' }}</span>
             </div>
 
             <div class="preview-item">
               <label>Fecha inicio</label>
               <span>
                 {{
-                  fechaInicio
-                    ? formatPreview(fechaInicio)
+                  createPreview().fechaInicio
+                    ? formatPreview(createPreview().fechaInicio!)
                     : '—'
                 }}
               </span>
@@ -684,8 +703,8 @@
               <label>Fecha fin</label>
               <span>
                 {{
-                  fechaFin
-                    ? formatPreview(fechaFin)
+                  createPreview().fechaFin
+                    ? formatPreview(createPreview().fechaFin!)
                     : '—'
                 }}
               </span>
@@ -693,17 +712,17 @@
 
             <div class="preview-item">
               <label>Zona horaria</label>
-              <span>{{ zonaHoraria || '—' }}</span>
+              <span>{{ createPreview().zonaHoraria || '—' }}</span>
             </div>
 
             <div class="preview-item">
               <label>Impacto</label>
-              <span>{{ impacto || '—' }}</span>
+              <span>{{ createPreview().impacto || '—' }}</span>
             </div>
 
             <div class="preview-item preview-item--full">
               <label>Observación</label>
-              <span>{{ observacion || '—' }}</span>
+              <span>{{ createPreview().observacion || '—' }}</span>
             </div>
 
           </div>

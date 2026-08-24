@@ -1,4 +1,9 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output
+} from '@angular/core';
 
 import { StandbyApplication }
 from '../../models/standby-application.model';
@@ -7,48 +12,44 @@ from '../../models/standby-application.model';
   selector: 'app-standby-card',
   standalone: true,
   templateUrl: './standby-card.html',
-  styleUrl: './standby-card.scss'
+  styleUrl: './standby-card.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StandbyCardComponent {
 
-  @Input()
-  application!: StandbyApplication;
+  readonly application = input.required<StandbyApplication>();
 
-  @Output()
-  selected =
-    new EventEmitter<number>();
+  readonly hasStandby = input(false);
 
-  @Output()
-  view =
-    new EventEmitter<number>();
+  readonly selected = output<number>();
 
-  @Output()
-  edit =
-    new EventEmitter<number>();
+  readonly view = output<number>();
+
+  readonly edit = output<number>();
 
   toggleSelection(): void {
 
-    if (this.application.programmed) {
+    const app = this.application();
+
+    if (this.hasStandby()) {
       return;
     }
 
-    this.selected.emit(
-      this.application.id
-    );
+    this.selected.emit(app.id);
 
   }
 
   onView(event: Event): void {
 
     event.stopPropagation();
-    this.view.emit(this.application.id);
+    this.view.emit(this.application().id);
 
   }
 
   onEdit(event: Event): void {
 
     event.stopPropagation();
-    this.edit.emit(this.application.id);
+    this.edit.emit(this.application().id);
 
   }
 

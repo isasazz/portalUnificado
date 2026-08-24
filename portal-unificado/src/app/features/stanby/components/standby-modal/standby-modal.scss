@@ -177,9 +177,10 @@
 }
 
 .user-card.selected {
-  background: $surface;
+  background: rgba(253, 218, 36, 0.35);
   color: $text-primary;
   border: 2px solid $amarillo-macondo;
+  font-weight: $font-weight-semibold;
 }
 
 .selection-summary {

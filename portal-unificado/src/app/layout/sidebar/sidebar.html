@@ -1,6 +1,6 @@
 <aside
   class="sidebar"
-  [class.sidebar--collapsed]="collapsed"
+  [class.sidebar--collapsed]="collapsed()"
 >
 
   <div class="sidebar__top">
@@ -10,7 +10,7 @@
       type="button"
       (click)="onToggle()"
       [attr.aria-label]="
-        collapsed
+        collapsed()
           ? 'Mostrar menú'
           : 'Ocultar menú'
       "
@@ -20,7 +20,7 @@
       <span></span>
     </button>
 
-    @if (!collapsed) {
+    @if (!collapsed()) {
       <a
         class="sidebar__logo"
         routerLink="/inicio"
@@ -79,7 +79,7 @@
       AM
     </div>
 
-    @if (!collapsed) {
+    @if (!collapsed()) {
       <div class="user-info">
         <span>Ana Morales</span>
         <small>admin@empresa.com</small>
@@ -104,7 +104,7 @@
           />
         </svg>
       </span>
-      @if (!collapsed) {
+      @if (!collapsed()) {
         <span class="menu-item__label">Contactos</span>
       }
     </a>
@@ -123,7 +123,7 @@
           />
         </svg>
       </span>
-      @if (!collapsed) {
+      @if (!collapsed()) {
         <span class="menu-item__label">Standby</span>
       }
     </a>
@@ -142,7 +142,7 @@
           />
         </svg>
       </span>
-      @if (!collapsed) {
+      @if (!collapsed()) {
         <span class="menu-item__label">Ventana</span>
       }
     </a>
@@ -159,7 +159,7 @@
           />
         </svg>
       </span>
-      @if (!collapsed) {
+      @if (!collapsed()) {
         <span class="menu-item__label">Alertas</span>
       }
     </a>

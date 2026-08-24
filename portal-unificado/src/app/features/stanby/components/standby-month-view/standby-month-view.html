@@ -1,10 +1,10 @@
 <div
   class="standby-layout"
-  [class.standby-layout--calendar-only]="!showPeopleList"
-  [class.standby-layout--outline]="outlineMode"
+  [class.standby-layout--calendar-only]="!showPeopleList()"
+  [class.standby-layout--outline]="outlineMode()"
 >
 
-  @if (showPeopleList) {
+  @if (showPeopleList()) {
 
   <aside class="sidebar">
 
@@ -47,7 +47,7 @@
 
             }
 
-            @if (person.aplicaciones.length > 0 && !hideAppChips) {
+            @if (person.aplicaciones.length > 0 && !hideAppChips()) {
 
               <div class="person-apps">
                 <span class="person-apps__label">
@@ -148,12 +148,12 @@
             [class.is-range-start]="day.isRangeStart"
             [class.is-range-end]="day.isRangeEnd"
             [style.background]="
-              !outlineMode && day.assignment
+              !outlineMode() && day.assignment
                 ? day.assignment.color + '22'
                 : null
             "
             [style.borderColor]="
-              !outlineMode && day.assignment
+              !outlineMode() && day.assignment
                 ? day.assignment.color
                 : null
             "
@@ -163,7 +163,7 @@
               {{ day.dayNumber }}
             </span>
 
-            @if (day.assignment && !outlineMode) {
+            @if (day.assignment && !outlineMode()) {
 
               <div class="tooltip">
 

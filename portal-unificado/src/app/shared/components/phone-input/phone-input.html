@@ -1,19 +1,19 @@
 <div
   class="phone-input"
-  [class.phone-input--disabled]="disabled"
+  [class.phone-input--disabled]="disabled() || isDisabled()"
 >
 
   <button
     type="button"
     class="phone-input__prefix"
-    [disabled]="disabled"
+    [disabled]="disabled() || isDisabled()"
     (click)="toggleDropdown(); $event.stopPropagation()"
   >
     <span class="phone-input__flag">
-      {{ selectedCountry.flag }}
+      {{ selectedCountry().flag }}
     </span>
     <span class="phone-input__dial">
-      +{{ selectedCountry.dial }}
+      +{{ selectedCountry().dial }}
     </span>
     <span class="phone-input__caret">▾</span>
   </button>
@@ -21,13 +21,13 @@
   <input
     class="phone-input__number"
     type="tel"
-    [value]="localNumber"
-    [readonly]="disabled"
+    [value]="localNumber()"
+    [readonly]="disabled() || isDisabled()"
     placeholder="Número"
     (input)="onLocalNumberChange($any($event.target).value)"
   />
 
-  @if (dropdownOpen) {
+  @if (dropdownOpen()) {
 
     <div
       class="phone-input__dropdown"
@@ -37,14 +37,15 @@
       <input
         class="phone-input__search"
         type="text"
-        [(ngModel)]="search"
+        [value]="search()"
         placeholder="Buscar país o prefijo..."
+        (input)="onSearchChange($any($event.target).value)"
       />
 
       <div class="phone-input__list">
 
         @for (
-          country of filteredCountries;
+          country of filteredCountries();
           track country.iso + country.dial
         ) {
 
@@ -52,8 +53,8 @@
             type="button"
             class="phone-input__option"
             [class.active]="
-              country.iso === selectedCountry.iso &&
-              country.dial === selectedCountry.dial
+              country.iso === selectedCountry().iso &&
+              country.dial === selectedCountry().dial
             "
             (click)="selectCountry(country)"
           >
@@ -68,7 +69,7 @@
 
         }
 
-        @if (filteredCountries.length === 0) {
+        @if (filteredCountries().length === 0) {
           <p class="phone-input__empty">
             Sin resultados
           </p>

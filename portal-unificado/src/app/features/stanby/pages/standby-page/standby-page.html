@@ -70,6 +70,7 @@
 
         <app-standby-card
           [application]="application"
+          [hasStandby]="hasAppStandby(application.codigoAplicacion)"
           (selected)="toggleCard($event)"
           (view)="openViewForApp($event)"
           (edit)="openEditForApp($event)"
@@ -172,6 +173,7 @@
     [visible]="showViewModal"
     [assignments]="viewAssignments"
     [aplicacionCodigo]="viewAppCodigo"
+    [aplicacionNombre]="viewAppNombre"
     (closed)="closeViewModal()"
   />
 

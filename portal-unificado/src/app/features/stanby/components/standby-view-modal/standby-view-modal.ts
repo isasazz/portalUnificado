@@ -1,8 +1,8 @@
 import {
+  ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Input,
-  Output
+  input,
+  output
 } from '@angular/core';
 
 import { StandbyAssignment }
@@ -16,21 +16,20 @@ from '../standby-month-view/standby-month-view';
   standalone: true,
   imports: [StandbyMonthViewComponent],
   templateUrl: './standby-view-modal.html',
-  styleUrl: './standby-view-modal.scss'
+  styleUrl: './standby-view-modal.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StandbyViewModalComponent {
 
-  @Input()
-  visible = false;
+  readonly visible = input(false);
 
-  @Input()
-  assignments: StandbyAssignment[] = [];
+  readonly assignments = input<StandbyAssignment[]>([]);
 
-  @Input()
-  aplicacionCodigo = '';
+  readonly aplicacionCodigo = input('');
 
-  @Output()
-  closed = new EventEmitter<void>();
+  readonly aplicacionNombre = input('');
+
+  readonly closed = output<void>();
 
   close(): void {
 

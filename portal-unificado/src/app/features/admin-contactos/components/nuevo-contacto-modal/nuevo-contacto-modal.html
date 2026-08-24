@@ -1,4 +1,4 @@
-@if (visible) {
+@if (visible()) {
 
 <div class="modal-backdrop">
 
@@ -61,7 +61,10 @@
 
       </div>
 
-      <div class="form-grid">
+      <div
+        class="form-grid"
+        [formGroup]="form"
+      >
 
         <div class="field">
 
@@ -79,8 +82,7 @@
           <label>Celular</label>
 
           <app-phone-input
-            [value]="celular"
-            (valueChange)="onCelularChange($event)"
+            formControlName="celular"
           />
 
         </div>

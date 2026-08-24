@@ -94,6 +94,28 @@ export class StandbyScheduleService {
 
   }
 
+  getByAppCodigo(
+    codigoAplicacion: string
+  ): StandbyAssignment[] {
+
+    return this.savedAssignments.filter(
+      assignment =>
+        assignment.aplicaciones?.some(
+          app =>
+            app.codigoAplicacion === codigoAplicacion
+        )
+    );
+
+  }
+
+  isAppProgrammed(
+    codigoAplicacion: string
+  ): boolean {
+
+    return this.getByAppCodigo(codigoAplicacion).length > 0;
+
+  }
+
   private getColor(
     responsable: string
   ): string {

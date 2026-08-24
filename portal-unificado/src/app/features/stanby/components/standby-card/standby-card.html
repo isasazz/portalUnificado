@@ -1,15 +1,15 @@
 <div
   class="standby-card"
-  [class.selected]="application.selected && !application.programmed"
-  [class.programmed]="application.programmed"
+  [class.selected]="application().selected && !hasStandby()"
+  [class.programmed]="hasStandby()"
   (click)="toggleSelection()"
 >
 
-  @if (application.programmed || application.selected) {
+  @if (hasStandby() || application().selected) {
 
     <div class="standby-card__top">
 
-      @if (application.programmed) {
+      @if (hasStandby()) {
 
         <div class="card-actions" (click)="$event.stopPropagation()">
 
@@ -47,25 +47,25 @@
   }
 
   <strong class="app-code">
-    {{ application.codigoAplicacion }}
+    {{ application().codigoAplicacion }}
   </strong>
 
   <h3 class="app-name">
-    {{ application.nombreAplicacion }}
+    {{ application().nombreAplicacion }}
   </h3>
 
   <p class="app-description">
-    {{ application.descripcion }}
+    {{ application().descripcion }}
   </p>
 
   <div class="standby-card__meta">
-    <span>{{ application.evc }}</span>
+    <span>{{ application().evc }}</span>
     <span class="dot">·</span>
-    <span>{{ application.linea }}</span>
+    <span>{{ application().linea }}</span>
   </div>
 
   <span class="app-owner">
-    {{ application.responsable }}
+    {{ application().responsable }}
   </span>
 
 </div>

@@ -1,9 +1,9 @@
 import {
+  ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Input,
-  Output,
-  inject
+  inject,
+  input,
+  output
 } from '@angular/core';
 import {
   RouterLink,
@@ -21,19 +21,17 @@ from '../../core/services/theme.service';
     RouterLinkActive
   ],
   templateUrl: './sidebar.html',
-  styleUrl: './sidebar.scss'
+  styleUrl: './sidebar.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent {
 
   private readonly themeService =
     inject(ThemeService);
 
-  @Input()
-  collapsed = false;
+  readonly collapsed = input(false);
 
-  @Output()
-  toggle =
-    new EventEmitter<void>();
+  readonly toggle = output<void>();
 
   get isDark(): boolean {
 

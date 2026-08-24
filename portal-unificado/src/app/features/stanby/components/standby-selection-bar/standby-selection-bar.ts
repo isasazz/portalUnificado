@@ -1,8 +1,8 @@
 import {
+  ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Input,
-  Output
+  input,
+  output
 } from '@angular/core';
 
 
@@ -10,15 +10,14 @@ import {
   selector: 'app-standby-selection-bar',
   standalone: true,
   templateUrl: './standby-selection-bar.html',
-  styleUrl: './standby-selection-bar.scss'
+  styleUrl: './standby-selection-bar.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StandbySelectionBarComponent {
 
-  @Input()
-  visible = false;
+  readonly visible = input(false);
 
-  @Output()
-  addStandby = new EventEmitter<void>();
+  readonly addStandby = output<void>();
 
   onAddStandby(): void {
 

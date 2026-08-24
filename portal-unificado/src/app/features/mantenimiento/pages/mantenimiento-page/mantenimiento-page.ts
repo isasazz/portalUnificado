@@ -1,6 +1,16 @@
-import { Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal
+} from '@angular/core';
 import { NgClass } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 
 import { STANDBY_APPLICATIONS }
 from '../../../stanby/mocks/standby-applications.mock';
@@ -8,268 +18,103 @@ from '../../../stanby/mocks/standby-applications.mock';
 import { StandbyApplication }
 from '../../../stanby/models/standby-application.model';
 
-interface MaintenanceWindow {
-  id: number;
-  aplicacion: string;
-  nombreAplicacion: string;
-  evc: string;
-  linea: string;
-  frecuencia: string;
-  fechaInicio: string;
-  fechaFin: string;
-  zonaHoraria: string;
-  estado: string;
-  impacto: string;
-  observacion: string;
-  tipo: 'Ventana programada' | 'Promesa de servicio';
-  crq?: string;
-}
+import {
+  MaintenanceWindow,
+  TipoVentanaForm
+} from '../../models/maintenance-window.model';
+
+import { MantenimientoService }
+from '../../services/mantenimiento.service';
 
 @Component({
   selector: 'app-mantenimiento-page',
   standalone: true,
-  imports: [FormsModule, NgClass],
+  imports: [ReactiveFormsModule, NgClass],
   templateUrl: './mantenimiento-page.html',
-  styleUrl: './mantenimiento-page.scss'
+  styleUrl: './mantenimiento-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MantenimientoPageComponent {
 
-  viewMode: 'list' | 'form' = 'list';
+  private readonly fb = inject(FormBuilder);
 
-  applications: StandbyApplication[] =
+  readonly mantenimiento = inject(MantenimientoService);
+
+  readonly applications: StandbyApplication[] =
     STANDBY_APPLICATIONS.map(app => ({ ...app }));
 
-  /** Filtros del listado de ventanas */
-  listFilterEvc = '';
-  listFilterLinea = '';
-  listFilterEstado = '';
-  listSearchApp = '';
+  readonly viewMode = signal<'list' | 'form'>('list');
 
-  /** Filtros del formulario (selección de app) */
-  filterEvc = '';
-  filterLinea = '';
-  searchApp = '';
+  readonly selectedApp = signal<StandbyApplication | undefined>(
+    undefined
+  );
 
-  tipoVentana: '' | 'programada' | 'promesa' = '';
-  crq = '';
+  readonly filterEvc = signal('');
+  readonly filterLinea = signal('');
+  readonly searchApp = signal('');
 
-  selectedApp?: StandbyApplication;
+  readonly formRevision = signal(0);
 
-  estado = 'Programada';
-  frecuencia = 'Semanal';
-  fechaInicio = '2026-08-20T22:00';
-  fechaFin = '2026-08-21T02:00';
-  zonaHoraria = 'América / Bogotá';
-  impacto = 'Servicio degradado durante la ventana';
-  observacion = '';
+  readonly showEditPanel = signal(false);
 
-  showEditPanel = false;
-  editingWindow?: MaintenanceWindow;
+  readonly editingWindow = signal<MaintenanceWindow | undefined>(
+    undefined
+  );
 
-  editEstado = '';
-  editFrecuencia = '';
-  editFechaInicio = '';
-  editFechaFin = '';
-  editZonaHoraria = '';
-  editImpacto = '';
-  editObservacion = '';
-  editAplicacion = '';
-  editNombreAplicacion = '';
-  editEvc = '';
-  editLinea = '';
+  readonly createForm = this.fb.group({
+    tipoVentana: ['' as TipoVentanaForm],
+    crq: [''],
+    estado: ['Programada'],
+    frecuencia: ['Semanal'],
+    fechaInicio: ['2026-08-20T22:00', Validators.required],
+    fechaFin: ['2026-08-21T02:00', Validators.required],
+    zonaHoraria: ['América / Bogotá'],
+    impacto: ['Servicio degradado durante la ventana'],
+    observacion: ['']
+  });
 
-  maintenanceWindows: MaintenanceWindow[] = [
-    {
-      id: 1,
-      aplicacion: 'NU0113001',
-      nombreAplicacion: 'Núcleo Único',
-      evc: 'EVC Core Bancario',
-      linea: 'Aplicaciones',
-      frecuencia: 'Semanal',
-      fechaInicio: '20/08/2026 22:00',
-      fechaFin: '21/08/2026 02:00',
-      zonaHoraria: 'América / Bogotá',
-      estado: 'Programada',
-      impacto: 'Servicio degradado durante la ventana',
-      observacion: 'Reinicio coordinado con operaciones',
-      tipo: 'Ventana programada',
-      crq: 'CRQ-10234'
-    },
-    {
-      id: 2,
-      aplicacion: 'NU0113002',
-      nombreAplicacion: 'Portal Transaccional',
-      evc: 'EVC Canales',
-      linea: 'Aplicaciones',
-      frecuencia: 'Mensual',
-      fechaInicio: '05/09/2026 23:00',
-      fechaFin: '06/09/2026 03:00',
-      zonaHoraria: 'América / Bogotá',
-      estado: 'Programada',
-      impacto: 'Canales digitales no disponibles',
-      observacion: 'Notificar a canales 24h antes',
-      tipo: 'Ventana programada',
-      crq: 'CRQ-10456'
-    },
-    {
-      id: 3,
-      aplicacion: 'NU0113003',
-      nombreAplicacion: 'App Personas',
-      evc: 'EVC Digital',
-      linea: 'Aplicaciones',
-      frecuencia: 'Una vez',
-      fechaInicio: '12/09/2026 01:00',
-      fechaFin: '12/09/2026 05:00',
-      zonaHoraria: 'América / Bogotá',
-      estado: 'Programada',
-      impacto: 'App móvil en modo lectura',
-      observacion: '',
-      tipo: 'Ventana programada',
-      crq: 'CRQ-10789'
-    },
-    {
-      id: 4,
-      aplicacion: 'NU0113004',
-      nombreAplicacion: 'Gestión de Alertas',
-      evc: 'EVC Operaciones',
-      linea: 'Monitoreo',
-      frecuencia: 'Semanal',
-      fechaInicio: '18/09/2026 22:00',
-      fechaFin: '19/09/2026 01:00',
-      zonaHoraria: 'América / Bogotá',
-      estado: 'En ejecución',
-      impacto: 'Alertas con demora temporal',
-      observacion: 'Ventana en curso',
-      tipo: 'Ventana programada',
-      crq: 'CRQ-11012'
-    },
-    {
-      id: 5,
-      aplicacion: 'NU0113005',
-      nombreAplicacion: 'Pasarela de Pagos',
-      evc: 'EVC Canales',
-      linea: 'Aplicaciones',
-      frecuencia: 'Diaria',
-      fechaInicio: '21/08/2026 00:00',
-      fechaFin: '21/08/2026 02:00',
-      zonaHoraria: 'América / Bogotá',
-      estado: 'Finalizada',
-      impacto: 'Pagos diferidos al finalizar',
-      observacion: 'Cerrada sin incidentes',
-      tipo: 'Promesa de servicio'
-    },
-    {
-      id: 6,
-      aplicacion: 'NU0113001',
-      nombreAplicacion: 'Núcleo Único',
-      evc: 'EVC Core Bancario',
-      linea: 'Aplicaciones',
-      frecuencia: 'Mensual',
-      fechaInicio: '01/10/2026 21:00',
-      fechaFin: '02/10/2026 01:00',
-      zonaHoraria: 'América / Bogotá',
-      estado: 'Programada',
-      impacto: 'Actualización de núcleo',
-      observacion: 'Pendiente validación de cab',
-      tipo: 'Ventana programada',
-      crq: 'CRQ-11345'
-    }
-  ];
+  readonly editForm = this.fb.group({
+    estado: [''],
+    frecuencia: [''],
+    fechaInicio: ['', Validators.required],
+    fechaFin: ['', Validators.required],
+    zonaHoraria: [''],
+    impacto: [''],
+    observacion: [''],
+    aplicacion: [{ value: '', disabled: true }],
+    nombreAplicacion: [{ value: '', disabled: true }],
+    evc: [{ value: '', disabled: true }],
+    linea: [{ value: '', disabled: true }]
+  });
 
-  get evcOptions(): string[] {
+  readonly evcOptions = computed(() =>
+    [
+      ...new Set(this.applications.map(app => app.evc))
+    ].sort()
+  );
 
-    return [
-      ...new Set(
-        this.applications.map(app => app.evc)
-      )
-    ].sort();
+  readonly lineaOptions = computed(() =>
+    [
+      ...new Set(this.applications.map(app => app.linea))
+    ].sort()
+  );
 
-  }
+  readonly filteredApplications = computed(() => {
 
-  get lineaOptions(): string[] {
+    this.formRevision();
 
-    return [
-      ...new Set(
-        this.applications.map(app => app.linea)
-      )
-    ].sort();
+    const term = this.searchApp().trim().toLowerCase();
+    const evc = this.filterEvc();
+    const linea = this.filterLinea();
 
-  }
-
-  get listEvcOptions(): string[] {
-
-    return [
-      ...new Set(
-        this.maintenanceWindows.map(w => w.evc)
-      )
-    ].sort();
-
-  }
-
-  get listLineaOptions(): string[] {
-
-    return [
-      ...new Set(
-        this.maintenanceWindows.map(w => w.linea)
-      )
-    ].sort();
-
-  }
-
-  get filteredWindows(): MaintenanceWindow[] {
-
-    const term = this.listSearchApp.trim().toLowerCase();
-
-    return this.maintenanceWindows.filter(window => {
-
-      const matchEvc =
-        !this.listFilterEvc ||
-        window.evc === this.listFilterEvc;
-
-      const matchLinea =
-        !this.listFilterLinea ||
-        window.linea === this.listFilterLinea;
-
-      const matchEstado =
-        !this.listFilterEstado ||
-        window.estado === this.listFilterEstado;
-
-      const matchSearch =
-        !term ||
-        window.aplicacion.toLowerCase().includes(term) ||
-        window.nombreAplicacion
-          .toLowerCase()
-          .includes(term);
-
-      return (
-        matchEvc &&
-        matchLinea &&
-        matchEstado &&
-        matchSearch
-      );
-
-    });
-
-  }
-
-  get filteredApplications(): StandbyApplication[] {
-
-    if (!this.hasActiveAppFilters) {
+    if (!term && !evc && !linea) {
       return [];
     }
 
-    const term = this.searchApp.trim().toLowerCase();
-
     return this.applications.filter(app => {
 
-      const matchEvc =
-        !this.filterEvc ||
-        app.evc === this.filterEvc;
-
-      const matchLinea =
-        !this.filterLinea ||
-        app.linea === this.filterLinea;
-
+      const matchEvc = !evc || app.evc === evc;
+      const matchLinea = !linea || app.linea === linea;
       const matchSearch =
         !term ||
         app.codigoAplicacion
@@ -283,107 +128,153 @@ export class MantenimientoPageComponent {
 
     });
 
-  }
+  });
 
-  get hasActiveAppFilters(): boolean {
+  readonly hasActiveAppFilters = computed(() =>
+    Boolean(
+      this.searchApp().trim() ||
+      this.filterEvc() ||
+      this.filterLinea()
+    )
+  );
 
-    return Boolean(
-      this.searchApp.trim() ||
-      this.filterEvc ||
-      this.filterLinea
-    );
+  readonly isVentanaProgramada = computed(() => {
+    this.formRevision();
+    return this.createForm.controls.tipoVentana.value === 'programada';
+  });
 
-  }
+  readonly isPromesaServicio = computed(() => {
+    this.formRevision();
+    return this.createForm.controls.tipoVentana.value === 'promesa';
+  });
 
-  get isVentanaProgramada(): boolean {
+  readonly canFillFormFields = computed(() => {
+    this.formRevision();
+    const tipo = this.createForm.controls.tipoVentana.value;
 
-    return this.tipoVentana === 'programada';
-
-  }
-
-  get isPromesaServicio(): boolean {
-
-    return this.tipoVentana === 'promesa';
-
-  }
-
-  get canFillFormFields(): boolean {
-
-    if (!this.tipoVentana) {
+    if (!tipo) {
       return false;
     }
 
-    if (this.isPromesaServicio) {
+    if (tipo === 'promesa') {
       return true;
     }
 
-    return this.crq.trim().length > 0;
+    return Boolean(this.createForm.controls.crq.value?.trim());
+  });
+
+  readonly canSave = computed(() => {
+    this.formRevision();
+    return (
+      this.canFillFormFields() &&
+      !!this.selectedApp() &&
+      this.createForm.valid
+    );
+  });
+
+  readonly canSaveEdit = computed(() => {
+    this.formRevision();
+    return !!this.editingWindow() && this.editForm.valid;
+  });
+
+  readonly createPreview = computed(() => {
+    this.formRevision();
+    return this.createForm.getRawValue();
+  });
+
+  readonly hasTipoVentana = computed(() => {
+    this.formRevision();
+    return !!this.createForm.controls.tipoVentana.value;
+  });
+
+  readonly statusClass = MantenimientoService.statusClass;
+
+  readonly formatPreview = MantenimientoService.formatDateTime;
+
+  constructor() {
+
+    this.createForm.valueChanges.subscribe(() => {
+      this.formRevision.update(v => v + 1);
+    });
+
+    this.editForm.valueChanges.subscribe(() => {
+      this.formRevision.update(v => v + 1);
+    });
 
   }
 
-  get canSave(): boolean {
+  setListFilter(
+    field: 'evc' | 'linea' | 'searchApp',
+    value: string
+  ): void {
 
-    if (!this.canFillFormFields) {
-      return false;
+    if (field === 'evc') {
+      this.mantenimiento.listFilterEvc.set(value);
+      return;
     }
 
-    return (
-      !!this.selectedApp &&
-      !!this.fechaInicio &&
-      !!this.fechaFin
-    );
+    if (field === 'linea') {
+      this.mantenimiento.listFilterLinea.set(value);
+      return;
+    }
 
-  }
-
-  get canSaveEdit(): boolean {
-
-    return (
-      !!this.editingWindow &&
-      !!this.editFechaInicio.trim() &&
-      !!this.editFechaFin.trim()
-    );
+    this.mantenimiento.listSearchApp.set(value);
 
   }
 
   openForm(): void {
 
     this.closeEditPanel();
-    this.resetForm();
-    this.viewMode = 'form';
+    this.resetCreateForm();
+    this.viewMode.set('form');
 
   }
 
   cancelForm(): void {
 
-    this.viewMode = 'list';
-    this.resetForm();
+    this.viewMode.set('list');
+    this.resetCreateForm();
 
   }
 
   selectApp(app: StandbyApplication): void {
 
-    this.selectedApp = app;
+    this.selectedApp.set(app);
 
   }
 
-  selectTipoVentana(
-    tipo: 'programada' | 'promesa'
+  selectTipoVentana(tipo: 'programada' | 'promesa'): void {
+
+    this.createForm.patchValue({
+      tipoVentana: tipo,
+      crq: tipo === 'promesa' ? '' : this.createForm.controls.crq.value
+    });
+    this.formRevision.update(v => v + 1);
+
+  }
+
+  updateAppFilter(
+    field: 'evc' | 'linea' | 'searchApp',
+    value: string
   ): void {
 
-    this.tipoVentana = tipo;
-
-    if (tipo === 'promesa') {
-      this.crq = '';
+    if (field === 'evc') {
+      this.filterEvc.set(value);
+      return;
     }
+
+    if (field === 'linea') {
+      this.filterLinea.set(value);
+      return;
+    }
+
+    this.searchApp.set(value);
 
   }
 
   toggleEstadoFilter(estado: string): void {
 
-    this.listFilterEstado =
-      this.listFilterEstado === estado
-        ? ''
-        : estado;
+    this.mantenimiento.toggleEstadoFilter(estado);
 
   }
 
@@ -394,60 +285,50 @@ export class MantenimientoPageComponent {
 
     event.stopPropagation();
 
-    this.editingWindow = window;
-    this.editEstado = window.estado;
-    this.editFrecuencia = window.frecuencia;
-    this.editFechaInicio = window.fechaInicio;
-    this.editFechaFin = window.fechaFin;
-    this.editZonaHoraria = window.zonaHoraria;
-    this.editImpacto = window.impacto;
-    this.editObservacion = window.observacion;
-    this.editAplicacion = window.aplicacion;
-    this.editNombreAplicacion = window.nombreAplicacion;
-    this.editEvc = window.evc;
-    this.editLinea = window.linea;
-    this.showEditPanel = true;
+    this.editingWindow.set(window);
+    this.editForm.patchValue({
+      estado: window.estado,
+      frecuencia: window.frecuencia,
+      fechaInicio: window.fechaInicio,
+      fechaFin: window.fechaFin,
+      zonaHoraria: window.zonaHoraria,
+      impacto: window.impacto,
+      observacion: window.observacion,
+      aplicacion: window.aplicacion,
+      nombreAplicacion: window.nombreAplicacion,
+      evc: window.evc,
+      linea: window.linea
+    });
+    this.showEditPanel.set(true);
 
   }
 
   closeEditPanel(): void {
 
-    this.showEditPanel = false;
-    this.editingWindow = undefined;
+    this.showEditPanel.set(false);
+    this.editingWindow.set(undefined);
 
   }
 
   saveEdit(): void {
 
-    if (!this.canSaveEdit || !this.editingWindow) {
+    const window = this.editingWindow();
+
+    if (!this.canSaveEdit() || !window || this.editForm.invalid) {
       return;
     }
 
-    const id = this.editingWindow.id;
+    const values = this.editForm.getRawValue();
 
-    this.maintenanceWindows =
-      this.maintenanceWindows.map(window => {
-
-        if (window.id !== id) {
-          return window;
-        }
-
-        return {
-          ...window,
-          estado: this.editEstado,
-          frecuencia: this.editFrecuencia,
-          fechaInicio: this.editFechaInicio,
-          fechaFin: this.editFechaFin,
-          zonaHoraria: this.editZonaHoraria,
-          impacto: this.editImpacto,
-          observacion: this.editObservacion,
-          aplicacion: this.editAplicacion,
-          nombreAplicacion: this.editNombreAplicacion,
-          evc: this.editEvc,
-          linea: this.editLinea
-        };
-
-      });
+    this.mantenimiento.updateWindow(window.id, {
+      estado: values.estado ?? window.estado,
+      frecuencia: values.frecuencia ?? window.frecuencia,
+      fechaInicio: values.fechaInicio ?? window.fechaInicio,
+      fechaFin: values.fechaFin ?? window.fechaFin,
+      zonaHoraria: values.zonaHoraria ?? window.zonaHoraria,
+      impacto: values.impacto ?? window.impacto,
+      observacion: values.observacion ?? window.observacion
+    });
 
     this.closeEditPanel();
 
@@ -455,104 +336,63 @@ export class MantenimientoPageComponent {
 
   saveMaintenanceWindow(): void {
 
-    if (!this.canSave || !this.selectedApp) {
+    const app = this.selectedApp();
+
+    if (!this.canSave() || !app || this.createForm.invalid) {
       return;
     }
 
-    const newWindow: MaintenanceWindow = {
+    const values = this.createForm.getRawValue();
+    const isProgramada = values.tipoVentana === 'programada';
+
+    this.mantenimiento.addWindow({
       id: Date.now(),
-      aplicacion: this.selectedApp.codigoAplicacion,
-      nombreAplicacion:
-        this.selectedApp.nombreAplicacion,
-      evc: this.selectedApp.evc,
-      linea: this.selectedApp.linea,
-      frecuencia: this.frecuencia,
-      fechaInicio: this.formatDateTime(this.fechaInicio),
-      fechaFin: this.formatDateTime(this.fechaFin),
-      zonaHoraria: this.zonaHoraria,
-      estado: this.estado,
-      impacto: this.impacto,
-      observacion: this.observacion.trim(),
-      tipo: this.isVentanaProgramada
+      aplicacion: app.codigoAplicacion,
+      nombreAplicacion: app.nombreAplicacion,
+      evc: app.evc,
+      linea: app.linea,
+      frecuencia: values.frecuencia ?? 'Semanal',
+      fechaInicio: MantenimientoService.formatDateTime(
+        values.fechaInicio ?? ''
+      ),
+      fechaFin: MantenimientoService.formatDateTime(
+        values.fechaFin ?? ''
+      ),
+      zonaHoraria: values.zonaHoraria ?? 'América / Bogotá',
+      estado: values.estado ?? 'Programada',
+      impacto: values.impacto ?? '',
+      observacion: values.observacion?.trim() ?? '',
+      tipo: isProgramada
         ? 'Ventana programada'
         : 'Promesa de servicio',
-      crq: this.isVentanaProgramada
-        ? this.crq.trim()
+      crq: isProgramada
+        ? values.crq?.trim()
         : undefined
-    };
+    });
 
-    this.maintenanceWindows = [
-      newWindow,
-      ...this.maintenanceWindows
-    ];
-
-    this.viewMode = 'list';
-    this.resetForm();
+    this.viewMode.set('list');
+    this.resetCreateForm();
 
   }
 
-  formatPreview(value: string): string {
+  private resetCreateForm(): void {
 
-    return this.formatDateTime(value);
-
-  }
-
-  statusClass(estado: string): string {
-
-    const key = estado.toLowerCase();
-
-    if (key.includes('ejecución')) {
-      return 'status--running';
-    }
-
-    if (key.includes('finalizada')) {
-      return 'status--done';
-    }
-
-    if (key.includes('cancelada')) {
-      return 'status--cancel';
-    }
-
-    return 'status--scheduled';
-
-  }
-
-  private resetForm(): void {
-
-    this.selectedApp = undefined;
-    this.filterEvc = '';
-    this.filterLinea = '';
-    this.searchApp = '';
-    this.tipoVentana = '';
-    this.crq = '';
-    this.estado = 'Programada';
-    this.frecuencia = 'Semanal';
-    this.fechaInicio = '2026-08-20T22:00';
-    this.fechaFin = '2026-08-21T02:00';
-    this.zonaHoraria = 'América / Bogotá';
-    this.impacto = 'Servicio degradado durante la ventana';
-    this.observacion = '';
-
-  }
-
-  private formatDateTime(value: string): string {
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
-
-    const pad = (n: number) =>
-      n.toString().padStart(2, '0');
-
-    return (
-      `${pad(date.getDate())}/` +
-      `${pad(date.getMonth() + 1)}/` +
-      `${date.getFullYear()} ` +
-      `${pad(date.getHours())}:` +
-      `${pad(date.getMinutes())}`
-    );
+    this.selectedApp.set(undefined);
+    this.filterEvc.set('');
+    this.filterLinea.set('');
+    this.searchApp.set('');
+    this.createForm.reset({
+      tipoVentana: '' as TipoVentanaForm,
+      crq: '',
+      estado: 'Programada',
+      frecuencia: 'Semanal',
+      fechaInicio: '2026-08-20T22:00',
+      fechaFin: '2026-08-21T02:00',
+      zonaHoraria: 'América / Bogotá',
+      impacto: 'Servicio degradado durante la ventana',
+      observacion: ''
+    });
+    this.formRevision.update(v => v + 1);
 
   }
 

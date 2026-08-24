@@ -1,13 +1,17 @@
 import {
+  ChangeDetectionStrategy,
   Component,
-  EventEmitter,
+  forwardRef,
   HostListener,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges
+  input,
+  output,
+  signal
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  FormsModule,
+  NG_VALUE_ACCESSOR
+} from '@angular/forms';
 
 import {
   COUNTRY_DIAL_CODES,
@@ -20,81 +24,102 @@ import {
   standalone: true,
   imports: [FormsModule],
   templateUrl: './phone-input.html',
-  styleUrl: './phone-input.scss'
+  styleUrl: './phone-input.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => PhoneInputComponent),
+      multi: true
+    }
+  ]
 })
-export class PhoneInputComponent implements OnChanges {
+export class PhoneInputComponent implements ControlValueAccessor {
 
-  @Input()
-  value = '';
+  readonly disabled = input(false);
 
-  @Input()
-  disabled = false;
-
-  @Output()
-  valueChange = new EventEmitter<string>();
+  readonly valueChange = output<string>();
 
   readonly countries = COUNTRY_DIAL_CODES;
 
-  selectedCountry: CountryDialCode =
-    this.findCountry(DEFAULT_COUNTRY_ISO)!;
+  readonly selectedCountry = signal<CountryDialCode>(
+    this.findCountry(DEFAULT_COUNTRY_ISO)!
+  );
 
-  localNumber = '';
+  readonly localNumber = signal('');
 
-  search = '';
+  readonly search = signal('');
 
-  dropdownOpen = false;
+  readonly dropdownOpen = signal(false);
 
-  get filteredCountries(): CountryDialCode[] {
+  readonly isDisabled = signal(false);
 
-    const term = this.search.trim().toLowerCase();
+  readonly filteredCountries = signal<CountryDialCode[]>(
+    this.countries
+  );
 
-    if (!term) {
-      return this.countries;
-    }
+  private onChange: (value: string) => void = () => {};
+  private onTouched: () => void = () => {};
 
-    return this.countries.filter(country =>
-      country.name.toLowerCase().includes(term) ||
-      country.dial.includes(term) ||
-      country.iso.toLowerCase().includes(term)
-    );
+  writeValue(value: string): void {
+
+    this.parseValue(value ?? '');
 
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  registerOnChange(fn: (value: string) => void): void {
 
-    if (changes['value']) {
-      this.parseValue(this.value);
-    }
+    this.onChange = fn;
+
+  }
+
+  registerOnTouched(fn: () => void): void {
+
+    this.onTouched = fn;
+
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+
+    this.isDisabled.set(isDisabled);
 
   }
 
   toggleDropdown(): void {
 
-    if (this.disabled) {
+    if (this.disabled() || this.isDisabled()) {
       return;
     }
 
-    this.dropdownOpen = !this.dropdownOpen;
+    this.dropdownOpen.update(open => !open);
 
-    if (this.dropdownOpen) {
-      this.search = '';
+    if (this.dropdownOpen()) {
+      this.search.set('');
+      this.updateFilteredCountries();
     }
 
   }
 
   selectCountry(country: CountryDialCode): void {
 
-    this.selectedCountry = country;
-    this.dropdownOpen = false;
-    this.search = '';
+    this.selectedCountry.set(country);
+    this.dropdownOpen.set(false);
+    this.search.set('');
     this.emitValue();
 
   }
 
   onLocalNumberChange(value: string): void {
 
-    this.localNumber = value.replace(/[^\d\s-]/g, '');
+    this.localNumber.set(value.replace(/[^\d\s-]/g, ''));
     this.emitValue();
+
+  }
+
+  onSearchChange(value: string): void {
+
+    this.search.set(value);
+    this.updateFilteredCountries();
 
   }
 
@@ -104,20 +129,24 @@ export class PhoneInputComponent implements OnChanges {
     const target = event.target as HTMLElement | null;
 
     if (!target?.closest('.phone-input')) {
-      this.dropdownOpen = false;
+      this.dropdownOpen.set(false);
     }
 
   }
 
   private emitValue(): void {
 
-    const digits = this.localNumber.replace(/\D/g, '');
+    const digits = this.localNumber().replace(/\D/g, '');
 
     const full = digits
-      ? `+${this.selectedCountry.dial} ${this.localNumber.trim()}`
-      : `+${this.selectedCountry.dial}`;
+      ? `+${this.selectedCountry().dial} ${this.localNumber().trim()}`
+      : `+${this.selectedCountry().dial}`;
 
-    this.valueChange.emit(full.trim());
+    const value = full.trim();
+
+    this.onChange(value);
+    this.onTouched();
+    this.valueChange.emit(value);
 
   }
 
@@ -126,9 +155,10 @@ export class PhoneInputComponent implements OnChanges {
     const cleaned = (raw || '').trim();
 
     if (!cleaned) {
-      this.selectedCountry =
-        this.findCountry(DEFAULT_COUNTRY_ISO)!;
-      this.localNumber = '';
+      this.selectedCountry.set(
+        this.findCountry(DEFAULT_COUNTRY_ISO)!
+      );
+      this.localNumber.set('');
       return;
     }
 
@@ -144,16 +174,36 @@ export class PhoneInputComponent implements OnChanges {
     );
 
     if (match) {
-      this.selectedCountry = match;
-      this.localNumber = normalized
-        .slice(match.dial.length)
-        .trim();
+      this.selectedCountry.set(match);
+      this.localNumber.set(
+        normalized.slice(match.dial.length).trim()
+      );
       return;
     }
 
-    this.selectedCountry =
-      this.findCountry(DEFAULT_COUNTRY_ISO)!;
-    this.localNumber = cleaned.replace(/^\+?57\s?/, '');
+    this.selectedCountry.set(
+      this.findCountry(DEFAULT_COUNTRY_ISO)!
+    );
+    this.localNumber.set(cleaned.replace(/^\+?57\s?/, ''));
+
+  }
+
+  private updateFilteredCountries(): void {
+
+    const term = this.search().trim().toLowerCase();
+
+    if (!term) {
+      this.filteredCountries.set(this.countries);
+      return;
+    }
+
+    this.filteredCountries.set(
+      this.countries.filter(country =>
+        country.name.toLowerCase().includes(term) ||
+        country.dial.includes(term) ||
+        country.iso.toLowerCase().includes(term)
+      )
+    );
 
   }
 

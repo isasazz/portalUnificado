@@ -1,17 +1,19 @@
 import {
+  ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges
+  effect,
+  inject,
+  input,
+  output
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { Router } from '@angular/router';
 
-import {
-  StandbyCalendarComponent
-} from '../standby-calendar/standby-calendar';
+import { StandbyMonthViewComponent }
+from '../../../stanby/components/standby-month-view/standby-month-view';
 
 import { PhoneInputComponent }
 from '../../../../shared/components/phone-input/phone-input';
@@ -25,24 +27,32 @@ from '../../models/contacto.model';
   templateUrl: './contacto-modal.html',
   styleUrls: ['./contacto-modal.scss'],
   imports: [
-    StandbyCalendarComponent,
-    FormsModule,
+    StandbyMonthViewComponent,
+    ReactiveFormsModule,
     PhoneInputComponent
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContactoModalComponent implements OnChanges {
+export class ContactoModalComponent {
 
-  @Input()
-  visible = false;
+  readonly visible = input(false);
 
-  @Input()
-  contacto: Contacto | null = null;
+  readonly contacto = input<Contacto | null>(null);
 
-  @Input()
-  editMode = false;
+  readonly editMode = input(false);
 
-  @Output()
-  closed = new EventEmitter<void>();
+  readonly closed = output<void>();
+
+  readonly standbyAssignments: never[] = [];
+
+  private readonly router = inject(Router);
+
+  private readonly fb = inject(FormBuilder);
+
+  readonly contactoForm = this.fb.group({
+    celular: [''],
+    correoTeams: ['']
+  });
 
   activeTab:
     | 'detalle'
@@ -50,39 +60,37 @@ export class ContactoModalComponent implements OnChanges {
     | 'standby'
     | 'mantenimiento' = 'detalle';
 
-  celular = '';
+  constructor() {
 
-  correoTeams = '';
+    effect(() => {
 
-  constructor(
-    private router: Router
-  ) {}
+      if (!this.visible()) {
+        return;
+      }
 
-  ngOnChanges(changes: SimpleChanges): void {
-
-    if (changes['visible'] && this.visible) {
-
-      this.activeTab = this.editMode
+      this.activeTab = this.editMode()
         ? 'contacto'
         : 'detalle';
 
-      this.celular = this.contacto?.celular ?? '';
-      this.correoTeams =
-        `${(this.contacto?.codigoAplicacion ?? 'app').toLowerCase()}@bancolombia.com.co`;
+      this.contactoForm.patchValue({
+        celular: this.contacto()?.celular ?? '',
+        correoTeams:
+          `${(this.contacto()?.codigoAplicacion ?? 'app').toLowerCase()}@bancolombia.com.co`
+      });
 
-    }
+      if (this.editMode()) {
+        this.contactoForm.enable();
+      } else {
+        this.contactoForm.disable();
+      }
+
+    });
 
   }
 
   get canEditContactoTab(): boolean {
 
-    return this.editMode;
-
-  }
-
-  onCelularChange(value: string): void {
-
-    this.celular = value;
+    return this.editMode();
 
   }
 
@@ -106,7 +114,7 @@ export class ContactoModalComponent implements OnChanges {
 
   goToStandby(): void {
 
-    if (this.editMode) {
+    if (this.editMode()) {
       return;
     }
 
@@ -116,7 +124,7 @@ export class ContactoModalComponent implements OnChanges {
       ['/standby'],
       {
         queryParams: {
-          app: this.contacto?.codigoAplicacion ?? 'NU0113001'
+          app: this.contacto()?.codigoAplicacion ?? 'NU0113001'
         }
       }
     );
@@ -125,7 +133,7 @@ export class ContactoModalComponent implements OnChanges {
 
   goToMaintenance(): void {
 
-    if (this.editMode) {
+    if (this.editMode()) {
       return;
     }
 
@@ -135,7 +143,7 @@ export class ContactoModalComponent implements OnChanges {
       ['/mantenimiento'],
       {
         queryParams: {
-          app: this.contacto?.codigoAplicacion ?? 'NU0113001'
+          app: this.contacto()?.codigoAplicacion ?? 'NU0113001'
         }
       }
     );
