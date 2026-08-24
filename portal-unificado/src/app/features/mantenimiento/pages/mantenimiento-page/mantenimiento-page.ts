@@ -58,6 +58,18 @@ export class MantenimientoPageComponent {
 
   readonly showEditPanel = signal(false);
 
+  readonly showTypeModal = signal(false);
+
+  readonly showSaveToast = signal(false);
+
+  readonly highlightedWindowId = signal<number | null>(null);
+
+  private saveToastTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private highlightTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private static readonly CRQ_PATTERN = /^CRQ-\d{5}$/i;
+
   readonly editingWindow = signal<MaintenanceWindow | undefined>(
     undefined
   );
@@ -161,7 +173,19 @@ export class MantenimientoPageComponent {
       return true;
     }
 
-    return Boolean(this.createForm.controls.crq.value?.trim());
+    return this.isCrqValid();
+  });
+
+  readonly isCrqValid = computed(() => {
+    this.formRevision();
+    const value = this.createForm.controls.crq.value?.trim() ?? '';
+    return MantenimientoPageComponent.CRQ_PATTERN.test(value);
+  });
+
+  readonly isCrqInvalid = computed(() => {
+    this.formRevision();
+    const value = this.createForm.controls.crq.value?.trim() ?? '';
+    return value.length > 0 && !this.isCrqValid();
   });
 
   readonly canSave = computed(() => {
@@ -186,6 +210,31 @@ export class MantenimientoPageComponent {
   readonly hasTipoVentana = computed(() => {
     this.formRevision();
     return !!this.createForm.controls.tipoVentana.value;
+  });
+
+  readonly displayWindows = computed(() => {
+
+    const list = this.mantenimiento.filteredWindows();
+    const highlightId = this.highlightedWindowId();
+
+    if (!highlightId) {
+      return list;
+    }
+
+    const index = list.findIndex(window => window.id === highlightId);
+
+    if (index <= 0) {
+      return list;
+    }
+
+    const highlighted = list[index];
+
+    return [
+      highlighted,
+      ...list.slice(0, index),
+      ...list.slice(index + 1)
+    ];
+
   });
 
   readonly statusClass = MantenimientoService.statusClass;
@@ -227,14 +276,20 @@ export class MantenimientoPageComponent {
 
     this.closeEditPanel();
     this.resetCreateForm();
-    this.viewMode.set('form');
+    this.showTypeModal.set(true);
+
+  }
+
+  closeTypeModal(): void {
+
+    this.showTypeModal.set(false);
+    this.resetCreateForm();
 
   }
 
   cancelForm(): void {
 
-    this.viewMode.set('list');
-    this.resetCreateForm();
+    this.closeTypeModal();
 
   }
 
@@ -248,8 +303,26 @@ export class MantenimientoPageComponent {
 
     this.createForm.patchValue({
       tipoVentana: tipo,
-      crq: tipo === 'promesa' ? '' : this.createForm.controls.crq.value
+      crq: ''
     });
+    this.selectedApp.set(undefined);
+    this.filterEvc.set('');
+    this.filterLinea.set('');
+    this.searchApp.set('');
+    this.formRevision.update(v => v + 1);
+
+  }
+
+  changeTipoVentana(): void {
+
+    this.createForm.patchValue({
+      tipoVentana: '' as TipoVentanaForm,
+      crq: ''
+    });
+    this.selectedApp.set(undefined);
+    this.filterEvc.set('');
+    this.filterLinea.set('');
+    this.searchApp.set('');
     this.formRevision.update(v => v + 1);
 
   }
@@ -377,9 +450,15 @@ export class MantenimientoPageComponent {
 
     const values = this.createForm.getRawValue();
     const isProgramada = values.tipoVentana === 'programada';
+    const tipo = isProgramada
+      ? 'Ventana programada' as const
+      : 'Promesa de servicio' as const;
+    const estado = values.estado ?? 'Programada';
+
+    const newId = Date.now();
 
     this.mantenimiento.addWindow({
-      id: Date.now(),
+      id: newId,
       aplicacion: app.codigoAplicacion,
       nombreAplicacion: app.nombreAplicacion,
       evc: app.evc,
@@ -392,19 +471,73 @@ export class MantenimientoPageComponent {
         values.fechaFin ?? ''
       ),
       zonaHoraria: values.zonaHoraria ?? 'América / Bogotá',
-      estado: values.estado ?? 'Programada',
+      estado,
       impacto: values.impacto ?? '',
       observacion: values.observacion?.trim() ?? '',
-      tipo: isProgramada
-        ? 'Ventana programada'
-        : 'Promesa de servicio',
+      tipo,
       crq: isProgramada
         ? values.crq?.trim()
         : undefined
     });
 
+    this.mantenimiento.listFilterTipo.set(tipo);
+    this.mantenimiento.listFilterEstado.set(estado);
+    this.mantenimiento.listFilterEvc.set('');
+    this.mantenimiento.listFilterLinea.set('');
+    this.mantenimiento.listSearchApp.set('');
+
+    this.showTypeModal.set(false);
     this.viewMode.set('list');
     this.resetCreateForm();
+    this.focusSavedWindow(newId);
+    this.showSaveSuccessToast();
+
+  }
+
+  dismissSaveToast(): void {
+
+    this.showSaveToast.set(false);
+
+    if (this.saveToastTimer) {
+      clearTimeout(this.saveToastTimer);
+      this.saveToastTimer = null;
+    }
+
+  }
+
+  private focusSavedWindow(id: number): void {
+
+    if (this.highlightTimer) {
+      clearTimeout(this.highlightTimer);
+    }
+
+    this.highlightedWindowId.set(id);
+
+    setTimeout(() => {
+      const element = document.getElementById(`window-card-${id}`);
+
+      element?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, 80);
+
+    this.highlightTimer = setTimeout(() => {
+      this.highlightedWindowId.set(null);
+      this.highlightTimer = null;
+    }, 5000);
+
+  }
+
+  private showSaveSuccessToast(): void {
+
+    this.dismissSaveToast();
+    this.showSaveToast.set(true);
+
+    this.saveToastTimer = setTimeout(() => {
+      this.showSaveToast.set(false);
+      this.saveToastTimer = null;
+    }, 4000);
 
   }
 
