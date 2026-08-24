@@ -15,8 +15,7 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     estado: 'Programada',
     impacto: 'Servicio degradado durante la ventana',
     observacion: 'Reinicio coordinado con operaciones',
-    tipo: 'Ventana programada',
-    crq: 'CRQ-10234'
+    tipo: 'Ventana programada'
   },
   {
     id: 2,
@@ -31,8 +30,7 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     estado: 'Programada',
     impacto: 'Canales digitales no disponibles',
     observacion: 'Notificar a canales 24h antes',
-    tipo: 'Ventana programada',
-    crq: 'CRQ-10456'
+    tipo: 'Ventana programada'
   },
   {
     id: 3,
@@ -47,8 +45,7 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     estado: 'Programada',
     impacto: 'App móvil en modo lectura',
     observacion: '',
-    tipo: 'Ventana programada',
-    crq: 'CRQ-10789'
+    tipo: 'Ventana programada'
   },
   {
     id: 4,
@@ -63,8 +60,7 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     estado: 'En ejecución',
     impacto: 'Alertas con demora temporal',
     observacion: 'Ventana en curso',
-    tipo: 'Ventana programada',
-    crq: 'CRQ-11012'
+    tipo: 'Ventana programada'
   },
   {
     id: 5,
@@ -79,7 +75,8 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     estado: 'Finalizada',
     impacto: 'Pagos diferidos al finalizar',
     observacion: 'Cerrada sin incidentes',
-    tipo: 'Promesa de servicio'
+    tipo: 'Promesa de servicio',
+    crq: 'CRQ-10890'
   },
   {
     id: 6,
@@ -94,7 +91,22 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     estado: 'Programada',
     impacto: 'Actualización de núcleo',
     observacion: 'Pendiente validación de cab',
-    tipo: 'Ventana programada',
-    crq: 'CRQ-11345'
+    tipo: 'Ventana programada'
+  },
+  {
+    id: 7,
+    aplicacion: 'NU0113006',
+    nombreAplicacion: 'Créditos Digitales',
+    evc: 'EVC Productos',
+    linea: 'Aplicaciones',
+    frecuencia: 'Una vez',
+    fechaInicio: '28/09/2026 20:00',
+    fechaFin: '28/09/2026 23:00',
+    zonaHoraria: 'América / Bogotá',
+    estado: 'Programada',
+    impacto: 'Originación de créditos no disponible',
+    observacion: 'Coordinado con mesa de ayuda',
+    tipo: 'Promesa de servicio',
+    crq: 'CRQ-11567'
   }
 ];

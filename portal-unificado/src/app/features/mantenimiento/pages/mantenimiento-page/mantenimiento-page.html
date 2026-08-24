@@ -58,41 +58,105 @@
 
         </div>
 
-        <div class="estado-filters">
+        <div class="filter-toolbar">
 
-          <button
-            type="button"
-            class="estado-chip"
-            [class.estado-chip--active]="mantenimiento.listFilterEstado() === 'Programada'"
-            (click)="toggleEstadoFilter('Programada')"
-          >
-            Programada
-          </button>
+          <div class="filter-group">
+            <span class="filter-group__label">Tipo</span>
 
-          <button
-            type="button"
-            class="estado-chip"
-            [class.estado-chip--active]="mantenimiento.listFilterEstado() === 'En ejecución'"
-            (click)="toggleEstadoFilter('En ejecución')"
-          >
-            En ejecución
-          </button>
+            <div
+              class="filter-tabs"
+              role="tablist"
+              aria-label="Tipo de ventana"
+            >
 
-          <button
-            type="button"
-            class="estado-chip"
-            [class.estado-chip--active]="mantenimiento.listFilterEstado() === 'Finalizada'"
-            (click)="toggleEstadoFilter('Finalizada')"
-          >
-            Finalizada
-          </button>
+              <button
+                type="button"
+                role="tab"
+                class="filter-tab filter-tab--todos"
+                [class.filter-tab--active]="mantenimiento.listFilterTipo() === ''"
+                [attr.aria-selected]="mantenimiento.listFilterTipo() === ''"
+                (click)="clearTipoFilter()"
+              >
+                Todos
+              </button>
 
-        </div>
+              <button
+                type="button"
+                role="tab"
+                class="filter-tab filter-tab--programada"
+                [class.filter-tab--active]="mantenimiento.listFilterTipo() === 'Ventana programada'"
+                [attr.aria-selected]="mantenimiento.listFilterTipo() === 'Ventana programada'"
+                (click)="toggleTipoFilter('Ventana programada')"
+              >
+                Ventana programada
+              </button>
 
-        <div class="filters-actions">
-          <small>
+              <button
+                type="button"
+                role="tab"
+                class="filter-tab filter-tab--promesa"
+                [class.filter-tab--active]="mantenimiento.listFilterTipo() === 'Promesa de servicio'"
+                [attr.aria-selected]="mantenimiento.listFilterTipo() === 'Promesa de servicio'"
+                (click)="toggleTipoFilter('Promesa de servicio')"
+              >
+                Promesa de servicio
+              </button>
+
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-group__label">Estado</span>
+
+            <div
+              class="filter-links"
+              role="group"
+              aria-label="Estado de la ventana"
+            >
+
+              <button
+                type="button"
+                class="filter-link"
+                [class.filter-link--active]="mantenimiento.listFilterEstado() === ''"
+                (click)="clearEstadoFilter()"
+              >
+                Todas
+              </button>
+
+              <button
+                type="button"
+                class="filter-link"
+                [class.filter-link--active]="mantenimiento.listFilterEstado() === 'Programada'"
+                (click)="toggleEstadoFilter('Programada')"
+              >
+                Programada
+              </button>
+
+              <button
+                type="button"
+                class="filter-link"
+                [class.filter-link--active]="mantenimiento.listFilterEstado() === 'En ejecución'"
+                (click)="toggleEstadoFilter('En ejecución')"
+              >
+                En ejecución
+              </button>
+
+              <button
+                type="button"
+                class="filter-link"
+                [class.filter-link--active]="mantenimiento.listFilterEstado() === 'Finalizada'"
+                (click)="toggleEstadoFilter('Finalizada')"
+              >
+                Finalizada
+              </button>
+
+            </div>
+          </div>
+
+          <p class="filters-count">
             {{ mantenimiento.filteredWindows().length }} ventana(s)
-          </small>
+          </p>
+
         </div>
 
       </div>
@@ -131,6 +195,7 @@
 
               <article
                 class="window-tile"
+                [ngClass]="statusClass(window.estado)"
                 [class.window-tile--editing]="
                   showEditPanel() &&
                   editingWindow()?.id === window.id
@@ -139,12 +204,23 @@
 
                 <div class="window-tile__top">
 
-                  <span
-                    class="status-pill"
-                    [ngClass]="statusClass(window.estado)"
-                  >
-                    {{ window.estado }}
-                  </span>
+                  <div class="window-tile__meta-row">
+                    <span
+                      class="tipo-label"
+                      [class.tipo-label--promesa]="isPromesa(window)"
+                    >
+                      {{ tipoLabel(window.tipo) }}
+                    </span>
+
+                    <span class="window-tile__dot" aria-hidden="true">·</span>
+
+                    <span
+                      class="status-label"
+                      [ngClass]="statusClass(window.estado)"
+                    >
+                      {{ window.estado }}
+                    </span>
+                  </div>
 
                   <div class="window-tile__actions">
 
@@ -179,9 +255,16 @@
                     {{ window.nombreAplicacion }}
                   </h3>
 
-                  <p class="window-tile__meta">
+                  <p class="window-tile__org">
                     {{ window.evc }} · {{ window.linea }}
                   </p>
+
+                  @if (isPromesa(window) && window.crq) {
+                    <p class="window-tile__crq">
+                      <span>CRQ</span>
+                      {{ window.crq }}
+                    </p>
+                  }
 
                   <p class="window-tile__impact">
                     {{ window.impacto }}
@@ -198,9 +281,15 @@
                 <div class="window-tile__footer">
 
                   <div class="window-tile__dates">
-                    <span>{{ window.fechaInicio }}</span>
-                    <span class="arrow">→</span>
-                    <span>{{ window.fechaFin }}</span>
+                    <div class="date-block">
+                      <span class="date-block__label">Inicio</span>
+                      <span class="date-block__value">{{ window.fechaInicio }}</span>
+                    </div>
+                    <span class="arrow" aria-hidden="true">→</span>
+                    <div class="date-block">
+                      <span class="date-block__label">Fin</span>
+                      <span class="date-block__value">{{ window.fechaFin }}</span>
+                    </div>
                   </div>
 
                   <span class="window-tile__zone">

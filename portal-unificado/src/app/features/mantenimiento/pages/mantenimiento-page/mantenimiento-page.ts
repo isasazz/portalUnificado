@@ -20,6 +20,7 @@ from '../../../stanby/models/standby-application.model';
 
 import {
   MaintenanceWindow,
+  MaintenanceWindowType,
   TipoVentanaForm
 } from '../../models/maintenance-window.model';
 
@@ -272,9 +273,41 @@ export class MantenimientoPageComponent {
 
   }
 
+  toggleTipoFilter(tipo: MaintenanceWindowType): void {
+
+    this.mantenimiento.listFilterTipo.set(tipo);
+
+  }
+
+  clearTipoFilter(): void {
+
+    this.mantenimiento.listFilterTipo.set('');
+
+  }
+
   toggleEstadoFilter(estado: string): void {
 
-    this.mantenimiento.toggleEstadoFilter(estado);
+    this.mantenimiento.listFilterEstado.set(estado);
+
+  }
+
+  clearEstadoFilter(): void {
+
+    this.mantenimiento.listFilterEstado.set('');
+
+  }
+
+  tipoLabel(tipo: MaintenanceWindowType): string {
+
+    return tipo === 'Ventana programada'
+      ? 'Programada'
+      : 'Promesa de servicio';
+
+  }
+
+  isPromesa(window: MaintenanceWindow): boolean {
+
+    return window.tipo === 'Promesa de servicio';
 
   }
 

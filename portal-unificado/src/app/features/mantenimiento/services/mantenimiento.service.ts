@@ -4,8 +4,10 @@ import {
   signal
 } from '@angular/core';
 
-import { MaintenanceWindow }
-from '../models/maintenance-window.model';
+import {
+  MaintenanceWindow,
+  MaintenanceWindowType
+} from '../models/maintenance-window.model';
 
 import { MAINTENANCE_WINDOWS_MOCK }
 from '../mocks/maintenance-windows.mock';
@@ -25,6 +27,7 @@ export class MantenimientoService {
   readonly listFilterEvc = signal('');
   readonly listFilterLinea = signal('');
   readonly listFilterEstado = signal('');
+  readonly listFilterTipo = signal<MaintenanceWindowType | ''>('');
   readonly listSearchApp = signal('');
 
   readonly filteredWindows = computed(() => {
@@ -33,18 +36,20 @@ export class MantenimientoService {
     const evc = this.listFilterEvc();
     const linea = this.listFilterLinea();
     const estado = this.listFilterEstado();
+    const tipo = this.listFilterTipo();
 
     return this.windows().filter(window => {
 
       const matchEvc = !evc || window.evc === evc;
       const matchLinea = !linea || window.linea === linea;
       const matchEstado = !estado || window.estado === estado;
+      const matchTipo = !tipo || window.tipo === tipo;
       const matchSearch =
         !term ||
         window.aplicacion.toLowerCase().includes(term) ||
         window.nombreAplicacion.toLowerCase().includes(term);
 
-      return matchEvc && matchLinea && matchEstado && matchSearch;
+      return matchEvc && matchLinea && matchEstado && matchTipo && matchSearch;
 
     });
 
@@ -87,6 +92,14 @@ export class MantenimientoService {
 
     this.listFilterEstado.update(current =>
       current === estado ? '' : estado
+    );
+
+  }
+
+  toggleTipoFilter(tipo: MaintenanceWindowType): void {
+
+    this.listFilterTipo.update(current =>
+      current === tipo ? '' : tipo
     );
 
   }
