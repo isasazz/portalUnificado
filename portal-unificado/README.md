@@ -1,9 +1,33 @@
+<!-- Espacio superior del encabezado -->
+<p align="center">
+  <img
+    alt=""
+    width="1"
+    height="280"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</p>
+
+<div align="center">
+
 # Portal Unificado
 
-Portal admin (Bancolombia) en **Angular 21**.  
-Frontend con datos mock en memoria (demo de UI, sin backend).
+Demo frontend · Angular 21 · Bancolombia
 
-Repo: [https://github.com/isasazz/portalUnificado](https://github.com/isasazz/portalUnificado)
+Portal admin con datos mock en memoria (UI de demostración, sin backend).
+
+[isasazz/portalUnificado](https://github.com/isasazz/portalUnificado)
+
+</div>
+
+<p align="center">
+  <img
+    alt=""
+    width="1"
+    height="40"
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  />
+</p>
 
 ---
 
@@ -31,7 +55,9 @@ Si no tienes Node, instálalo desde: [https://nodejs.org](https://nodejs.org) (e
 
 ---
 
-## Cómo clonar y ejecutar (cualquier PC)
+## Cómo clonar y ejecutar
+
+Sigue estos pasos en orden. Funciona en cualquier PC con Node 20 o 22.
 
 ### 1. Clonar el repositorio
 
@@ -74,7 +100,9 @@ Para detener el servidor: `Ctrl + C` en la terminal.
 
 ---
 
-## Resumen rápido (copiar y pegar)
+## Resumen rápido
+
+Copia y pega esto en PowerShell:
 
 ```powershell
 git clone https://github.com/isasazz/portalUnificado.git

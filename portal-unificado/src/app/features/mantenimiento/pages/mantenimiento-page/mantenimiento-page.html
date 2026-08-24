@@ -7,54 +7,52 @@
 
     @if (viewMode() === 'list') {
 
-      <h2 class="list-title">Ventanas activas</h2>
+      <header class="list-hero">
+        <h2 class="list-title">Ventanas activas</h2>
+      </header>
 
-      <div class="page-header">
+      <div class="list-filters">
 
-        <div class="header-actions">
+        <div class="list-toolbar">
+
+          <div class="filters-grid">
+
+            <select
+              [value]="mantenimiento.listFilterEvc()"
+              (change)="mantenimiento.listFilterEvc.set($any($event.target).value)"
+            >
+              <option value="">Todos los EVC</option>
+              @for (evc of mantenimiento.listEvcOptions(); track evc) {
+                <option [value]="evc">{{ evc }}</option>
+              }
+            </select>
+
+            <select
+              [value]="mantenimiento.listFilterLinea()"
+              (change)="mantenimiento.listFilterLinea.set($any($event.target).value)"
+            >
+              <option value="">Todas las líneas</option>
+              @for (linea of mantenimiento.listLineaOptions(); track linea) {
+                <option [value]="linea">{{ linea }}</option>
+              }
+            </select>
+
+            <input
+              type="text"
+              placeholder="Buscar aplicación (código o nombre)"
+              [value]="mantenimiento.listSearchApp()"
+              (input)="mantenimiento.listSearchApp.set($any($event.target).value)"
+            />
+
+          </div>
 
           <button
             type="button"
-            class="btn-save"
+            class="btn-save list-toolbar__add"
             (click)="openForm()"
           >
             Agregar ventana
           </button>
-
-        </div>
-
-      </div>
-
-      <div class="list-filters">
-
-        <div class="filters-grid">
-
-          <select
-            [value]="mantenimiento.listFilterEvc()"
-            (change)="mantenimiento.listFilterEvc.set($any($event.target).value)"
-          >
-            <option value="">Todos los EVC</option>
-            @for (evc of mantenimiento.listEvcOptions(); track evc) {
-              <option [value]="evc">{{ evc }}</option>
-            }
-          </select>
-
-          <select
-            [value]="mantenimiento.listFilterLinea()"
-            (change)="mantenimiento.listFilterLinea.set($any($event.target).value)"
-          >
-            <option value="">Todas las líneas</option>
-            @for (linea of mantenimiento.listLineaOptions(); track linea) {
-              <option [value]="linea">{{ linea }}</option>
-            }
-          </select>
-
-          <input
-            type="text"
-            placeholder="Buscar aplicación (código o nombre)"
-            [value]="mantenimiento.listSearchApp()"
-            (input)="mantenimiento.listSearchApp.set($any($event.target).value)"
-          />
 
         </div>
 

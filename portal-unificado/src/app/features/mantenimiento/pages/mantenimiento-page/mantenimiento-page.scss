@@ -30,6 +30,58 @@
   margin-bottom: $space-32;
 }
 
+.list-hero {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 $space-24;
+}
+
+.list-title {
+  position: relative;
+  margin: 0;
+  padding-bottom: $space-12;
+  width: fit-content;
+
+  text-align: center;
+  font-size: $font-size-h2;
+  font-weight: $font-weight-bold;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: $text-primary;
+}
+
+.list-title::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 4px;
+  margin: $space-12 auto 0;
+
+  background: $amarillo-macondo;
+  border-radius: $radius-pill;
+}
+
+.list-toolbar {
+  display: flex;
+  align-items: center;
+  gap: $space-16;
+  margin-bottom: $space-20;
+}
+
+.list-toolbar .filters-grid {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-16;
+  margin-bottom: 0;
+}
+
+.list-toolbar__add {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .list-filters > .filters-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -38,7 +90,9 @@
 }
 
 .list-filters > .filters-grid select,
-.list-filters > .filters-grid input {
+.list-filters > .filters-grid input,
+.list-toolbar .filters-grid select,
+.list-toolbar .filters-grid input {
   @include input-base;
   width: 100%;
 }
@@ -168,31 +222,6 @@
 
   font-size: $font-size-sm;
   color: $text-secondary;
-}
-
-.list-title {
-  position: relative;
-  margin: 0 auto $space-24;
-  padding-bottom: $space-16;
-  width: fit-content;
-
-  text-align: center;
-  font-size: $font-size-h2;
-  font-weight: $font-weight-bold;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  color: $text-primary;
-}
-
-.list-title::after {
-  content: '';
-  display: block;
-  width: 48px;
-  height: 4px;
-  margin: $space-12 auto 0;
-
-  background: $amarillo-macondo;
-  border-radius: $radius-pill;
 }
 
 .page-header {
@@ -1337,9 +1366,17 @@
     border-bottom: 1px solid $border-light;
   }
 
-  .page-header {
+  .list-toolbar {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+  }
+
+  .list-toolbar .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .list-toolbar__add {
+    width: 100%;
   }
 }
 
