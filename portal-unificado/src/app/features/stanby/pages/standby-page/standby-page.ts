@@ -63,6 +63,8 @@ export class StandbyPageComponent implements OnInit {
 
   viewAppNombre = '';
 
+  activeView: 'available' | 'programmed' = 'available';
+
   ngOnInit(): void {
 
     this.route.queryParams.subscribe(params => {
@@ -118,12 +120,34 @@ export class StandbyPageComponent implements OnInit {
 
   }
 
-  get selectableApplications(): StandbyApplication[] {
+  get unprogrammedApplications(): StandbyApplication[] {
 
     return this.applications.filter(
       app =>
         !this.hasAppStandby(app.codigoAplicacion)
     );
+
+  }
+
+  get programmedApplications(): StandbyApplication[] {
+
+    return this.applications.filter(
+      app =>
+        this.hasAppStandby(app.codigoAplicacion)
+    );
+
+  }
+
+  get selectableApplications(): StandbyApplication[] {
+
+    return this.unprogrammedApplications;
+
+  }
+
+  setActiveView(view: 'available' | 'programmed'): void {
+
+    this.activeView = view;
+    this.cdr.markForCheck();
 
   }
 
@@ -153,6 +177,8 @@ export class StandbyPageComponent implements OnInit {
       application =>
         application.selected = checked
     );
+
+    this.cdr.markForCheck();
 
   }
 

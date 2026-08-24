@@ -5,7 +5,7 @@
 
   <div class="standby-main">
 
-    @if (hasSelection) {
+    @if (activeView === 'available' && hasSelection) {
 
       <div class="page-header">
 
@@ -25,68 +25,142 @@
 
     }
 
-    <div class="filters">
+    <section class="standby-section">
 
-      <select>
-        <option>Todos los EVC</option>
-      </select>
+      @if (activeView === 'available') {
 
-      <select>
-        <option>Todas las líneas</option>
-      </select>
+        <header class="section-header">
+          <h2 class="section-title">Aplicaciones disponibles</h2>
+          <p class="section-subtitle">
+            Selecciona una o más aplicaciones para programar standby.
+          </p>
+        </header>
 
-      <input
-        type="text"
-        placeholder="Buscar aplicación"
-      />
+      } @else {
 
-    </div>
+        <header class="section-header">
+          <h2 class="section-title">Standby programados</h2>
+          <p class="section-subtitle">
+            Aplicaciones con standby activo en
+            <strong>{{ currentMonthLabel }}</strong>.
+          </p>
+        </header>
 
-    <div class="select-all-row">
+      }
 
-      <label class="select-all">
+      <div class="filters">
+
+        <select>
+          <option>Todos los EVC</option>
+        </select>
+
+        <select>
+          <option>Todas las líneas</option>
+        </select>
+
         <input
-          type="checkbox"
-          [checked]="allSelected"
-          (change)="toggleSelectAll($any($event.target).checked)"
-        />
-        <span>Seleccionar todas</span>
-      </label>
-
-      @if (hasSelection) {
-        <small>
-          {{ selectedApplications.length }} seleccionada(s)
-        </small>
-      }
-
-    </div>
-
-    <p class="standby-hint">
-      <span class="standby-hint__dot"></span>
-      Las aplicaciones con borde morado tienen standby
-      programado en
-      <strong>{{ currentMonthLabel }}</strong>.
-    </p>
-
-    <div class="cards-list">
-
-      @for (
-        application of applications;
-        track application.id
-      ) {
-
-        <app-standby-card
-          [application]="application"
-          [hasStandby]="hasAppStandby(application.codigoAplicacion)"
-          [activeThisMonth]="hasAppStandbyThisMonth(application.codigoAplicacion)"
-          (selected)="toggleCard($event)"
-          (view)="openViewForApp($event)"
-          (edit)="openEditForApp($event)"
+          type="text"
+          placeholder="Buscar aplicación"
         />
 
+      </div>
+
+      <div class="view-switcher">
+
+        <button
+          type="button"
+          class="view-switcher__btn view-switcher__btn--available"
+          [class.view-switcher__btn--active]="activeView === 'available'"
+          (click)="setActiveView('available')"
+        >
+          Aplicaciones disponibles
+        </button>
+
+        @if (programmedApplications.length > 0) {
+
+          <button
+            type="button"
+            class="view-switcher__btn view-switcher__btn--programmed"
+            [class.view-switcher__btn--active]="activeView === 'programmed'"
+            (click)="setActiveView('programmed')"
+          >
+            Ver standby programados
+          </button>
+
+        }
+
+      </div>
+
+      @if (activeView === 'available') {
+
+        <div class="select-all-row">
+
+          <label class="select-all">
+            <input
+              type="checkbox"
+              [checked]="allSelected"
+              (change)="toggleSelectAll($any($event.target).checked)"
+            />
+            <span>Seleccionar todas</span>
+          </label>
+
+          @if (hasSelection) {
+            <small>
+              {{ selectedApplications.length }} seleccionada(s)
+            </small>
+          }
+
+        </div>
+
+        <div class="cards-list">
+
+          @for (
+            application of unprogrammedApplications;
+            track application.id
+          ) {
+
+            <app-standby-card
+              [application]="application"
+              [hasStandby]="false"
+              [activeThisMonth]="false"
+              (selected)="toggleCard($event)"
+            />
+
+          }
+
+        </div>
+
+      } @else {
+
+        <p class="standby-hint">
+          <span class="standby-hint__dot"></span>
+          Las aplicaciones con borde morado tienen standby
+          programado en
+          <strong>{{ currentMonthLabel }}</strong>.
+        </p>
+
+        <div class="cards-list">
+
+          @for (
+            application of programmedApplications;
+            track application.id
+          ) {
+
+            <app-standby-card
+              [application]="application"
+              [hasStandby]="true"
+              [activeThisMonth]="hasAppStandbyThisMonth(application.codigoAplicacion)"
+              (view)="openViewForApp($event)"
+              (edit)="openEditForApp($event)"
+            />
+
+          }
+
+        </div>
+
       }
 
-    </div>
+    </section>
 
   </div>
 
