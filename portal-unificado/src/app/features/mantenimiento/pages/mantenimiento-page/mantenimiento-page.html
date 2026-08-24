@@ -180,6 +180,12 @@
                     {{ window.impacto }}
                   </p>
 
+                  @if (window.observacion) {
+                    <p class="window-tile__note">
+                      {{ window.observacion }}
+                    </p>
+                  }
+
                 </div>
 
                 <div class="window-tile__footer">
@@ -292,6 +298,15 @@
                   />
                 </div>
 
+                <div class="field">
+                  <label>Observación</label>
+                  <textarea
+                    rows="3"
+                    [(ngModel)]="editObservacion"
+                    placeholder="Notas de la ventana"
+                  ></textarea>
+                </div>
+
               </div>
 
               <div class="edit-panel__footer">
@@ -352,146 +367,188 @@
 
       <div class="maintenance-form">
 
-        <div class="filters-grid">
+        <section class="form-section form-section--apps">
 
-          <select [(ngModel)]="filterEvc">
-            <option value="">Todos los EVC</option>
-            @for (evc of evcOptions; track evc) {
-              <option [value]="evc">{{ evc }}</option>
-            }
-          </select>
-
-          <select [(ngModel)]="filterLinea">
-            <option value="">Todas las líneas</option>
-            @for (linea of lineaOptions; track linea) {
-              <option [value]="linea">{{ linea }}</option>
-            }
-          </select>
-
-          <input
-            type="text"
-            placeholder="Buscar aplicación (código o nombre)"
-            [(ngModel)]="searchApp"
-          />
-
-        </div>
-
-        <div class="filters-actions">
-          <small>
-            {{ filteredApplications.length }} aplicación(es)
-          </small>
-        </div>
-
-        <div class="apps-list">
-
-          @for (
-            app of filteredApplications;
-            track app.id
-          ) {
-
-            <button
-              type="button"
-              class="app-row"
-              [class.app-row--selected]="
-                selectedApp?.id === app.id
-              "
-              (click)="selectApp(app)"
-            >
-
-              <div class="app-row__main">
-                <strong>{{ app.codigoAplicacion }}</strong>
-                <span>{{ app.nombreAplicacion }}</span>
-              </div>
-
-              <div class="app-row__meta">
-                {{ app.evc }} · {{ app.linea }}
-              </div>
-
-            </button>
-
-          }
-
-          @if (filteredApplications.length === 0) {
-            <p class="empty-apps">
-              No hay aplicaciones con esos filtros.
+          <header class="form-section__header">
+            <h3>Seleccionar aplicación</h3>
+            <p>
+              Usa los filtros o la búsqueda para listar aplicaciones.
             </p>
+          </header>
+
+          <div class="filters-grid">
+
+            <select [(ngModel)]="filterEvc">
+              <option value="">Todos los EVC</option>
+              @for (evc of evcOptions; track evc) {
+                <option [value]="evc">{{ evc }}</option>
+              }
+            </select>
+
+            <select [(ngModel)]="filterLinea">
+              <option value="">Todas las líneas</option>
+              @for (linea of lineaOptions; track linea) {
+                <option [value]="linea">{{ linea }}</option>
+              }
+            </select>
+
+            <input
+              type="text"
+              placeholder="Buscar aplicación (código o nombre)"
+              [(ngModel)]="searchApp"
+            />
+
+          </div>
+
+          @if (hasActiveAppFilters) {
+
+            <div class="filters-actions">
+              <small>
+                {{ filteredApplications.length }} aplicación(es)
+              </small>
+            </div>
+
+            <div class="apps-list">
+
+              @for (
+                app of filteredApplications;
+                track app.id
+              ) {
+
+                <button
+                  type="button"
+                  class="app-row"
+                  [class.app-row--selected]="
+                    selectedApp?.id === app.id
+                  "
+                  (click)="selectApp(app)"
+                >
+
+                  <div class="app-row__main">
+                    <strong>{{ app.codigoAplicacion }}</strong>
+                    <span>{{ app.nombreAplicacion }}</span>
+                  </div>
+
+                  <div class="app-row__meta">
+                    {{ app.evc }} · {{ app.linea }}
+                  </div>
+
+                </button>
+
+              }
+
+              @if (filteredApplications.length === 0) {
+                <p class="empty-apps">
+                  No hay aplicaciones con esos filtros.
+                </p>
+              }
+
+            </div>
+
+          } @else {
+
+            <p class="form-section__hint">
+              Selecciona un EVC, una línea o escribe en el buscador
+              para ver aplicaciones.
+            </p>
+
           }
 
-        </div>
+        </section>
 
-        <div class="form-grid">
+        <section class="form-section form-section--details">
 
-          <div class="field">
-            <label>Estado</label>
-            <select [(ngModel)]="estado">
-              <option>Programada</option>
-              <option>En ejecución</option>
-              <option>Finalizada</option>
-              <option>Cancelada</option>
-            </select>
+          <header class="form-section__header">
+            <h3>Datos de la ventana</h3>
+            <p>
+              Configura estado, fechas e impacto de la ventana.
+            </p>
+          </header>
+
+          <div class="form-grid">
+
+            <div class="field">
+              <label>Estado</label>
+              <select [(ngModel)]="estado">
+                <option>Programada</option>
+                <option>En ejecución</option>
+                <option>Finalizada</option>
+                <option>Cancelada</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Frecuencia</label>
+              <select [(ngModel)]="frecuencia">
+                <option>Una vez</option>
+                <option>Diaria</option>
+                <option>Semanal</option>
+                <option>Mensual</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Fecha inicio</label>
+              <input
+                type="datetime-local"
+                [(ngModel)]="fechaInicio"
+              />
+            </div>
+
+            <div class="field">
+              <label>Fecha fin</label>
+              <input
+                type="datetime-local"
+                [(ngModel)]="fechaFin"
+              />
+            </div>
+
+            <div class="field">
+              <label>Zona horaria</label>
+              <select [(ngModel)]="zonaHoraria">
+                <option>América / Bogotá</option>
+                <option>América / Lima</option>
+                <option>UTC</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Aplicación</label>
+              <input
+                type="text"
+                [value]="
+                  selectedApp
+                    ? selectedApp.codigoAplicacion
+                    : ''
+                "
+                placeholder="Selecciona una app arriba"
+                readonly
+              />
+            </div>
+
+            <div class="field field--full">
+              <label>Impacto</label>
+              <input
+                type="text"
+                [(ngModel)]="impacto"
+                placeholder="Describe el impacto esperado"
+              />
+            </div>
+
+            <div class="field field--full">
+              <label>Observación</label>
+              <textarea
+                rows="3"
+                [(ngModel)]="observacion"
+                placeholder="Notas adicionales de la ventana"
+              ></textarea>
+            </div>
+
           </div>
 
-          <div class="field">
-            <label>Frecuencia</label>
-            <select [(ngModel)]="frecuencia">
-              <option>Una vez</option>
-              <option>Diaria</option>
-              <option>Semanal</option>
-              <option>Mensual</option>
-            </select>
-          </div>
+        </section>
 
-          <div class="field">
-            <label>Fecha inicio</label>
-            <input
-              type="datetime-local"
-              [(ngModel)]="fechaInicio"
-            />
-          </div>
-
-          <div class="field">
-            <label>Fecha fin</label>
-            <input
-              type="datetime-local"
-              [(ngModel)]="fechaFin"
-            />
-          </div>
-
-          <div class="field">
-            <label>Zona horaria</label>
-            <select [(ngModel)]="zonaHoraria">
-              <option>América / Bogotá</option>
-              <option>América / Lima</option>
-              <option>UTC</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>Aplicación</label>
-            <input
-              type="text"
-              [value]="
-                selectedApp
-                  ? selectedApp.codigoAplicacion
-                  : ''
-              "
-              placeholder="Selecciona una app arriba"
-              readonly
-            />
-          </div>
-
-          <div class="field field--full">
-            <label>Impacto</label>
-            <input
-              type="text"
-              [(ngModel)]="impacto"
-              placeholder="Describe el impacto esperado"
-            />
-          </div>
-
-        </div>
-
-        <div class="summary-card">
+        <section class="form-section form-section--summary">
 
           <h3>Resumen</h3>
           <p class="summary-card__hint">
@@ -566,9 +623,14 @@
               <span>{{ impacto || '—' }}</span>
             </div>
 
+            <div class="preview-item preview-item--full">
+              <label>Observación</label>
+              <span>{{ observacion || '—' }}</span>
+            </div>
+
           </div>
 
-        </div>
+        </section>
 
       </div>
 

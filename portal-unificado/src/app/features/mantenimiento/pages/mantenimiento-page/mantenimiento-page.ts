@@ -20,6 +20,7 @@ interface MaintenanceWindow {
   zonaHoraria: string;
   estado: string;
   impacto: string;
+  observacion: string;
 }
 
 @Component({
@@ -55,6 +56,7 @@ export class MantenimientoPageComponent {
   fechaFin = '2026-08-21T02:00';
   zonaHoraria = 'América / Bogotá';
   impacto = 'Servicio degradado durante la ventana';
+  observacion = '';
 
   showEditPanel = false;
   editingWindow?: MaintenanceWindow;
@@ -65,6 +67,7 @@ export class MantenimientoPageComponent {
   editFechaFin = '';
   editZonaHoraria = '';
   editImpacto = '';
+  editObservacion = '';
   editAplicacion = '';
   editNombreAplicacion = '';
   editEvc = '';
@@ -82,7 +85,8 @@ export class MantenimientoPageComponent {
       fechaFin: '21/08/2026 02:00',
       zonaHoraria: 'América / Bogotá',
       estado: 'Programada',
-      impacto: 'Servicio degradado durante la ventana'
+      impacto: 'Servicio degradado durante la ventana',
+      observacion: 'Reinicio coordinado con operaciones'
     },
     {
       id: 2,
@@ -95,7 +99,8 @@ export class MantenimientoPageComponent {
       fechaFin: '06/09/2026 03:00',
       zonaHoraria: 'América / Bogotá',
       estado: 'Programada',
-      impacto: 'Canales digitales no disponibles'
+      impacto: 'Canales digitales no disponibles',
+      observacion: 'Notificar a canales 24h antes'
     },
     {
       id: 3,
@@ -108,7 +113,8 @@ export class MantenimientoPageComponent {
       fechaFin: '12/09/2026 05:00',
       zonaHoraria: 'América / Bogotá',
       estado: 'Programada',
-      impacto: 'App móvil en modo lectura'
+      impacto: 'App móvil en modo lectura',
+      observacion: ''
     },
     {
       id: 4,
@@ -121,7 +127,8 @@ export class MantenimientoPageComponent {
       fechaFin: '19/09/2026 01:00',
       zonaHoraria: 'América / Bogotá',
       estado: 'En ejecución',
-      impacto: 'Alertas con demora temporal'
+      impacto: 'Alertas con demora temporal',
+      observacion: 'Ventana en curso'
     },
     {
       id: 5,
@@ -134,7 +141,8 @@ export class MantenimientoPageComponent {
       fechaFin: '21/08/2026 02:00',
       zonaHoraria: 'América / Bogotá',
       estado: 'Finalizada',
-      impacto: 'Pagos diferidos al finalizar'
+      impacto: 'Pagos diferidos al finalizar',
+      observacion: 'Cerrada sin incidentes'
     },
     {
       id: 6,
@@ -147,7 +155,8 @@ export class MantenimientoPageComponent {
       fechaFin: '02/10/2026 01:00',
       zonaHoraria: 'América / Bogotá',
       estado: 'Programada',
-      impacto: 'Actualización de núcleo'
+      impacto: 'Actualización de núcleo',
+      observacion: 'Pendiente validación de cab'
     }
   ];
 
@@ -229,6 +238,10 @@ export class MantenimientoPageComponent {
 
   get filteredApplications(): StandbyApplication[] {
 
+    if (!this.hasActiveAppFilters) {
+      return [];
+    }
+
     const term = this.searchApp.trim().toLowerCase();
 
     return this.applications.filter(app => {
@@ -253,6 +266,16 @@ export class MantenimientoPageComponent {
       return matchEvc && matchLinea && matchSearch;
 
     });
+
+  }
+
+  get hasActiveAppFilters(): boolean {
+
+    return Boolean(
+      this.searchApp.trim() ||
+      this.filterEvc ||
+      this.filterLinea
+    );
 
   }
 
@@ -320,6 +343,7 @@ export class MantenimientoPageComponent {
     this.editFechaFin = window.fechaFin;
     this.editZonaHoraria = window.zonaHoraria;
     this.editImpacto = window.impacto;
+    this.editObservacion = window.observacion;
     this.editAplicacion = window.aplicacion;
     this.editNombreAplicacion = window.nombreAplicacion;
     this.editEvc = window.evc;
@@ -358,6 +382,7 @@ export class MantenimientoPageComponent {
           fechaFin: this.editFechaFin,
           zonaHoraria: this.editZonaHoraria,
           impacto: this.editImpacto,
+          observacion: this.editObservacion,
           aplicacion: this.editAplicacion,
           nombreAplicacion: this.editNombreAplicacion,
           evc: this.editEvc,
@@ -388,7 +413,8 @@ export class MantenimientoPageComponent {
       fechaFin: this.formatDateTime(this.fechaFin),
       zonaHoraria: this.zonaHoraria,
       estado: this.estado,
-      impacto: this.impacto
+      impacto: this.impacto,
+      observacion: this.observacion.trim()
     };
 
     this.maintenanceWindows = [
@@ -439,6 +465,7 @@ export class MantenimientoPageComponent {
     this.fechaFin = '2026-08-21T02:00';
     this.zonaHoraria = 'América / Bogotá';
     this.impacto = 'Servicio degradado durante la ventana';
+    this.observacion = '';
 
   }
 

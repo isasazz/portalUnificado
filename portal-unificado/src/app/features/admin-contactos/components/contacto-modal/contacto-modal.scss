@@ -309,6 +309,10 @@ select:disabled {
   gap: $space-8;
 }
 
+.maintenance-item--full {
+  grid-column: 1 / -1;
+}
+
 .maintenance-item label {
   @include text-label;
 }

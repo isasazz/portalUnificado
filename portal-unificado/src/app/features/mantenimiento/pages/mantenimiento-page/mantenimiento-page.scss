@@ -266,6 +266,19 @@
   overflow: hidden;
 }
 
+.window-tile__note {
+  margin: $space-8 0 0;
+  padding: $space-8 $space-12;
+
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  line-height: 1.4;
+
+  background: $background-body;
+  border-radius: $radius-sm;
+  border-left: 3px solid $amarillo-macondo;
+}
+
 .window-tile__footer {
   display: flex;
   flex-direction: column;
@@ -309,14 +322,62 @@
 }
 
 .maintenance-form {
-  @include card;
-
-  padding: $space-32;
-  border: 1px solid $border-light;
-
   display: flex;
   flex-direction: column;
   gap: $space-24;
+}
+
+.form-section {
+  @include card;
+
+  padding: $space-24;
+  border: 1px solid $border-light;
+  display: flex;
+  flex-direction: column;
+  gap: $space-20;
+}
+
+.form-section__header {
+  padding-bottom: $space-16;
+  border-bottom: 3px solid $amarillo-macondo;
+}
+
+.form-section__header h3 {
+  margin: 0 0 $space-8;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+}
+
+.form-section__header p {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1.45;
+}
+
+.form-section__hint {
+  margin: 0;
+  padding: $space-16 $space-20;
+
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  text-align: center;
+
+  background: $background-body;
+  border: 1px dashed $border-color;
+  border-radius: $radius-md;
+}
+
+.form-section--summary {
+  background: $background-body;
+}
+
+.form-section--summary h3 {
+  margin: 0 0 $space-8;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
 }
 
 .form-grid {
@@ -357,11 +418,18 @@
 
 .field input,
 .field select,
+.field textarea,
 .filters-grid select,
 .filters-grid input {
   @include input-base;
   width: 100%;
   color: $text-primary;
+}
+
+.field textarea {
+  min-height: 88px;
+  resize: vertical;
+  font-family: $font-family-base;
 }
 
 .field input[readonly] {
@@ -428,7 +496,8 @@
 }
 
 .preview-card,
-.summary-card {
+.summary-card,
+.form-section--summary {
   padding: $space-24;
 
   border: 1px solid $border-color;
@@ -437,7 +506,8 @@
 }
 
 .preview-card h3,
-.summary-card h3 {
+.summary-card h3,
+.form-section--summary h3 {
   margin: 0 0 $space-8;
   color: $text-primary;
 }
@@ -457,6 +527,10 @@
 .preview-item {
   @include flex-column;
   gap: $space-4;
+}
+
+.preview-item--full {
+  grid-column: 1 / -1;
 }
 
 .preview-item label {

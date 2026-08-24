@@ -68,6 +68,26 @@
 
   </div>
 
+  <a
+    class="sidebar__user"
+    routerLink="/perfil"
+    routerLinkActive="active"
+    title="Mi perfil"
+  >
+
+    <div class="avatar">
+      AM
+    </div>
+
+    @if (!collapsed) {
+      <div class="user-info">
+        <span>Ana Morales</span>
+        <small>admin@empresa.com</small>
+      </div>
+    }
+
+  </a>
+
   <nav class="sidebar__menu">
 
     <a
@@ -145,25 +165,5 @@
     </a>
 
   </nav>
-
-  <a
-    class="sidebar__user"
-    routerLink="/perfil"
-    routerLinkActive="active"
-    title="Mi perfil"
-  >
-
-    <div class="avatar">
-      AM
-    </div>
-
-    @if (!collapsed) {
-      <div class="user-info">
-        <span>Ana Morales</span>
-        <small>admin@empresa.com</small>
-      </div>
-    }
-
-  </a>
 
 </aside>

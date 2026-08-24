@@ -14,7 +14,34 @@
 
 .page-actions {
   display: flex;
+  align-items: center;
   gap: $space-12;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.selection-count {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+}
+
+.btn-bulk-edit {
+  @include button-primary;
+}
+
+.btn-clear-selection {
+  @include button-base;
+
+  background: transparent;
+  color: $text-secondary;
+  border: 1px solid $border-color;
+  padding: $space-12 $space-16;
+}
+
+.btn-clear-selection:hover {
+  color: $text-primary;
+  border-color: $text-primary;
 }
 
 .btn-new-contact {
@@ -69,6 +96,7 @@
 .contact-row {
   display: grid;
   grid-template-columns:
+    36px
     minmax(140px, 1.1fr)
     minmax(160px, 1.2fr)
     minmax(180px, 1.4fr)
@@ -82,6 +110,25 @@
 
   border-radius: $radius-md;
   background: $surface;
+  border: 1.5px solid transparent;
+}
+
+.contact-row--selected {
+  border-color: $amarillo-macondo;
+  background: rgba(253, 218, 36, 0.08);
+}
+
+.contact-row__check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.row-check {
+  width: 18px;
+  height: 18px;
+  accent-color: $negro-cib;
+  cursor: pointer;
 }
 
 .contact-row--header {
@@ -231,7 +278,8 @@
   justify-content: center;
 }
 
-.confirm-dialog {
+.confirm-dialog,
+.bulk-edit-dialog {
   width: min(420px, 92vw);
 
   padding: $space-24;
@@ -239,6 +287,63 @@
   background: $surface;
   border-radius: $radius-lg;
   box-shadow: $shadow-lg;
+}
+
+.bulk-edit-dialog {
+  width: min(480px, 92vw);
+}
+
+.bulk-edit-dialog h3 {
+  margin: 0 0 $space-8;
+  color: $text-primary;
+  font-size: $font-size-lg;
+}
+
+.bulk-edit-hint {
+  margin: 0 0 $space-20;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  line-height: 1.5;
+}
+
+.bulk-edit-hint strong {
+  color: $text-primary;
+}
+
+.bulk-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-16;
+  margin-bottom: $space-24;
+}
+
+.bulk-edit-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+.bulk-edit-form label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bulk-edit-form input,
+.bulk-edit-form select {
+  @include input-base;
+  width: 100%;
+}
+
+.btn-bulk-save {
+  @include button-primary;
+}
+
+.btn-bulk-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .confirm-dialog h3 {
@@ -286,7 +391,7 @@
 
 @media (max-width: 1100px) {
   .contact-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 36px 1fr 1fr;
   }
 
   .contact-row__actions {
