@@ -367,6 +367,66 @@
 
       <div class="maintenance-form">
 
+        <section class="form-section form-section--type">
+
+          <header class="form-section__header">
+            <h3>Tipo de ventana</h3>
+            <p>
+              Elige si es una ventana programada o una promesa de servicio.
+            </p>
+          </header>
+
+          <div class="tipo-ventana-options">
+
+            <button
+              type="button"
+              class="tipo-chip"
+              [class.tipo-chip--active]="isVentanaProgramada"
+              (click)="selectTipoVentana('programada')"
+            >
+              Ventana programada
+            </button>
+
+            <button
+              type="button"
+              class="tipo-chip"
+              [class.tipo-chip--active]="isPromesaServicio"
+              (click)="selectTipoVentana('promesa')"
+            >
+              Promesa de servicio
+            </button>
+
+          </div>
+
+          @if (isVentanaProgramada) {
+
+            <div class="field field--crq">
+              <label>CRQ</label>
+              <input
+                type="text"
+                [(ngModel)]="crq"
+                placeholder="Ingresa el número de CRQ"
+              />
+            </div>
+
+            @if (!canFillFormFields) {
+              <p class="form-section__hint">
+                Ingresa el CRQ para habilitar el resto del formulario.
+              </p>
+            }
+
+          }
+
+          @if (!tipoVentana) {
+            <p class="form-section__hint">
+              Selecciona el tipo de ventana para continuar.
+            </p>
+          }
+
+        </section>
+
+        @if (canFillFormFields) {
+
         <section class="form-section form-section--apps">
 
           <header class="form-section__header">
@@ -558,6 +618,24 @@
           <div class="preview-grid">
 
             <div class="preview-item">
+              <label>Tipo</label>
+              <span>
+                {{
+                  isVentanaProgramada
+                    ? 'Ventana programada'
+                    : 'Promesa de servicio'
+                }}
+              </span>
+            </div>
+
+            @if (isVentanaProgramada) {
+              <div class="preview-item">
+                <label>CRQ</label>
+                <span>{{ crq || '—' }}</span>
+              </div>
+            }
+
+            <div class="preview-item">
               <label>Aplicación</label>
               <span>
                 @if (selectedApp) {
@@ -631,6 +709,8 @@
           </div>
 
         </section>
+
+        }
 
       </div>
 

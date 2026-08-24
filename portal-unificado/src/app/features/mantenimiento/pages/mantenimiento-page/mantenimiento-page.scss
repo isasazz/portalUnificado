@@ -369,6 +369,42 @@
   border-radius: $radius-md;
 }
 
+.tipo-ventana-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-12;
+}
+
+.tipo-chip {
+  @include button-base;
+
+  padding: $space-12 $space-24;
+  min-height: 44px;
+
+  background: $surface;
+  color: $text-secondary;
+  border: 1.5px solid $border-color;
+
+  font-size: $font-size-sm;
+  border-radius: $radius-pill;
+}
+
+.tipo-chip:hover {
+  border-color: $link-color;
+  color: $link-color;
+}
+
+.tipo-chip--active {
+  border-color: $link-color;
+  background: rgba(0, 153, 216, 0.12);
+  color: $link-color;
+  font-weight: $font-weight-semibold;
+}
+
+.field--crq {
+  max-width: 420px;
+}
+
 .form-section--summary {
   background: $background-body;
 }

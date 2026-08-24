@@ -21,6 +21,8 @@ interface MaintenanceWindow {
   estado: string;
   impacto: string;
   observacion: string;
+  tipo: 'Ventana programada' | 'Promesa de servicio';
+  crq?: string;
 }
 
 @Component({
@@ -47,6 +49,9 @@ export class MantenimientoPageComponent {
   filterEvc = '';
   filterLinea = '';
   searchApp = '';
+
+  tipoVentana: '' | 'programada' | 'promesa' = '';
+  crq = '';
 
   selectedApp?: StandbyApplication;
 
@@ -86,7 +91,9 @@ export class MantenimientoPageComponent {
       zonaHoraria: 'América / Bogotá',
       estado: 'Programada',
       impacto: 'Servicio degradado durante la ventana',
-      observacion: 'Reinicio coordinado con operaciones'
+      observacion: 'Reinicio coordinado con operaciones',
+      tipo: 'Ventana programada',
+      crq: 'CRQ-10234'
     },
     {
       id: 2,
@@ -100,7 +107,9 @@ export class MantenimientoPageComponent {
       zonaHoraria: 'América / Bogotá',
       estado: 'Programada',
       impacto: 'Canales digitales no disponibles',
-      observacion: 'Notificar a canales 24h antes'
+      observacion: 'Notificar a canales 24h antes',
+      tipo: 'Ventana programada',
+      crq: 'CRQ-10456'
     },
     {
       id: 3,
@@ -114,7 +123,9 @@ export class MantenimientoPageComponent {
       zonaHoraria: 'América / Bogotá',
       estado: 'Programada',
       impacto: 'App móvil en modo lectura',
-      observacion: ''
+      observacion: '',
+      tipo: 'Ventana programada',
+      crq: 'CRQ-10789'
     },
     {
       id: 4,
@@ -128,7 +139,9 @@ export class MantenimientoPageComponent {
       zonaHoraria: 'América / Bogotá',
       estado: 'En ejecución',
       impacto: 'Alertas con demora temporal',
-      observacion: 'Ventana en curso'
+      observacion: 'Ventana en curso',
+      tipo: 'Ventana programada',
+      crq: 'CRQ-11012'
     },
     {
       id: 5,
@@ -142,7 +155,8 @@ export class MantenimientoPageComponent {
       zonaHoraria: 'América / Bogotá',
       estado: 'Finalizada',
       impacto: 'Pagos diferidos al finalizar',
-      observacion: 'Cerrada sin incidentes'
+      observacion: 'Cerrada sin incidentes',
+      tipo: 'Promesa de servicio'
     },
     {
       id: 6,
@@ -156,7 +170,9 @@ export class MantenimientoPageComponent {
       zonaHoraria: 'América / Bogotá',
       estado: 'Programada',
       impacto: 'Actualización de núcleo',
-      observacion: 'Pendiente validación de cab'
+      observacion: 'Pendiente validación de cab',
+      tipo: 'Ventana programada',
+      crq: 'CRQ-11345'
     }
   ];
 
@@ -279,7 +295,37 @@ export class MantenimientoPageComponent {
 
   }
 
+  get isVentanaProgramada(): boolean {
+
+    return this.tipoVentana === 'programada';
+
+  }
+
+  get isPromesaServicio(): boolean {
+
+    return this.tipoVentana === 'promesa';
+
+  }
+
+  get canFillFormFields(): boolean {
+
+    if (!this.tipoVentana) {
+      return false;
+    }
+
+    if (this.isPromesaServicio) {
+      return true;
+    }
+
+    return this.crq.trim().length > 0;
+
+  }
+
   get canSave(): boolean {
+
+    if (!this.canFillFormFields) {
+      return false;
+    }
 
     return (
       !!this.selectedApp &&
@@ -317,6 +363,18 @@ export class MantenimientoPageComponent {
   selectApp(app: StandbyApplication): void {
 
     this.selectedApp = app;
+
+  }
+
+  selectTipoVentana(
+    tipo: 'programada' | 'promesa'
+  ): void {
+
+    this.tipoVentana = tipo;
+
+    if (tipo === 'promesa') {
+      this.crq = '';
+    }
 
   }
 
@@ -414,7 +472,13 @@ export class MantenimientoPageComponent {
       zonaHoraria: this.zonaHoraria,
       estado: this.estado,
       impacto: this.impacto,
-      observacion: this.observacion.trim()
+      observacion: this.observacion.trim(),
+      tipo: this.isVentanaProgramada
+        ? 'Ventana programada'
+        : 'Promesa de servicio',
+      crq: this.isVentanaProgramada
+        ? this.crq.trim()
+        : undefined
     };
 
     this.maintenanceWindows = [
@@ -459,6 +523,8 @@ export class MantenimientoPageComponent {
     this.filterEvc = '';
     this.filterLinea = '';
     this.searchApp = '';
+    this.tipoVentana = '';
+    this.crq = '';
     this.estado = 'Programada';
     this.frecuencia = 'Semanal';
     this.fechaInicio = '2026-08-20T22:00';
