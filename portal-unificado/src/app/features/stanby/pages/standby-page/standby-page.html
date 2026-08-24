@@ -61,6 +61,13 @@
 
     </div>
 
+    <p class="standby-hint">
+      <span class="standby-hint__dot"></span>
+      Las aplicaciones con borde morado tienen standby
+      programado en
+      <strong>{{ currentMonthLabel }}</strong>.
+    </p>
+
     <div class="cards-list">
 
       @for (
@@ -71,6 +78,7 @@
         <app-standby-card
           [application]="application"
           [hasStandby]="hasAppStandby(application.codigoAplicacion)"
+          [activeThisMonth]="hasAppStandbyThisMonth(application.codigoAplicacion)"
           (selected)="toggleCard($event)"
           (view)="openViewForApp($event)"
           (edit)="openEditForApp($event)"

@@ -1,7 +1,7 @@
 <div
   class="standby-card"
   [class.selected]="application().selected && !hasStandby()"
-  [class.programmed]="hasStandby()"
+  [class.active-this-month]="activeThisMonth()"
   (click)="toggleSelection()"
 >
 

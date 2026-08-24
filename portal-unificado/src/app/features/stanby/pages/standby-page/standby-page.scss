@@ -72,6 +72,39 @@
   font-size: $font-size-sm;
 }
 
+.standby-hint {
+  display: flex;
+  align-items: center;
+  gap: $space-8;
+
+  margin: 0 0 $space-16;
+  padding: $space-12 $space-16;
+
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+  background: $surface;
+
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1.45;
+}
+
+.standby-hint strong {
+  color: $text-primary;
+  font-weight: $font-weight-semibold;
+  text-transform: capitalize;
+}
+
+.standby-hint__dot {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+
+  border: 2px solid $violeta-orquidea;
+  border-radius: $radius-sm;
+  background: transparent;
+}
+
 .cards-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

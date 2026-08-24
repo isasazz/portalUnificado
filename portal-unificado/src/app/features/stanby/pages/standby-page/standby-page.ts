@@ -101,6 +101,23 @@ export class StandbyPageComponent implements OnInit {
 
   }
 
+  hasAppStandbyThisMonth(codigoAplicacion: string): boolean {
+
+    return this.scheduleService.hasAppStandbyInCurrentMonth(
+      codigoAplicacion
+    );
+
+  }
+
+  get currentMonthLabel(): string {
+
+    return new Date().toLocaleDateString(
+      'es-CO',
+      { month: 'long', year: 'numeric' }
+    );
+
+  }
+
   get selectableApplications(): StandbyApplication[] {
 
     return this.applications.filter(
@@ -126,6 +143,7 @@ export class StandbyPageComponent implements OnInit {
     }
 
     app.selected = !app.selected;
+    this.cdr.markForCheck();
 
   }
 

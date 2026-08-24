@@ -136,6 +136,50 @@ export class StandbyScheduleService {
 
   }
 
+  hasAppStandbyInCurrentMonth(
+    codigoAplicacion: string,
+    referenceDate: Date = new Date()
+  ): boolean {
+
+    return this.getByAppCodigo(codigoAplicacion).some(
+      assignment =>
+        this.overlapsMonth(assignment, referenceDate)
+    );
+
+  }
+
+  private overlapsMonth(
+    assignment: StandbyAssignment,
+    referenceDate: Date
+  ): boolean {
+
+    const year = referenceDate.getFullYear();
+    const month = referenceDate.getMonth();
+
+    const monthStart =
+      this.startOfDay(new Date(year, month, 1));
+    const monthEnd =
+      this.startOfDay(new Date(year, month + 1, 0));
+
+    const start =
+      this.startOfDay(assignment.fechaInicio);
+    const end =
+      this.startOfDay(assignment.fechaFin);
+
+    return start <= monthEnd && end >= monthStart;
+
+  }
+
+  private startOfDay(date: Date): number {
+
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    ).getTime();
+
+  }
+
   private getColor(
     responsable: string
   ): string {

@@ -3,6 +3,8 @@
 @use 'abstracts/mixins' as *;
 
 .standby-card {
+  position: relative;
+
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -35,14 +37,25 @@
   transform: translateY(-4px);
 }
 
-.standby-card.programmed {
+.standby-card.active-this-month {
   cursor: default;
-  border-color: rgba(144, 99, 205, 0.45);
   transform: none;
 }
 
-.standby-card.programmed:hover {
-  border-color: $violeta-orquidea;
+.standby-card.active-this-month::after {
+  content: '';
+
+  position: absolute;
+  inset: 0;
+
+  border: 2px solid $violeta-orquidea;
+  border-radius: $radius-lg;
+
+  pointer-events: none;
+}
+
+.standby-card.active-this-month:hover {
+  border-color: $border-light;
   box-shadow: $shadow-sm;
   transform: none;
 }
