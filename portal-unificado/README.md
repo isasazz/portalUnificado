@@ -1,117 +1,183 @@
 # Portal Unificado
 
-Portal admin (Bancolombia) en **Angular 21**. Frontend con datos mock en memoria para demo de UI.
+Portal admin (Bancolombia) en **Angular 21**.  
+Frontend con datos mock en memoria (demo de UI, sin backend).
 
-## Requisitos
-
-- **Node.js 20 o 22** (LTS recomendado: 22)
-- **npm** (viene con Node)
-- **No uses Node 21**: Angular CLI falla en este entorno (`ERR_REQUIRE_ESM`)
-
-En este workspace hay un Node portable en:
-
-```text
-portal/.tools/node-v22.23.2-win-x64
-```
-
-(También existe una copia antigua en `portalUnificado/node22/`; preferir `.tools`.)
+Repo: [https://github.com/isasazz/portalUnificado](https://github.com/isasazz/portalUnificado)
 
 ---
 
-## Cómo ejecutar el proyecto (Windows / PowerShell)
+## Requisitos
 
-### 1. Abrir la carpeta del proyecto
+Antes de empezar, asegúrate de tener:
+
+| Requisito | Detalle |
+|-----------|---------|
+| **Node.js** | Versión **20** o **22** (recomendado: **22 LTS**) |
+| **npm** | Viene con Node |
+| **Git** | Para clonar el repositorio |
+
+### Importante
+
+- **No uses Node 21.** Con esa versión Angular CLI falla (`ERR_REQUIRE_ESM`).
+- Comprueba tu versión:
 
 ```powershell
-cd c:\Users\Isabela\Downloads\portal\portalUnificado\portal-unificado
-```
-
-### 2. Usar Node 22 (portable)
-
-En la **misma** sesión de PowerShell:
-
-```powershell
-$env:Path = "c:\Users\Isabela\Downloads\portal\.tools\node-v22.23.2-win-x64;" + $env:Path
 node -v
+npm -v
 ```
 
-Debe mostrar algo como `v22.23.2`. Si no, no continues: el PATH no tomó el Node correcto.
+Si no tienes Node, instálalo desde: [https://nodejs.org](https://nodejs.org) (elige LTS 22).
 
-### 3. Instalar dependencias (solo la primera vez, o si cambió `package.json`)
+---
+
+## Cómo clonar y ejecutar (cualquier PC)
+
+### 1. Clonar el repositorio
+
+```powershell
+git clone https://github.com/isasazz/portalUnificado.git
+cd portalUnificado
+```
+
+### 2. Entrar a la carpeta de la app Angular
+
+El código de la aplicación está dentro de `portal-unificado`:
+
+```powershell
+cd portal-unificado
+```
+
+### 3. Instalar dependencias
+
+Solo la primera vez (o si cambió `package.json`):
 
 ```powershell
 npm install
 ```
 
-### 4. Levantar el servidor de desarrollo
+Espera a que termine sin errores.
+
+### 4. Levantar la aplicación
 
 ```powershell
 npm start
 ```
 
-Equivale a `ng serve`. Cuando compile, abre el navegador en:
+Cuando compile, abre el navegador en:
 
 **http://localhost:4200/**
 
-La app se recarga sola al guardar cambios.
+La app se recarga sola al guardar cambios en el código.
+
+Para detener el servidor: `Ctrl + C` en la terminal.
+
+---
+
+## Resumen rápido (copiar y pegar)
+
+```powershell
+git clone https://github.com/isasazz/portalUnificado.git
+cd portalUnificado/portal-unificado
+npm install
+npm start
+```
+
+Luego abre: http://localhost:4200/
 
 ---
 
 ## Comandos útiles
 
-| Acción | Comando |
-|--------|---------|
-| Desarrollo | `npm start` |
-| Build de producción | `npm run build` |
-| Tests unitarios | `npm test` |
+| Acción | Comando | Dónde ejecutarlo |
+|--------|---------|------------------|
+| Instalar dependencias | `npm install` | `portal-unificado/` |
+| Desarrollo | `npm start` | `portal-unificado/` |
+| Build de producción | `npm run build` | `portal-unificado/` |
+| Tests | `npm test` | `portal-unificado/` |
 
-El build deja la salida en:
+El build genera la salida en:
 
 ```text
-dist/portal-unificado
+portal-unificado/dist/portal-unificado
 ```
 
 ---
 
-## Estructura rápida
+## Rutas de la app
+
+| Ruta | Módulo |
+|------|--------|
+| `/inicio` | Inicio |
+| `/contactos` | Contactos |
+| `/standby` | Standby |
+| `/mantenimiento` | Mantenimiento / ventanas |
+| `/perfil` | Perfil |
+
+---
+
+## Estructura del repo
 
 ```text
-portal-unificado/
-├── src/app/
-│   ├── features/     # contactos, standby, mantenimiento, perfil, inicio
-│   ├── layout/       # sidebar y layout principal
-│   ├── shared/       # componentes reutilizables
-│   └── styles/       # tokens SCSS (colores, mixins)
-├── angular.json
-├── package.json
-└── README.md
+portalUnificado/                 ← raíz del repositorio (git clone)
+├── .gitignore
+└── portal-unificado/            ← app Angular (aquí corres npm)
+    ├── src/app/
+    │   ├── features/            # contactos, standby, mantenimiento, perfil, inicio
+    │   ├── layout/
+    │   ├── shared/
+    │   └── styles/
+    ├── package.json
+    ├── angular.json
+    └── README.md
 ```
-
-Rutas principales: `/inicio`, `/contactos`, `/standby`, `/mantenimiento`, `/perfil`.
 
 ---
 
 ## Problemas frecuentes
 
-**`ERR_REQUIRE_ESM` o errores raros de `yargs` / Angular CLI**  
-→ Estás en Node 21 u otra versión incompatible. Vuelve a poner el PATH de Node 22 (paso 2) y verifica con `node -v`.
+### `ERR_REQUIRE_ESM` o errores raros de Angular CLI / yargs
 
-**`npm` / `ng` no se reconoce**  
-→ Ejecuta el paso 2 en esa misma ventana de terminal; el PATH no se guarda solo entre sesiones.
+Estás usando una versión de Node incompatible (casi siempre **Node 21**).
 
-**Puerto 4200 ocupado**  
-→ Cierra el otro `npm start`, o arranca con:
+1. Instala Node **20** o **22**.
+2. Cierra y vuelve a abrir la terminal.
+3. Verifica con `node -v`.
+4. En `portal-unificado` vuelve a correr `npm install` y `npm start`.
+
+### `npm` no se reconoce
+
+Node no está en el PATH. Reinstala Node desde [nodejs.org](https://nodejs.org) y reinicia la terminal.
+
+### `cd portal-unificado` no existe
+
+Estás en la carpeta incorrecta. Después del clone debes estar en:
+
+```text
+.../portalUnificado
+```
+
+y luego:
+
+```powershell
+cd portal-unificado
+```
+
+### Puerto 4200 ocupado
+
+Cierra el otro `npm start`, o usa otro puerto:
 
 ```powershell
 npx ng serve --port 4201
 ```
 
-**Cambios de standby/contactos se pierden al recargar**  
-→ Es normal: todo está en memoria (mock), sin backend.
+### Los datos se pierden al recargar la página
+
+Es normal: todo está en memoria (mocks), no hay backend ni base de datos.
 
 ---
 
-## Stack frontend
+## Stack
 
 - Angular 21 (standalone, lazy routes, OnPush)
 - Reactive Forms
