@@ -146,7 +146,7 @@
 .select-all input {
   width: 16px;
   height: 16px;
-  accent-color: $violeta-orquidea;
+  accent-color: $amarillo-macondo;
   cursor: pointer;
 }
 
@@ -218,9 +218,9 @@
 .btn-add {
   @include button-base;
 
-  background: $verde-andino;
-  border: 1px solid $verde-andino;
-  color: $blanco;
+  background: $amarillo-macondo;
+  border: 1px solid $amarillo-macondo;
+  color: $negro-cib;
 }
 
 .btn-add:disabled {
@@ -229,7 +229,9 @@
 }
 
 .btn-add:hover:not(:disabled) {
-  filter: brightness(0.95);
+  background: $negro-cib;
+  border-color: $negro-cib;
+  color: $amarillo-macondo;
 }
 
 .standby-panel {
@@ -251,9 +253,15 @@
 }
 
 .standby-panel .btn-add {
-  background: $violeta-orquidea;
-  border-color: $violeta-orquidea;
-  color: $blanco;
+  background: $amarillo-macondo;
+  border-color: $amarillo-macondo;
+  color: $negro-cib;
+}
+
+.standby-panel .btn-add:hover:not(:disabled) {
+  background: $negro-cib;
+  border-color: $negro-cib;
+  color: $amarillo-macondo;
 }
 
 .standby-panel__header {
@@ -308,7 +316,7 @@
   padding: $space-16;
 
   border: 1px solid $border-light;
-  border-left: 3px solid $violeta-orquidea;
+  border-left: 3px solid $amarillo-macondo;
   border-radius: $radius-md;
   background: $background-body;
 }
@@ -320,7 +328,7 @@
 }
 
 .panel-item__info strong {
-  color: $violeta-orquidea;
+  color: $negro-cib;
   font-size: $font-size-sm;
 }
 

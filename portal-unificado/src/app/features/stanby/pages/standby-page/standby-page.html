@@ -5,7 +5,7 @@
 
   <div class="standby-main">
 
-    @if (activeView === 'available' && hasSelection) {
+    @if (activeView === 'available' && hasSelection && !showSidePanel) {
 
       <div class="page-header">
 
@@ -123,6 +123,7 @@
               [application]="application"
               [hasStandby]="false"
               [activeThisMonth]="false"
+              [isSelected]="application.selected"
               (selected)="toggleCard($event)"
             />
 

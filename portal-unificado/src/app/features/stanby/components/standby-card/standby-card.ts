@@ -23,6 +23,8 @@ export class StandbyCardComponent {
 
   readonly activeThisMonth = input(false);
 
+  readonly isSelected = input(false);
+
   readonly selected = output<number>();
 
   readonly view = output<number>();

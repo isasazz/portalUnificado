@@ -1,11 +1,11 @@
 <div
   class="standby-card"
-  [class.selected]="application().selected && !hasStandby()"
+  [class.selected]="isSelected() && !hasStandby()"
   [class.active-this-month]="activeThisMonth()"
   (click)="toggleSelection()"
 >
 
-  @if (hasStandby() || application().selected) {
+  @if (hasStandby() || isSelected()) {
 
     <div class="standby-card__top">
 

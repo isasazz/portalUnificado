@@ -88,13 +88,15 @@
 .btn-corporate {
   @include button-base;
 
-  background: $verde-andino;
-  color: $blanco;
-  border: 1px solid $verde-andino;
+  background: $amarillo-macondo;
+  color: $negro-cib;
+  border: 1px solid $amarillo-macondo;
 
   min-width: 160px;
 }
 
 .btn-corporate:hover {
-  filter: brightness(0.95);
+  background: $negro-cib;
+  border-color: $negro-cib;
+  color: $amarillo-macondo;
 }

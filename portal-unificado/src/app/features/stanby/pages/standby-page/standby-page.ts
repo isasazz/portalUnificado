@@ -89,7 +89,13 @@ export class StandbyPageComponent implements OnInit {
       }
 
       application.selected = true;
+      this.applications = this.applications.map(app =>
+        app.id === application.id
+          ? { ...app, selected: true }
+          : app
+      );
       this.addToStandbyPanel();
+      this.cdr.markForCheck();
 
     });
 
@@ -153,32 +159,57 @@ export class StandbyPageComponent implements OnInit {
 
   toggleCard(id: number): void {
 
-    const app =
-      this.applications.find(
-        application =>
-          application.id === id
-      );
+    this.applications = this.applications.map(application => {
 
-    if (
-      !app ||
-      this.hasAppStandby(app.codigoAplicacion)
-    ) {
-      return;
-    }
+      if (
+        application.id !== id ||
+        this.hasAppStandby(application.codigoAplicacion)
+      ) {
+        return application;
+      }
 
-    app.selected = !app.selected;
+      return {
+        ...application,
+        selected: !application.selected
+      };
+
+    });
+
+    this.syncPanelWithSelection();
     this.cdr.markForCheck();
 
   }
 
   toggleSelectAll(checked: boolean): void {
 
-    this.selectableApplications.forEach(
-      application =>
-        application.selected = checked
+    const selectableIds = new Set(
+      this.selectableApplications.map(app => app.id)
     );
 
+    this.applications = this.applications.map(application =>
+      selectableIds.has(application.id)
+        ? { ...application, selected: checked }
+        : application
+    );
+
+    this.syncPanelWithSelection();
     this.cdr.markForCheck();
+
+  }
+
+  private syncPanelWithSelection(): void {
+
+    if (!this.showSidePanel) {
+      return;
+    }
+
+    this.panelApplications = [
+      ...this.selectedApplications
+    ];
+
+    if (this.panelApplications.length === 0) {
+      this.showSidePanel = false;
+    }
 
   }
 
@@ -216,39 +247,29 @@ export class StandbyPageComponent implements OnInit {
 
   addToStandbyPanel(): void {
 
-    this.panelApplications = [
-      ...this.selectedApplications
-    ];
-
     this.showSidePanel = true;
+    this.syncPanelWithSelection();
+    this.cdr.markForCheck();
 
   }
 
   removeFromPanel(id: number): void {
 
-    this.panelApplications =
-      this.panelApplications.filter(
-        app => app.id !== id
-      );
+    this.applications = this.applications.map(app =>
+      app.id === id
+        ? { ...app, selected: false }
+        : app
+    );
 
-    const source =
-      this.applications.find(
-        app => app.id === id
-      );
-
-    if (source) {
-      source.selected = false;
-    }
-
-    if (this.panelApplications.length === 0) {
-      this.showSidePanel = false;
-    }
+    this.syncPanelWithSelection();
+    this.cdr.markForCheck();
 
   }
 
   closeSidePanel(): void {
 
     this.showSidePanel = false;
+    this.cdr.markForCheck();
 
   }
 

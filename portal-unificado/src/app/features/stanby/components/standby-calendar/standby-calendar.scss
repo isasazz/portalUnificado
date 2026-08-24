@@ -31,9 +31,9 @@
 }
 
 .calendar-nav:hover {
-  background: $violeta-orquidea;
-  border-color: $violeta-orquidea;
-  color: $blanco;
+  background: $amarillo-macondo;
+  border-color: $amarillo-macondo;
+  color: $negro-cib;
 }
 
 .weekdays {
@@ -88,14 +88,14 @@
 }
 
 .calendar-day.selectable:hover {
-  border-color: $violeta-orquidea;
-  background: rgba(144, 99, 205, 0.06);
+  border-color: $amarillo-macondo;
+  background: rgba(253, 218, 36, 0.12);
 }
 
 .calendar-day.selected {
-  background: rgba(144, 99, 205, 0.18);
-  color: $violeta-orquidea;
-  border: 1.5px solid $violeta-orquidea;
+  background: rgba(253, 218, 36, 0.28);
+  color: $negro-cib;
+  border: 1.5px solid $amarillo-macondo;
   font-weight: $font-weight-bold;
   opacity: 1;
   cursor: default;
@@ -106,9 +106,9 @@
 }
 
 .calendar-day.selected:hover {
-  background: rgba(144, 99, 205, 0.24);
-  border-color: $violeta-orquidea;
-  color: $violeta-orquidea;
+  background: rgba(253, 218, 36, 0.38);
+  border-color: $amarillo-macondo;
+  color: $negro-cib;
 }
 
 .calendar-day.occupied {
