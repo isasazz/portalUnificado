@@ -1,0 +1,7 @@
+# Node portable (no subir al repo)
+/node22/
+
+# Dependencias y artefactos
+node_modules/
+dist/
+.angular/
