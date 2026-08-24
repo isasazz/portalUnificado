@@ -26,7 +26,7 @@ export class MantenimientoService {
 
   readonly listFilterEvc = signal('');
   readonly listFilterLinea = signal('');
-  readonly listFilterEstado = signal('');
+  readonly listFilterEstado = signal('En ejecución');
   readonly listFilterTipo = signal<MaintenanceWindowType | ''>('');
   readonly listSearchApp = signal('');
 
