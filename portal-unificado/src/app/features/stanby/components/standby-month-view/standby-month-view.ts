@@ -30,6 +30,10 @@ export class StandbyMonthViewComponent {
 
   readonly hideAppChips = input(false);
 
+  readonly tooltipBelow = input(false);
+
+  readonly peopleListAtBottom = input(false);
+
   currentDate = new Date();
 
   calendarDays: CalendarDay[] = [];

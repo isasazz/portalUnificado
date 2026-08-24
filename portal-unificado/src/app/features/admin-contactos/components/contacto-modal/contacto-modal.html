@@ -66,7 +66,10 @@
 
     </div>
 
-    <div class="modal-body">
+    <div
+      class="modal-body"
+      [class.modal-body--standby]="activeTab === 'standby'"
+    >
 
       @if (activeTab === 'detalle') {
 
@@ -275,9 +278,12 @@
         >
 
           <app-standby-month-view
-            [assignments]="standbyAssignments"
-            [showPeopleList]="false"
-            [outlineMode]="true"
+            [assignments]="standbyAssignments()"
+            [showPeopleList]="true"
+            [outlineMode]="false"
+            [hideAppChips]="true"
+            [tooltipBelow]="false"
+            [peopleListAtBottom]="true"
           />
 
           @if (!editMode()) {

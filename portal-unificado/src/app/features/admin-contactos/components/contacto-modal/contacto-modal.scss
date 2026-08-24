@@ -131,6 +131,10 @@
   background: $surface;
 }
 
+.modal-body--standby {
+  padding-top: $space-40;
+}
+
 .placeholder {
   display: flex;
   flex-direction: column;
@@ -151,10 +155,24 @@
 
 .detalle-item label {
   @include text-label;
+
+  color: $negro-cib;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.06em;
+}
+
+:host-context([data-theme='dark']) .detalle-item label {
+  color: $blanco;
 }
 
 .detalle-item span {
   @include text-value;
+
+  color: $text-primary;
+  font-size: $font-size-md;
+  font-weight: $font-weight-regular;
+  line-height: 1.4;
 }
 
 .detalle-footer {
@@ -243,6 +261,42 @@ select:disabled {
   margin-top: $space-16;
   font-size: $font-size-sm;
   color: $text-secondary;
+}
+
+.standby-panel {
+  min-height: 0;
+}
+
+.standby-panel app-standby-month-view {
+  display: block;
+}
+
+.standby-panel ::ng-deep .standby-layout {
+  min-height: 0;
+  align-items: stretch;
+}
+
+.standby-panel ::ng-deep .sidebar {
+  width: 240px;
+  padding: $space-16;
+  max-height: none;
+  overflow: hidden;
+  align-self: stretch;
+}
+
+.standby-panel ::ng-deep .calendar-container {
+  padding: $space-16;
+  min-width: 0;
+  align-self: stretch;
+  padding-top: $space-24;
+}
+
+.standby-panel ::ng-deep .days-grid {
+  padding-top: $space-8;
+}
+
+.standby-panel ::ng-deep .tooltip {
+  z-index: 10;
 }
 
 .standby-panel--locked {

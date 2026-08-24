@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   input,
@@ -14,6 +15,9 @@ import { Router } from '@angular/router';
 
 import { StandbyMonthViewComponent }
 from '../../../stanby/components/standby-month-view/standby-month-view';
+
+import { StandbyScheduleService }
+from '../../../stanby/services/standby-schedule.service';
 
 import { PhoneInputComponent }
 from '../../../../shared/components/phone-input/phone-input';
@@ -43,7 +47,21 @@ export class ContactoModalComponent {
 
   readonly closed = output<void>();
 
-  readonly standbyAssignments: never[] = [];
+  private readonly scheduleService =
+    inject(StandbyScheduleService);
+
+  readonly standbyAssignments = computed(() => {
+
+    const codigo =
+      this.contacto()?.codigoAplicacion;
+
+    if (!codigo) {
+      return [];
+    }
+
+    return this.scheduleService.getByAppCodigo(codigo);
+
+  });
 
   private readonly router = inject(Router);
 

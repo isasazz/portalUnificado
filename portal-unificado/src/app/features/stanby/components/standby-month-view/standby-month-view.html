@@ -2,6 +2,7 @@
   class="standby-layout"
   [class.standby-layout--calendar-only]="!showPeopleList()"
   [class.standby-layout--outline]="outlineMode()"
+  [class.standby-layout--list-bottom]="peopleListAtBottom()"
 >
 
   @if (showPeopleList()) {
@@ -9,6 +10,8 @@
   <aside class="sidebar">
 
     <h4>PERSONAS PROGRAMADAS</h4>
+
+    <div class="sidebar-list">
 
     @for (
       person of monthPeople;
@@ -81,6 +84,8 @@
       </p>
 
     }
+
+    </div>
 
   </aside>
 
@@ -165,7 +170,10 @@
 
             @if (day.assignment && !outlineMode()) {
 
-              <div class="tooltip">
+              <div
+                class="tooltip"
+                [class.tooltip--below]="tooltipBelow()"
+              >
 
                 <strong>
                   {{ day.assignment.responsable }}

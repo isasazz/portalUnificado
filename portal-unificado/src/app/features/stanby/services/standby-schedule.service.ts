@@ -8,6 +8,9 @@ import {
 import { STANDBY_USER_PHONES }
 from '../mocks/standby-user-phones.mock';
 
+import { STANDBY_ASSIGNMENTS_MOCK }
+from '../mocks/standby-assignments.mock';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -22,11 +25,28 @@ export class StandbyScheduleService {
   private userColors =
     new Map<string, string>();
 
-  private nextId = 1;
+  private nextId = STANDBY_ASSIGNMENTS_MOCK.length + 1;
 
   draftAssignments: StandbyAssignment[] = [];
 
-  savedAssignments: StandbyAssignment[] = [];
+  savedAssignments: StandbyAssignment[] = [
+    ...STANDBY_ASSIGNMENTS_MOCK
+  ];
+
+  constructor() {
+
+    STANDBY_ASSIGNMENTS_MOCK.forEach(assignment => {
+
+      if (!this.userColors.has(assignment.responsable)) {
+        this.userColors.set(
+          assignment.responsable,
+          assignment.color
+        );
+      }
+
+    });
+
+  }
 
   acceptWeeks(
     responsable: string,

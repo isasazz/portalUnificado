@@ -113,6 +113,35 @@
   padding: $space-20;
 }
 
+.sidebar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.standby-layout--list-bottom {
+  align-items: stretch;
+}
+
+.standby-layout--list-bottom .sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.standby-layout--list-bottom .sidebar-list {
+  flex: 1;
+  justify-content: flex-end;
+  overflow-y: auto;
+  min-height: 0;
+  margin-top: auto;
+  padding-top: $space-12;
+}
+
+.standby-layout--list-bottom .assignment-card:first-child {
+  margin-top: 0;
+}
+
 .empty-list {
   margin-top: $space-16;
 
@@ -323,6 +352,11 @@
 
 .calendar-day:hover .tooltip {
   opacity: 1;
+}
+
+.tooltip--below {
+  bottom: auto;
+  top: calc(100% + 8px);
 }
 
 .empty-day {
