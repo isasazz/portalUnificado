@@ -10,7 +10,6 @@ import {
 export interface CalendarDay {
   date: Date;
   dayNumber: number;
-  isFriday: boolean;
   currentMonth: boolean;
 }
 
@@ -44,7 +43,7 @@ export class StandbyCalendarComponent implements OnChanges {
 
   currentDate = new Date();
 
-  selectedFridays: Date[] = [];
+  selectedWeekStarts: Date[] = [];
 
   readonly weekDays = [
     'Lun',
@@ -98,7 +97,6 @@ export class StandbyCalendarComponent implements OnChanges {
       this.days.push({
         date: new Date(),
         dayNumber: 0,
-        isFriday: false,
         currentMonth: false
       });
 
@@ -111,7 +109,6 @@ export class StandbyCalendarComponent implements OnChanges {
       this.days.push({
         date,
         dayNumber: day,
-        isFriday: date.getDay() === 5,
         currentMonth: true
       });
 
@@ -130,7 +127,7 @@ export class StandbyCalendarComponent implements OnChanges {
       return;
     }
 
-    if (!this.enabled || !day.isFriday) {
+    if (!this.enabled) {
       return;
     }
 
@@ -140,30 +137,30 @@ export class StandbyCalendarComponent implements OnChanges {
     }
 
     const exists =
-      this.selectedFridays.find(
-        friday =>
-          this.isSameDate(friday, day.date)
+      this.selectedWeekStarts.find(
+        start =>
+          this.isSameDate(start, day.date)
       );
 
     if (exists) {
 
-      this.selectedFridays =
-        this.selectedFridays.filter(
-          friday =>
-            !this.isSameDate(friday, day.date)
+      this.selectedWeekStarts =
+        this.selectedWeekStarts.filter(
+          start =>
+            !this.isSameDate(start, day.date)
         );
 
     } else {
 
-      this.selectedFridays = [
-        ...this.selectedFridays,
+      this.selectedWeekStarts = [
+        ...this.selectedWeekStarts,
         day.date
       ];
 
     }
 
     this.selectionChange.emit(
-      [...this.selectedFridays]
+      [...this.selectedWeekStarts]
     );
 
   }
@@ -185,14 +182,14 @@ export class StandbyCalendarComponent implements OnChanges {
 
   }
 
-  private emitOccupantsForWeek(friday: Date): void {
+  private emitOccupantsForWeek(weekStart: Date): void {
 
-    const end = this.addDays(friday, 6);
+    const end = this.addDays(weekStart, 6);
 
     const occupants = this.occupiedRanges
       .filter(range =>
         this.rangesOverlap(
-          friday,
+          weekStart,
           end,
           range.start,
           range.end
@@ -213,7 +210,7 @@ export class StandbyCalendarComponent implements OnChanges {
 
     if (unique.length === 0) {
       this.conflict.emit(
-        'Ese rango ya está reservado. Elige otro viernes.'
+        'Ese rango ya está reservado. Elige otra fecha de inicio.'
       );
       return;
     }
@@ -225,14 +222,14 @@ export class StandbyCalendarComponent implements OnChanges {
         : 'están';
 
     this.conflict.emit(
-      `En esos días ${verb}: ${names}. Elige otro viernes.`
+      `En esos días ${verb}: ${names}. Elige otra fecha de inicio.`
     );
 
   }
 
   clearSelection(): void {
 
-    this.selectedFridays = [];
+    this.selectedWeekStarts = [];
     this.selectionChange.emit([]);
 
   }
@@ -243,13 +240,13 @@ export class StandbyCalendarComponent implements OnChanges {
       return false;
     }
 
-    return this.selectedFridays.some(friday => {
+    return this.selectedWeekStarts.some(start => {
 
-      const end = this.addDays(friday, 6);
+      const end = this.addDays(start, 6);
 
       return this.isDateInRange(
         day.date,
-        friday,
+        start,
         end
       );
 
@@ -273,24 +270,24 @@ export class StandbyCalendarComponent implements OnChanges {
 
   }
 
-  isSelectableFriday(day: CalendarDay): boolean {
+  isSelectableDay(day: CalendarDay): boolean {
 
     return (
       this.enabled &&
       day.currentMonth &&
-      day.isFriday &&
+      !this.isOccupied(day) &&
       !this.weekHasOccupied(day.date)
     );
 
   }
 
-  private weekHasOccupied(friday: Date): boolean {
+  private weekHasOccupied(weekStart: Date): boolean {
 
-    const end = this.addDays(friday, 6);
+    const end = this.addDays(weekStart, 6);
 
     return this.occupiedRanges.some(range =>
       this.rangesOverlap(
-        friday,
+        weekStart,
         end,
         range.start,
         range.end

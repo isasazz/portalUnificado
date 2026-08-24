@@ -86,7 +86,7 @@
 
             Selecciona un responsable para habilitar
             la programación de standby.
-            Solo los viernes están disponibles.
+            Luego elige el día de inicio.
 
           </div>
 
@@ -96,7 +96,7 @@
 
             Responsable seleccionado:
             {{ selectedUser }}
-            · Solo viernes habilitados
+            · Selecciona el día de inicio
 
           </div>
 
@@ -122,7 +122,7 @@
           <label>Resumen de programación</label>
 
           <small>
-            Cada standby dura de viernes a jueves
+            Cada standby dura 7 días desde el día seleccionado
             @if (selectedUser) {
               · {{ selectedUser }}
             }

@@ -10,12 +10,6 @@ export class StandbyCalendarService {
     endDate: Date
   ): boolean {
 
-    const startDay =
-      startDate.getDay();
-
-    const endDay =
-      endDate.getDay();
-
     const diffDays =
       Math.floor(
         (
@@ -25,11 +19,7 @@ export class StandbyCalendarService {
         (1000 * 60 * 60 * 24)
       );
 
-    return (
-      startDay === 5 &&
-      endDay === 4 &&
-      diffDays === 6
-    );
+    return diffDays === 6;
 
   }
 

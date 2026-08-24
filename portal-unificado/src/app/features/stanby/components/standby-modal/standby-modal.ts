@@ -63,7 +63,7 @@ export class StandbyModalComponent {
 
   selectedUser?: string;
 
-  selectedFridays: Date[] = [];
+  selectedWeekStarts: Date[] = [];
 
   userSearch = '';
 
@@ -161,13 +161,13 @@ export class StandbyModalComponent {
 
     this.selectedUser = user;
     this.calendar?.clearSelection();
-    this.selectedFridays = [];
+    this.selectedWeekStarts = [];
 
   }
 
   onSelectionChange(dates: Date[]): void {
 
-    this.selectedFridays = dates.sort(
+    this.selectedWeekStarts = dates.sort(
       (a, b) =>
         a.getTime() - b.getTime()
     );
@@ -194,15 +194,15 @@ export class StandbyModalComponent {
     end: Date;
   }[] {
 
-    return this.selectedFridays.map(
-      friday => {
+    return this.selectedWeekStarts.map(
+      start => {
 
-        const end = new Date(friday);
+        const end = new Date(start);
 
         end.setDate(end.getDate() + 6);
 
         return {
-          start: friday,
+          start,
           end
         };
 
@@ -242,7 +242,7 @@ export class StandbyModalComponent {
     );
 
     this.calendar?.clearSelection();
-    this.selectedFridays = [];
+    this.selectedWeekStarts = [];
 
     this.showAcceptAlert = true;
 

@@ -75,7 +75,7 @@
   opacity: 0.45;
 }
 
-.calendar-day.friday {
+.calendar-day.selectable {
   cursor: pointer;
 
   color: $text-primary;
@@ -87,7 +87,7 @@
   font-weight: $font-weight-semibold;
 }
 
-.calendar-day.friday:hover {
+.calendar-day.selectable:hover {
   border-color: $violeta-orquidea;
   background: rgba(144, 99, 205, 0.06);
 }
@@ -101,7 +101,7 @@
   cursor: default;
 }
 
-.calendar-day.selected.friday {
+.calendar-day.selected.selectable {
   cursor: pointer;
 }
 
@@ -121,7 +121,7 @@
   pointer-events: auto;
 }
 
-.calendar-day.occupied.friday {
+.calendar-day.occupied.selectable {
   cursor: pointer;
   pointer-events: auto;
   background: $border-light;
