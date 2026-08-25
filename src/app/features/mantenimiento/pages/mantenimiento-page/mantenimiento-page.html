@@ -1,7 +1,4 @@
-<div
-  class="mantenimiento-page"
-  [class.mantenimiento-page--panel-open]="showEditPanel()"
->
+<div class="mantenimiento-page">
 
   <div class="mantenimiento-main">
 
@@ -198,10 +195,6 @@
                 [class.window-tile--just-saved]="
                   highlightedWindowId() === window.id
                 "
-                [class.window-tile--editing]="
-                  showEditPanel() &&
-                  editingWindow()?.id === window.id
-                "
               >
 
                 <div class="window-tile__top">
@@ -306,135 +299,6 @@
 
           </div>
 
-          @if (showEditPanel() && editingWindow(); as window) {
-
-            <aside class="edit-panel">
-
-              <div class="edit-panel__header">
-
-                <div>
-                  <h2>Editar ventana</h2>
-                  <p>
-                    {{ window.aplicacion }} · {{ window.nombreAplicacion }}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  class="panel-close"
-                  (click)="closeEditPanel()"
-                  aria-label="Cerrar panel"
-                >
-                  ✕
-                </button>
-
-              </div>
-
-              <div
-                class="edit-panel__body"
-                [formGroup]="editForm"
-              >
-
-                <div class="field">
-                  <label>Estado</label>
-                  <select formControlName="estado">
-                    <option>Programada</option>
-                    <option>En ejecución</option>
-                    <option>Finalizada</option>
-                    <option>Cancelada</option>
-                  </select>
-                </div>
-
-                <div class="field">
-                  <label>Frecuencia</label>
-                  <select formControlName="frecuencia">
-                    <option>Una vez</option>
-                    <option>Diaria</option>
-                    <option>Semanal</option>
-                    <option>Mensual</option>
-                  </select>
-                </div>
-
-                <div class="field">
-                  <label>Fecha inicio</label>
-                  <input
-                    type="text"
-                    formControlName="fechaInicio"
-                    placeholder="dd/MM/yyyy HH:mm"
-                  />
-                </div>
-
-                <div class="field">
-                  <label>Fecha fin</label>
-                  <input
-                    type="text"
-                    formControlName="fechaFin"
-                    placeholder="dd/MM/yyyy HH:mm"
-                  />
-                </div>
-
-                <div class="field">
-                  <label>Zona horaria</label>
-                  <select formControlName="zonaHoraria">
-                    <option>América / Bogotá</option>
-                    <option>América / Lima</option>
-                    <option>UTC</option>
-                  </select>
-                </div>
-
-                <div class="field">
-                  <label>Aplicación</label>
-                  <input
-                    type="text"
-                    formControlName="aplicacion"
-                    readonly
-                  />
-                </div>
-
-                <div class="field">
-                  <label>Impacto</label>
-                  <input
-                    type="text"
-                    formControlName="impacto"
-                  />
-                </div>
-
-                <div class="field">
-                  <label>Observación</label>
-                  <textarea
-                    rows="3"
-                    formControlName="observacion"
-                    placeholder="Notas de la ventana"
-                  ></textarea>
-                </div>
-
-              </div>
-
-              <div class="edit-panel__footer">
-
-                <button
-                  type="button"
-                  class="btn-secondary"
-                  (click)="closeEditPanel()"
-                >
-                  Cancelar
-                </button>
-
-                <button
-                  type="button"
-                  class="btn-save"
-                  [disabled]="!canSaveEdit()"
-                  (click)="saveEdit()"
-                >
-                  Guardar cambios
-                </button>
-
-              </div>
-
-            </aside>
-
-          }
-
         </div>
 
       }
@@ -442,6 +306,168 @@
     }
 
   </div>
+
+  @if (showEditPanel() && editingWindow(); as window) {
+
+    <div
+      class="edit-modal-backdrop"
+      (click)="closeEditPanel()"
+    >
+
+      <div
+        class="edit-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="edit-window-title"
+        (click)="$event.stopPropagation()"
+      >
+
+        <div class="edit-modal__header">
+
+          <div>
+            <h2 id="edit-window-title">Editar ventana</h2>
+            <p>
+              {{ window.aplicacion }} · {{ window.nombreAplicacion }}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="panel-close"
+            (click)="closeEditPanel()"
+            aria-label="Cerrar"
+          >
+            ✕
+          </button>
+
+        </div>
+
+        <div class="edit-modal__summary">
+          <span
+            class="tipo-label"
+            [class.tipo-label--promesa]="isPromesa(window)"
+          >
+            {{ tipoLabel(window.tipo) }}
+          </span>
+          <span
+            class="status-label"
+            [ngClass]="statusClass(window.estado)"
+          >
+            {{ window.estado }}
+          </span>
+          <span class="edit-modal__freq">{{ window.frecuencia }}</span>
+        </div>
+
+        <div
+          class="edit-modal__body"
+          [formGroup]="editForm"
+        >
+
+          <div class="field">
+            <label>Estado</label>
+            <select formControlName="estado">
+              <option>Programada</option>
+              <option>En ejecución</option>
+              <option>Finalizada</option>
+              <option>Cancelada</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Frecuencia</label>
+            <select formControlName="frecuencia">
+              <option>Una vez</option>
+              <option>Diaria</option>
+              <option>Semanal</option>
+              <option>Mensual</option>
+            </select>
+          </div>
+
+          <div class="edit-modal__grid">
+
+            <div class="field">
+              <label>Fecha inicio</label>
+              <input
+                type="text"
+                formControlName="fechaInicio"
+                placeholder="dd/MM/yyyy HH:mm"
+              />
+            </div>
+
+            <div class="field">
+              <label>Fecha fin</label>
+              <input
+                type="text"
+                formControlName="fechaFin"
+                placeholder="dd/MM/yyyy HH:mm"
+              />
+            </div>
+
+          </div>
+
+          <div class="field">
+            <label>Zona horaria</label>
+            <select formControlName="zonaHoraria">
+              <option>América / Bogotá</option>
+              <option>América / Lima</option>
+              <option>UTC</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Aplicación</label>
+            <input
+              type="text"
+              formControlName="aplicacion"
+              readonly
+            />
+          </div>
+
+          <div class="field">
+            <label>Impacto</label>
+            <input
+              type="text"
+              formControlName="impacto"
+            />
+          </div>
+
+          <div class="field">
+            <label>Observación</label>
+            <textarea
+              rows="3"
+              formControlName="observacion"
+              placeholder="Notas de la ventana"
+            ></textarea>
+          </div>
+
+        </div>
+
+        <div class="edit-modal__footer">
+
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="closeEditPanel()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="btn-save"
+            [disabled]="!canSaveEdit()"
+            (click)="saveEdit()"
+          >
+            Guardar cambios
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  }
 
   @if (showTypeModal()) {
 

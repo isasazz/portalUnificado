@@ -220,7 +220,7 @@
 
   background: $amarillo-macondo;
   border: 1px solid $amarillo-macondo;
-  color: $negro-cib;
+  color: $on-yellow;
 }
 
 .btn-add:disabled {
@@ -255,7 +255,7 @@
 .standby-panel .btn-add {
   background: $amarillo-macondo;
   border-color: $amarillo-macondo;
-  color: $negro-cib;
+  color: $on-yellow;
 }
 
 .standby-panel .btn-add:hover:not(:disabled) {
@@ -328,7 +328,7 @@
 }
 
 .panel-item__info strong {
-  color: $negro-cib;
+  color: $text-primary;
   font-size: $font-size-sm;
 }
 

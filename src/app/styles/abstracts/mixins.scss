@@ -70,12 +70,17 @@
   border-radius: $radius-pill;
 
   background: $surface;
+  color: $text-primary;
 
   padding: 0 $space-16;
 
   font-size: $font-size-md;
 
   @include transition;
+
+  &::placeholder {
+    color: $text-disabled;
+  }
 
   &:focus {
     outline: none;
@@ -107,7 +112,7 @@
   @include button-base;
 
   background: $amarillo-macondo;
-  color: $negro-cib;
+  color: $on-yellow;
 
   &:hover {
     background: $negro-cib;

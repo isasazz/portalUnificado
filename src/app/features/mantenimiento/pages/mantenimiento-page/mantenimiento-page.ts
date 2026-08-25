@@ -430,6 +430,7 @@ export class MantenimientoPageComponent {
     }
 
     const values = this.editForm.getRawValue();
+    const savedId = window.id;
 
     this.mantenimiento.updateWindow(window.id, {
       estado: values.estado ?? window.estado,
@@ -442,6 +443,7 @@ export class MantenimientoPageComponent {
     });
 
     this.closeEditPanel();
+    this.focusSavedWindow(savedId);
     this.saveSuccess.show({
       title: '¡Listo!',
       message: 'La ventana se actualizó.'

@@ -65,7 +65,7 @@
 
   cursor: pointer;
 
-  color: $text-primary;
+  color: $on-yellow;
 
   background: $amarillo-macondo;
 
@@ -156,14 +156,14 @@
 .detalle-item label {
   @include text-label;
 
-  color: $negro-cib;
+  color: $text-primary;
   font-size: $font-size-xs;
   font-weight: $font-weight-bold;
   letter-spacing: 0.06em;
 }
 
 :host-context([data-theme='dark']) .detalle-item label {
-  color: $blanco;
+  color: $text-primary;
 }
 
 .detalle-item span {

@@ -33,7 +33,7 @@
 .calendar-nav:hover {
   background: $amarillo-macondo;
   border-color: $amarillo-macondo;
-  color: $negro-cib;
+  color: $on-yellow;
 }
 
 .weekdays {
@@ -94,7 +94,7 @@
 
 .calendar-day.selected {
   background: rgba(253, 218, 36, 0.28);
-  color: $negro-cib;
+  color: $text-primary;
   border: 1.5px solid $amarillo-macondo;
   font-weight: $font-weight-bold;
   opacity: 1;
@@ -108,7 +108,7 @@
 .calendar-day.selected:hover {
   background: rgba(253, 218, 36, 0.38);
   border-color: $amarillo-macondo;
-  color: $negro-cib;
+  color: $text-primary;
 }
 
 .calendar-day.occupied {

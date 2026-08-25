@@ -57,7 +57,7 @@
   border-radius: 50%;
 
   background: $amarillo-macondo;
-  color: $text-primary;
+  color: $on-yellow;
 
   cursor: pointer;
 
@@ -89,7 +89,7 @@
   @include button-base;
 
   background: $amarillo-macondo;
-  color: $negro-cib;
+  color: $on-yellow;
   border: 1px solid $amarillo-macondo;
 
   min-width: 160px;
