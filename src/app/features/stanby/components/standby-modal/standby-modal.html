@@ -1,0 +1,257 @@
+@if (visible()) {
+
+<div class="modal-backdrop">
+
+  <div class="modal-container">
+
+    <div class="modal-header">
+
+      <div class="modal-header__info">
+
+        <h2>Agregar Standby</h2>
+
+        @if (aplicaciones().length > 0) {
+
+          <div class="app-codes">
+            @for (
+              app of aplicaciones();
+              track app.codigoAplicacion
+            ) {
+              <span class="app-code-chip">
+                {{ app.codigoAplicacion }}
+              </span>
+            }
+          </div>
+
+        }
+
+      </div>
+
+      <button
+        type="button"
+        class="close-button"
+        (click)="close()"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <div class="modal-content">
+
+      <div class="users-section">
+
+        <h3>Responsables</h3>
+
+        <input
+          class="user-search"
+          type="text"
+          placeholder="Buscar contacto..."
+          [(ngModel)]="userSearch"
+          name="userSearch"
+        />
+
+        <div class="users-list">
+
+          @for (
+            user of filteredUsers;
+            track user
+          ) {
+
+            <div
+              class="user-card"
+              [class.selected]="selectedUser === user"
+              (click)="selectUser(user)"
+            >
+              {{ user }}
+            </div>
+
+          }
+
+          @if (filteredUsers.length === 0) {
+            <p class="users-empty">
+              No se encontraron contactos.
+            </p>
+          }
+
+        </div>
+
+      </div>
+
+      <div class="calendar-section">
+
+        @if (!selectedUser) {
+
+          <div class="info-message">
+
+            Selecciona un responsable para habilitar
+            la programación de standby.
+            Luego elige el día de inicio.
+
+          </div>
+
+        } @else {
+
+          <div class="info-message success">
+
+            Responsable seleccionado:
+            {{ selectedUser }}
+            · Selecciona el día de inicio
+
+          </div>
+
+        }
+
+        <app-standby-calendar
+          [enabled]="!!selectedUser"
+          [occupiedRanges]="occupiedRanges"
+          (selectionChange)="onSelectionChange($event)"
+          (conflict)="onConflict($event)">
+        </app-standby-calendar>
+
+      </div>
+
+    </div>
+
+    <div class="selection-summary">
+
+      @if (standbyWeeks.length > 0) {
+
+        <div class="summary-card">
+
+          <label>Resumen de programación</label>
+
+          <small>
+            Cada standby dura 7 días desde el día seleccionado
+            @if (selectedUser) {
+              · {{ selectedUser }}
+            }
+          </small>
+
+          <ul class="week-list">
+
+            @for (
+              week of standbyWeeks;
+              track week.start
+            ) {
+
+              <li>
+                De
+                {{ week.start | date:'dd/MM/yyyy' }}
+                a
+                {{ week.end | date:'dd/MM/yyyy' }}
+              </li>
+
+            }
+
+          </ul>
+
+          <button
+            type="button"
+            class="btn-primary accept-button"
+            (click)="acceptSelection()"
+          >
+            Aceptar selección
+          </button>
+
+        </div>
+
+      }
+
+      @if (groupedAccepted.length > 0) {
+
+        <div class="summary-card trace">
+
+          <label>Selecciones aceptadas</label>
+
+          <ul class="week-list">
+
+            @for (
+              group of groupedAccepted;
+              track group.responsable
+            ) {
+
+              <li class="trace-item">
+
+                <div class="trace-item__main">
+                  {{ group.responsable }}
+                </div>
+
+                <ul class="trace-weeks">
+                  @for (
+                    week of group.weeks;
+                    track week.start
+                  ) {
+                    <li>
+                      De
+                      {{ week.start | date:'dd/MM/yyyy' }}
+                      a
+                      {{ week.end | date:'dd/MM/yyyy' }}
+                    </li>
+                  }
+                </ul>
+
+                @if (group.aplicaciones.length > 0) {
+
+                  <div class="trace-apps">
+                    <span class="trace-apps__label">
+                      Aplicaciones asociadas
+                    </span>
+                    @for (
+                      app of group.aplicaciones;
+                      track app.codigoAplicacion
+                    ) {
+                      <span class="app-chip">
+                        {{ app.codigoAplicacion }}
+                        ·
+                        {{ app.nombreAplicacion }}
+                      </span>
+                    }
+                  </div>
+
+                }
+
+              </li>
+
+            }
+
+          </ul>
+
+        </div>
+
+      }
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button
+        type="button"
+        class="btn-primary"
+        [disabled]="!canSave"
+        (click)="save()"
+      >
+        Guardar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+}
+
+<app-standby-alert
+  [visible]="showAcceptAlert"
+  title="Selección aceptada"
+  message="Continúa con otros usuarios para programar standby."
+  (closed)="closeAcceptAlert()">
+</app-standby-alert>
+
+<app-standby-alert
+  [visible]="showConflictAlert"
+  title="Standby ocupado"
+  [message]="conflictMessage"
+  (closed)="closeConflictAlert()">
+</app-standby-alert>

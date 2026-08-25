@@ -1,0 +1,51 @@
+@if (saveSuccess.visible()) {
+
+  <div
+    class="save-success-backdrop"
+    (click)="saveSuccess.dismiss()"
+  >
+
+    <div
+      class="save-success-dialog"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="save-success-title"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div class="save-success-dialog__header">
+
+        <h2 id="save-success-title">
+          {{ saveSuccess.title() }}
+        </h2>
+
+        <button
+          type="button"
+          class="save-success-dialog__close"
+          (click)="saveSuccess.dismiss()"
+          aria-label="Cerrar"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      <div class="save-success-dialog__body">
+
+        <p>{{ saveSuccess.message() }}</p>
+
+        <button
+          type="button"
+          class="save-success-dialog__accept"
+          (click)="saveSuccess.dismiss()"
+        >
+          Aceptar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}

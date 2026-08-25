@@ -1,0 +1,88 @@
+@use 'abstracts/colors' as *;
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+.save-success-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(44, 42, 41, 0.45);
+}
+
+.save-success-dialog {
+  width: 480px;
+  max-width: 90vw;
+
+  background: $surface;
+  border-radius: $radius-md;
+  border: 1px solid $border-light;
+  box-shadow: $shadow-lg;
+  overflow: hidden;
+}
+
+.save-success-dialog__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: $space-20 $space-24;
+  border-bottom: 1px solid $border-light;
+}
+
+.save-success-dialog__header h2 {
+  margin: 0;
+  font-size: $font-size-h3;
+  color: $text-primary;
+}
+
+.save-success-dialog__close {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: $amarillo-macondo;
+  color: $text-primary;
+
+  cursor: pointer;
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+}
+
+.save-success-dialog__body {
+  @include flex-column;
+  align-items: center;
+  gap: $space-20;
+
+  padding: $space-32 $space-24;
+  text-align: center;
+}
+
+.save-success-dialog__body p {
+  margin: 0;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+.save-success-dialog__accept {
+  @include button-base;
+
+  min-width: 160px;
+
+  background: $amarillo-macondo;
+  color: $negro-cib;
+  border: 1px solid $amarillo-macondo;
+}
+
+.save-success-dialog__accept:hover {
+  background: $negro-cib;
+  border-color: $negro-cib;
+  color: $amarillo-macondo;
+}
