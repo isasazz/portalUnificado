@@ -37,76 +37,57 @@ Antes de empezar, asegúrate de tener:
 
 | Requisito | Detalle |
 |-----------|---------|
-| **Node.js** | Versión **20** o **22** (recomendado: **22 LTS**) |
-| **npm** | Viene con Node |
+| **Node.js** | Solo **20** o **22** (recomendado: **22 LTS**) |
+| **npm** | Viene con Node (10+) |
 | **Git** | Para clonar el repositorio |
 
 ### Importante
 
-- **No uses Node 21.** Con esa versión Angular CLI falla (`ERR_REQUIRE_ESM`).
+- **No uses Node 21.** Rompe Angular CLI (`ERR_REQUIRE_ESM`).
+- El proyecto **bloquea** versiones inválidas al hacer `npm install` / `npm start` y muestra un mensaje claro.
 - Comprueba tu versión:
 
 ```powershell
 node -v
-npm -v
 ```
 
-Si no tienes Node, instálalo desde: [https://nodejs.org](https://nodejs.org) (elige LTS 22).
+Debe ser `v20.x.x` o `v22.x.x`. Si no, instala Node 22 LTS desde: [https://nodejs.org](https://nodejs.org), cierra la terminal y ábrela de nuevo.
 
 ---
 
 ## Cómo clonar y ejecutar
 
-Sigue estos pasos en orden. Funciona en cualquier PC con Node 20 o 22.
-
-### 1. Clonar el repositorio
+### Opción A — desde la raíz del repo (recomendado)
 
 ```powershell
 git clone https://github.com/isasazz/portalUnificado.git
 cd portalUnificado
-```
-
-### 2. Entrar a la carpeta de la app Angular
-
-El código de la aplicación está dentro de `portal-unificado`:
-
-```powershell
-cd portal-unificado
-```
-
-### 3. Instalar dependencias
-
-Solo la primera vez (o si cambió `package.json`):
-
-```powershell
 npm install
-```
-
-Espera a que termine sin errores.
-
-### 4. Levantar la aplicación
-
-```powershell
 npm start
 ```
 
-Cuando compile, abre el navegador en:
+### Opción B — dentro de la app Angular
+
+```powershell
+git clone https://github.com/isasazz/portalUnificado.git
+cd portalUnificado/portal-unificado
+npm install
+npm start
+```
+
+Cuando compile, abre:
 
 **http://localhost:4200/**
 
-La app se recarga sola al guardar cambios en el código.
-
-Para detener el servidor: `Ctrl + C` en la terminal.
+La app se recarga sola al guardar cambios. Para detener: `Ctrl + C`.
 
 ---
 
 ## Resumen rápido
 
-Copia y pega esto en PowerShell:
-
 ```powershell
 git clone https://github.com/isasazz/portalUnificado.git
-cd portalUnificado/portal-unificado
+cd portalUnificado
 npm install
 npm start
 ```
@@ -117,12 +98,11 @@ Luego abre: http://localhost:4200/
 
 ## Comandos útiles
 
-| Acción | Comando | Dónde ejecutarlo |
-|--------|---------|------------------|
-| Instalar dependencias | `npm install` | `portal-unificado/` |
-| Desarrollo | `npm start` | `portal-unificado/` |
-| Build de producción | `npm run build` | `portal-unificado/` |
-| Tests | `npm test` | `portal-unificado/` |
+| Acción | Comando | Dónde |
+|--------|---------|--------|
+| Instalar + arrancar | `npm install` → `npm start` | raíz del repo **o** `portal-unificado/` |
+| Build | `npm run build` | igual |
+| Tests | `npm test` | igual |
 
 El build genera la salida en:
 
@@ -147,31 +127,27 @@ portal-unificado/dist/portal-unificado
 ## Estructura del repo
 
 ```text
-portalUnificado/                 ← raíz del repositorio (git clone)
-├── .gitignore
-└── portal-unificado/            ← app Angular (aquí corres npm)
-    ├── src/app/
-    │   ├── features/            # contactos, standby, mantenimiento, perfil, inicio
-    │   ├── layout/
-    │   ├── shared/
-    │   └── styles/
+portalUnificado/                 ← raíz del repo (npm install / npm start)
+├── package.json                 ← redirige a la app + chequeo de Node
+├── .nvmrc                       ← Node 22
+└── portal-unificado/            ← app Angular
+    ├── scripts/check-node.mjs   ← bloquea Node 21 y similares
     ├── package.json
     ├── angular.json
-    └── README.md
+    └── src/app/
 ```
 
 ---
 
 ## Problemas frecuentes
 
+### Error al instalar/arrancar: “Node.js incompatible”
+
+El chequeo del proyecto te está avisando. Instala **Node 22 LTS**, reinicia la terminal, verifica `node -v` y vuelve a `npm install` / `npm start`.
+
 ### `ERR_REQUIRE_ESM` o errores raros de Angular CLI / yargs
 
-Estás usando una versión de Node incompatible (casi siempre **Node 21**).
-
-1. Instala Node **20** o **22**.
-2. Cierra y vuelve a abrir la terminal.
-3. Verifica con `node -v`.
-4. En `portal-unificado` vuelve a correr `npm install` y `npm start`.
+Misma causa: Node incorrecto (casi siempre **21**). Usa solo **20** o **22**.
 
 ### `npm` no se reconoce
 

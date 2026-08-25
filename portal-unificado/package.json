@@ -1,17 +1,27 @@
 {
   "name": "portal-unificado",
   "version": "0.0.0",
+  "private": true,
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": "20.x || 22.x",
+    "npm": ">=10"
+  },
+  "volta": {
+    "node": "22.23.2",
+    "npm": "10.9.2"
+  },
   "scripts": {
+    "check-node": "node ./scripts/check-node.mjs",
+    "preinstall": "node ./scripts/check-node.mjs",
+    "prestart": "node ./scripts/check-node.mjs",
+    "prebuild": "node ./scripts/check-node.mjs",
+    "pretest": "node ./scripts/check-node.mjs",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
-  },
-  "private": true,
-  "packageManager": "npm@10.9.2",
-  "engines": {
-    "node": ">=20 <21 || >=22"
   },
   "dependencies": {
     "@angular/common": "^21.2.0",
