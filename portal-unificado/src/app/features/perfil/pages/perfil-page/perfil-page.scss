@@ -292,6 +292,18 @@
   border-left: 4px solid $amarillo-macondo;
 }
 
+.visit-row--past {
+  border-left-color: #9ca3af;
+}
+
+.visit-row--current {
+  border-left-color: $verde-andino;
+}
+
+.visit-row--next {
+  border-left-color: $azul-caribe;
+}
+
 .visit-row__date {
   @include flex-column;
   gap: 2px;
@@ -316,9 +328,28 @@
   color: $text-primary;
 }
 
+.status-pill--past {
+  background: rgba(156, 163, 175, 0.35);
+  color: $text-secondary;
+}
+
+.status-pill--current {
+  background: rgba(0, 195, 137, 0.25);
+  color: $verde-andino;
+}
+
+.status-pill--next {
+  background: rgba(89, 203, 235, 0.3);
+  color: #1a7a96;
+}
+
 .status-pill--muted {
   background: $border-light;
   color: $text-secondary;
+}
+
+.identity-card__edit {
+  width: 100%;
 }
 
 .side-stack {

@@ -152,6 +152,9 @@
             [class.has-assignment]="!!day.assignment"
             [class.is-range-start]="day.isRangeStart"
             [class.is-range-end]="day.isRangeEnd"
+            [style.--assignment-color]="
+              day.assignment?.color ?? null
+            "
             [style.background]="
               !outlineMode() && day.assignment
                 ? day.assignment.color + '22'

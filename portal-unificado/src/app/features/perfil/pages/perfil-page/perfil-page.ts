@@ -31,6 +31,17 @@ type PerfilTab =
   | 'proximos'
   | 'historial';
 
+type StandbyPeriod =
+  | 'past'
+  | 'current'
+  | 'next';
+
+const STANDBY_PERIOD_COLORS: Record<StandbyPeriod, string> = {
+  past: '#9ca3af',
+  current: '#00c389',
+  next: '#59cbeb'
+};
+
 @Component({
   selector: 'app-perfil-page',
   standalone: true,
@@ -61,13 +72,7 @@ export class PerfilPageComponent {
   readonly historialPage = signal(1);
 
   readonly profileForm = this.fb.group({
-    nombre: ['', Validators.required],
-    celular: [''],
-    correo: ['', Validators.email],
-    cargo: [''],
-    area: [''],
-    ubicacion: [''],
-    fechaIngreso: ['']
+    celular: ['', Validators.required]
   });
 
   readonly myStandby = computed(() => {
@@ -77,11 +82,17 @@ export class PerfilPageComponent {
         this.profileService.profile().nombre
       );
 
-    if (saved.length > 0) {
-      return saved;
-    }
+    const source =
+      saved.length > 0
+        ? saved
+        : PERFIL_STANDBY_MOCK;
 
-    return PERFIL_STANDBY_MOCK;
+    return source.map(assignment => ({
+      ...assignment,
+      color: STANDBY_PERIOD_COLORS[
+        this.standbyPeriod(assignment)
+      ]
+    }));
 
   });
 
@@ -144,13 +155,7 @@ export class PerfilPageComponent {
       }
 
       this.profileService.updateDraft({
-        nombre: values.nombre ?? '',
-        celular: values.celular ?? '',
-        correo: values.correo ?? '',
-        cargo: values.cargo ?? '',
-        area: values.area ?? '',
-        ubicacion: values.ubicacion ?? '',
-        fechaIngreso: values.fechaIngreso ?? ''
+        celular: values.celular ?? ''
       });
 
     });
@@ -163,17 +168,42 @@ export class PerfilPageComponent {
 
   }
 
+  standbyPeriod(assignment: StandbyAssignment): StandbyPeriod {
+
+    const now = new Date();
+    const currentKey =
+      now.getFullYear() * 12 + now.getMonth();
+    const assignKey =
+      assignment.fechaInicio.getFullYear() * 12 +
+      assignment.fechaInicio.getMonth();
+
+    if (assignKey < currentKey) {
+      return 'past';
+    }
+
+    if (assignKey === currentKey) {
+      return 'current';
+    }
+
+    return 'next';
+
+  }
+
   startEdit(): void {
 
     this.profileService.startEdit();
-    this.profileForm.patchValue(this.profileService.draft());
+    this.profileForm.patchValue({
+      celular: this.profileService.draft().celular
+    });
 
   }
 
   cancelEdit(): void {
 
     this.profileService.cancelEdit();
-    this.profileForm.patchValue(this.profileService.profile());
+    this.profileForm.patchValue({
+      celular: this.profileService.profile().celular
+    });
 
   }
 

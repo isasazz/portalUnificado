@@ -54,14 +54,10 @@ export class UserProfileService {
   saveEdit(): void {
 
     const current = this.profile();
-    const nextDraft = this.draft();
 
     this.profileSource.set({
-      ...nextDraft,
-      lider: current.lider,
-      evc: current.evc,
-      linea: current.linea,
-      initials: this.buildInitials(nextDraft.nombre)
+      ...current,
+      celular: this.draft().celular
     });
 
     this.draft.set({ ...this.profileSource() });

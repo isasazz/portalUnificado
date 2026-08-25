@@ -67,13 +67,13 @@
 }
 
 .standby-layout--outline .calendar-day.has-assignment {
-  background: rgba(0, 195, 137, 0.18);
-  border: 2px solid $verde-andino;
+  background: color-mix(in srgb, var(--assignment-color, #00c389) 18%, transparent);
+  border: 2px solid var(--assignment-color, #00c389);
   box-shadow: none;
 }
 
 .standby-layout--outline .calendar-day.has-assignment .day-number {
-  color: $verde-andino;
+  color: var(--assignment-color, #00c389);
   font-weight: $font-weight-bold;
 }
 

@@ -25,7 +25,7 @@ export class StandbyScheduleService {
   private userColors =
     new Map<string, string>();
 
-  private nextId = STANDBY_ASSIGNMENTS_MOCK.length + 1;
+  private nextId = 1100;
 
   draftAssignments: StandbyAssignment[] = [];
 
