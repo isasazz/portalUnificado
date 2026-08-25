@@ -1,6 +1,8 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
+  effect,
   inject
 } from '@angular/core';
 
@@ -17,5 +19,19 @@ from '../../services/save-success.service';
 export class SaveSuccessModalComponent {
 
   readonly saveSuccess = inject(SaveSuccessService);
+
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  constructor() {
+
+    effect(() => {
+      this.saveSuccess.visible();
+      this.saveSuccess.title();
+      this.saveSuccess.message();
+      this.saveSuccess.buttonLabel();
+      this.cdr.markForCheck();
+    });
+
+  }
 
 }

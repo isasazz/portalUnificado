@@ -36,12 +36,6 @@ from '../../services/standby-schedule.service';
 
 
 
-import { SaveSuccessService }
-
-from '../../../../shared/services/save-success.service';
-
-
-
 import { StandbyAlertComponent }
 
 from '../standby-alert/standby-alert';
@@ -116,7 +110,10 @@ export class StandbyModalComponent {
 
 
 
-  readonly saved = output<void>();
+  readonly saved = output<{
+    appCodigo: string;
+    appNombre: string;
+  }>();
 
 
 
@@ -129,10 +126,6 @@ export class StandbyModalComponent {
   private readonly scheduleService =
 
     inject(StandbyScheduleService);
-
-  private readonly saveSuccess =
-
-    inject(SaveSuccessService);
 
 
 
@@ -526,17 +519,27 @@ export class StandbyModalComponent {
 
 
 
+    const apps = this.aplicaciones();
+
+    const first = apps[0];
+
+
+
     this.scheduleService.save();
 
-    this.saveSuccess.show(
 
-      'El standby se guardó correctamente. Ya puedes verlo en el calendario.'
-
-    );
-
-    this.saved.emit();
 
     this.close();
+
+
+
+    this.saved.emit({
+
+      appCodigo: first?.codigoAplicacion ?? '',
+
+      appNombre: first?.nombreAplicacion ?? ''
+
+    });
 
 
 
@@ -549,8 +552,6 @@ export class StandbyModalComponent {
 
 
     this.showSaveAlert = false;
-
-    this.saved.emit();
 
     this.close();
 

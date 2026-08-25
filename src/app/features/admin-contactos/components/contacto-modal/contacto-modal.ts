@@ -145,9 +145,10 @@ export class ContactoModalComponent {
     });
 
     this.close();
-    this.saveSuccess.show(
-      'La información de contacto se guardó correctamente.'
-    );
+    this.saveSuccess.show({
+      title: '¡Listo!',
+      message: 'El contacto se actualizó.'
+    });
 
   }
 

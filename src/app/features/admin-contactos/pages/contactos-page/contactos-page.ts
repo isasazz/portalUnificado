@@ -197,9 +197,10 @@ export class ContactosPageComponent {
 
     this.showBulkEdit.set(false);
     this.clearSelection();
-    this.saveSuccess.show(
-      'Los contactos seleccionados se actualizaron correctamente.'
-    );
+    this.saveSuccess.show({
+      title: '¡Listo!',
+      message: 'Los contactos se actualizaron.'
+    });
 
   }
 

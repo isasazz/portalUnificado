@@ -442,9 +442,10 @@ export class MantenimientoPageComponent {
     });
 
     this.closeEditPanel();
-    this.saveSuccess.show(
-      'La ventana de mantenimiento se actualizó correctamente.'
-    );
+    this.saveSuccess.show({
+      title: '¡Listo!',
+      message: 'La ventana se actualizó.'
+    });
 
   }
 
@@ -498,9 +499,10 @@ export class MantenimientoPageComponent {
     this.viewMode.set('list');
     this.resetCreateForm();
     this.focusSavedWindow(newId);
-    this.saveSuccess.show(
-      'La ventana se guardó correctamente. Quedó de primeras en el listado.'
-    );
+    this.saveSuccess.show({
+      title: '¡Listo!',
+      message: 'La ventana se guardó.'
+    });
 
   }
 

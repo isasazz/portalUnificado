@@ -50,9 +50,10 @@ export class NuevoContactoModalComponent {
   save(): void {
 
     this.close();
-    this.saveSuccess.show(
-      'El contacto se guardó correctamente.'
-    );
+    this.saveSuccess.show({
+      title: '¡Listo!',
+      message: 'El contacto se guardó.'
+    });
 
   }
 

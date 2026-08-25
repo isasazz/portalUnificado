@@ -148,9 +148,11 @@
           ) {
 
             <app-standby-card
+              [attr.id]="'standby-card-' + application.id"
               [application]="application"
               [hasStandby]="true"
               [activeThisMonth]="hasAppStandbyThisMonth(application.codigoAplicacion)"
+              [highlighted]="highlightedAppCodigo === application.codigoAplicacion"
               (view)="openViewForApp($event)"
               (edit)="openEditForApp($event)"
             />
@@ -249,7 +251,7 @@
     [visible]="showStandbyModal"
     [aplicaciones]="panelApplications"
     (closed)="closeStandbyModal()"
-    (saved)="onStandbySaved()"
+    (saved)="onStandbySaved($event)"
   />
 
   <app-standby-view-modal

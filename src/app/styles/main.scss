@@ -40,8 +40,8 @@
   color: var(--text-primary);
 }
 
-[data-theme='dark'] h1:not(.page-title-tab),
-[data-theme='dark'] h2,
+[data-theme='dark'] h1:not(.page-title-tab):not(#pu-save-ok-title),
+[data-theme='dark'] h2:not(#pu-save-ok-title),
 [data-theme='dark'] h3,
 [data-theme='dark'] h4,
 [data-theme='dark'] strong {

@@ -2,6 +2,7 @@
   class="standby-card"
   [class.selected]="isSelected() && !hasStandby()"
   [class.active-this-month]="activeThisMonth()"
+  [class.standby-card--highlight]="highlighted()"
   (click)="toggleSelection()"
 >
 

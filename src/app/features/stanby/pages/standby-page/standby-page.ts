@@ -28,6 +28,9 @@ from '../../components/standby-view-modal/standby-view-modal';
 import { StandbyScheduleService }
 from '../../services/standby-schedule.service';
 
+import { SaveSuccessService }
+from '../../../../shared/services/save-success.service';
+
 @Component({
   selector: 'app-standby-page',
   standalone: true,
@@ -44,6 +47,7 @@ export class StandbyPageComponent implements OnInit {
 
   private readonly route = inject(ActivatedRoute);
   private readonly scheduleService = inject(StandbyScheduleService);
+  private readonly saveSuccess = inject(SaveSuccessService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   applications: StandbyApplication[] =
@@ -62,6 +66,10 @@ export class StandbyPageComponent implements OnInit {
   viewAppCodigo = '';
 
   viewAppNombre = '';
+
+  highlightedAppCodigo = '';
+
+  private highlightTimer: ReturnType<typeof setTimeout> | null = null;
 
   activeView: 'available' | 'programmed' = 'available';
 
@@ -137,10 +145,24 @@ export class StandbyPageComponent implements OnInit {
 
   get programmedApplications(): StandbyApplication[] {
 
-    return this.applications.filter(
+    const list = this.applications.filter(
       app =>
         this.hasAppStandby(app.codigoAplicacion)
     );
+
+    if (!this.highlightedAppCodigo) {
+      return list;
+    }
+
+    return [...list].sort((a, b) => {
+      if (a.codigoAplicacion === this.highlightedAppCodigo) {
+        return -1;
+      }
+      if (b.codigoAplicacion === this.highlightedAppCodigo) {
+        return 1;
+      }
+      return 0;
+    });
 
   }
 
@@ -285,7 +307,10 @@ export class StandbyPageComponent implements OnInit {
 
   }
 
-  onStandbySaved(): void {
+  onStandbySaved(payload: {
+    appCodigo: string;
+    appNombre: string;
+  }): void {
 
     this.applications.forEach(app => {
       app.selected = false;
@@ -295,7 +320,52 @@ export class StandbyPageComponent implements OnInit {
     this.showSidePanel = false;
     this.showStandbyModal = false;
     this.applications = [...this.applications];
+    this.activeView = 'programmed';
+
+    if (payload.appCodigo) {
+      this.focusSavedStandby(payload.appCodigo);
+    }
+
     this.cdr.markForCheck();
+
+    this.saveSuccess.show({
+      title: '¡Listo!',
+      message: 'Tu standby quedó programado.',
+      buttonLabel: 'Continuar'
+    });
+
+  }
+
+  private focusSavedStandby(appCodigo: string): void {
+
+    if (this.highlightTimer) {
+      clearTimeout(this.highlightTimer);
+    }
+
+    this.highlightedAppCodigo = appCodigo;
+
+    const app = this.applications.find(
+      item => item.codigoAplicacion === appCodigo
+    );
+
+    setTimeout(() => {
+      if (!app) {
+        return;
+      }
+
+      document
+        .getElementById(`standby-card-${app.id}`)
+        ?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+    }, 100);
+
+    this.highlightTimer = setTimeout(() => {
+      this.highlightedAppCodigo = '';
+      this.highlightTimer = null;
+      this.cdr.markForCheck();
+    }, 5000);
 
   }
 

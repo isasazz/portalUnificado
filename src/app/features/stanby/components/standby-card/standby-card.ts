@@ -25,6 +25,8 @@ export class StandbyCardComponent {
 
   readonly isSelected = input(false);
 
+  readonly highlighted = input(false);
+
   readonly selected = output<number>();
 
   readonly view = output<number>();

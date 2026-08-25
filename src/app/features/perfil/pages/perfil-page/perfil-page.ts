@@ -219,9 +219,10 @@ export class PerfilPageComponent {
     }
 
     this.profileService.saveEdit();
-    this.saveSuccess.show(
-      'Tu perfil se actualizó correctamente.'
-    );
+    this.saveSuccess.show({
+      title: '¡Listo!',
+      message: 'Tu perfil se actualizó.'
+    });
 
   }
 
