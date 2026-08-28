@@ -35,6 +35,13 @@ export const routes: Routes = [
           ).then(m => m.StandbyPageComponent)
       },
       {
+        path: 'standby/consulta',
+        loadComponent: () =>
+          import(
+            './features/stanby/pages/standby-consulta-page/standby-consulta-page'
+          ).then(m => m.StandbyConsultaPageComponent)
+      },
+      {
         path: 'standby/politicas',
         loadComponent: () =>
           import(

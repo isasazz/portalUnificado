@@ -188,6 +188,48 @@
   color: $amarillo-macondo;
 }
 
+.menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.menu-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  margin: 0 0 0 44px;
+  padding-left: $space-12;
+
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.menu-sub__item {
+  padding: $space-8 $space-12;
+
+  border-radius: $radius-sm;
+
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  @include transition;
+}
+
+.menu-sub__item:hover {
+  color: $amarillo-macondo;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.menu-sub__item.active {
+  color: $blanco;
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: $font-weight-semibold;
+}
+
 .sidebar__user {
   padding: $space-16;
 

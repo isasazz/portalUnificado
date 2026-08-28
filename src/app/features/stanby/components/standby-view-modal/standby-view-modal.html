@@ -2,31 +2,95 @@
 
 <div class="modal-backdrop">
 
-  <div class="modal-container">
+  <div
+    class="modal-container"
+    [class.modal-container--person]="isPersonView()"
+  >
 
-    <div class="modal-header">
+    <div
+      class="modal-header"
+      [class.modal-header--person]="isPersonView()"
+    >
 
-      <div class="modal-header__info">
+      @if (isPersonView()) {
 
-        <h2>Detalle de standby</h2>
+        <div class="person-hero">
 
-        @if (aplicacionCodigo()) {
+          <span class="person-hero__avatar">
+            {{ personInitials() }}
+          </span>
 
-          <div class="app-under-title">
-            <span class="app-code">{{ aplicacionCodigo() }}</span>
-            @if (aplicacionNombre()) {
-              <span class="app-name">{{ aplicacionNombre() }}</span>
+          <div class="person-hero__info">
+            <span class="person-hero__eyebrow">
+              Standby por persona
+            </span>
+            <h2>{{ personName() }}</h2>
+            @if (personPhone()) {
+              <p>{{ personPhone() }}</p>
             }
           </div>
 
-        }
+          <div class="person-hero__stats">
 
-      </div>
+            <div class="person-stat">
+              <strong>{{ assignments().length }}</strong>
+              <span>
+                {{ assignments().length === 1 ? 'Turno' : 'Turnos' }}
+              </span>
+            </div>
+
+            @if (currentAssignment(); as current) {
+              <div class="person-stat person-stat--current">
+                <strong>En curso</strong>
+                <span>
+                  {{ current.fechaInicio | date:'dd/MM' }}
+                  →
+                  {{ current.fechaFin | date:'dd/MM' }}
+                </span>
+              </div>
+            }
+
+            @if (!currentAssignment() && nextAssignment(); as next) {
+              <div class="person-stat person-stat--next">
+                <strong>Próximo</strong>
+                <span>
+                  {{ next.fechaInicio | date:'dd/MM' }}
+                  →
+                  {{ next.fechaFin | date:'dd/MM' }}
+                </span>
+              </div>
+            }
+
+          </div>
+
+        </div>
+
+      } @else {
+
+        <div class="modal-header__info">
+
+          <h2>Detalle de standby</h2>
+
+          @if (aplicacionCodigo()) {
+
+            <div class="app-under-title">
+              <span class="app-code">{{ aplicacionCodigo() }}</span>
+              @if (aplicacionNombre()) {
+                <span class="app-name">{{ aplicacionNombre() }}</span>
+              }
+            </div>
+
+          }
+
+        </div>
+
+      }
 
       <button
         type="button"
         class="close-button"
         (click)="close()"
+        aria-label="Cerrar"
       >
         ✕
       </button>
@@ -39,15 +103,168 @@
 
         <div class="empty-detail">
           <p>
-            No hay standby registrado para esta aplicación.
+            @if (isPersonView()) {
+              Esta persona no tiene standby programado registrado.
+            } @else {
+              No hay standby registrado para esta aplicación.
+            }
           </p>
+        </div>
+
+      } @else if (isPersonView()) {
+
+        <div class="person-standby">
+
+          <aside class="person-timeline">
+
+            @if (upcomingAssignments().length > 0) {
+
+              <div class="person-timeline__group">
+
+                <h3>Próximos y actuales</h3>
+
+                @for (
+                  assignment of upcomingAssignments();
+                  track assignment.id
+                ) {
+                  <article
+                    class="turn-card"
+                    [class.turn-card--past]="
+                      standbyPeriod(assignment) === 'past'
+                    "
+                    [class.turn-card--current]="
+                      standbyPeriod(assignment) === 'current'
+                    "
+                    [class.turn-card--next]="
+                      standbyPeriod(assignment) === 'next'
+                    "
+                  >
+
+                    <div class="turn-card__top">
+
+                      <div class="turn-card__dates">
+                        <strong>
+                          {{ assignment.fechaInicio | date:'dd/MM/yyyy' }}
+                        </strong>
+                        <small>
+                          →
+                          {{ assignment.fechaFin | date:'dd/MM/yyyy' }}
+                        </small>
+                      </div>
+
+                      <span
+                        class="turn-card__pill"
+                        [class.turn-card__pill--past]="
+                          standbyPeriod(assignment) === 'past'
+                        "
+                        [class.turn-card__pill--current]="
+                          standbyPeriod(assignment) === 'current'
+                        "
+                        [class.turn-card__pill--next]="
+                          standbyPeriod(assignment) === 'next'
+                        "
+                      >
+                        {{ periodLabel(assignment) }}
+                      </span>
+
+                    </div>
+
+                    @if (assignment.aplicaciones?.length) {
+                      <div class="turn-card__apps">
+                        @for (
+                          app of assignment.aplicaciones;
+                          track app.codigoAplicacion
+                        ) {
+                          <span class="turn-card__app">
+                            {{ app.codigoAplicacion }}
+                          </span>
+                        }
+                      </div>
+                    }
+
+                  </article>
+                }
+
+              </div>
+
+            }
+
+            @if (pastAssignments().length > 0) {
+
+              <div class="person-timeline__group">
+
+                <h3>Historial</h3>
+
+                @for (
+                  assignment of pastAssignments();
+                  track assignment.id
+                ) {
+                  <article class="turn-card turn-card--past">
+
+                    <div class="turn-card__top">
+
+                      <div class="turn-card__dates">
+                        <strong>
+                          {{ assignment.fechaInicio | date:'dd/MM/yyyy' }}
+                        </strong>
+                        <small>
+                          →
+                          {{ assignment.fechaFin | date:'dd/MM/yyyy' }}
+                        </small>
+                      </div>
+
+                      <span class="turn-card__pill turn-card__pill--past">
+                        Finalizado
+                      </span>
+
+                    </div>
+
+                    @if (assignment.aplicaciones?.length) {
+                      <div class="turn-card__apps">
+                        @for (
+                          app of assignment.aplicaciones;
+                          track app.codigoAplicacion
+                        ) {
+                          <span class="turn-card__app">
+                            {{ app.codigoAplicacion }}
+                          </span>
+                        }
+                      </div>
+                    }
+
+                  </article>
+                }
+
+              </div>
+
+            }
+
+          </aside>
+
+          <section class="person-calendar">
+
+            <div class="person-calendar__header">
+              <h3>Calendario de turnos</h3>
+              <p>Vista mensual de la programación</p>
+            </div>
+
+            <app-standby-month-view
+              [assignments]="assignments()"
+              [showPeopleList]="false"
+              [outlineMode]="true"
+              [hideAppChips]="true"
+              [tooltipBelow]="true"
+            />
+
+          </section>
+
         </div>
 
       } @else {
 
         <app-standby-month-view
           [assignments]="assignments()"
-          [showPeopleList]="true"
+          [showPeopleList]="showPeopleList()"
           [hideAppChips]="false"
         />
 

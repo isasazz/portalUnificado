@@ -117,6 +117,49 @@ export class StandbyScheduleService {
 
   }
 
+  getAllResponsables(): string[] {
+
+    const names = new Set<string>();
+
+    Object.keys(STANDBY_USER_PHONES).forEach(name => {
+      names.add(name);
+    });
+
+    this.savedAssignments.forEach(assignment => {
+      names.add(assignment.responsable);
+    });
+
+    return [...names].sort((a, b) =>
+      a.localeCompare(b, 'es')
+    );
+
+  }
+
+  searchResponsables(term: string): string[] {
+
+    const query = term.trim().toLowerCase();
+
+    if (!query) {
+      return [];
+    }
+
+    return this.getAllResponsables().filter(name =>
+      name.toLowerCase().includes(query)
+    );
+
+  }
+
+  getAssignmentsForPerson(
+    responsable: string
+  ): StandbyAssignment[] {
+
+    return this.getByResponsable(responsable).sort(
+      (a, b) =>
+        a.fechaInicio.getTime() - b.fechaInicio.getTime()
+    );
+
+  }
+
   getByAppCodigo(
     codigoAplicacion: string
   ): StandbyAssignment[] {

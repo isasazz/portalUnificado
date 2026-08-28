@@ -109,24 +109,48 @@
       }
     </a>
 
-    <a
-      class="menu-item"
-      routerLink="/standby"
-      routerLinkActive="active"
-      title="Standby"
-    >
-      <span class="menu-item__icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zM7 12h5v5H7v-5z"
-            fill="currentColor"
-          />
-        </svg>
-      </span>
+    <div class="menu-group">
+
+      <a
+        class="menu-item"
+        routerLink="/standby"
+        routerLinkActive="active"
+        title="Standby"
+      >
+        <span class="menu-item__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zM7 12h5v5H7v-5z"
+              fill="currentColor"
+            />
+          </svg>
+        </span>
+        @if (!collapsed()) {
+          <span class="menu-item__label">Standby</span>
+        }
+      </a>
+
       @if (!collapsed()) {
-        <span class="menu-item__label">Standby</span>
+        <div class="menu-sub">
+          <a
+            class="menu-sub__item"
+            routerLink="/standby"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            Programar
+          </a>
+          <a
+            class="menu-sub__item"
+            routerLink="/standby/consulta"
+            routerLinkActive="active"
+          >
+            Consulta por persona
+          </a>
+        </div>
       }
-    </a>
+
+    </div>
 
     <a
       class="menu-item"
