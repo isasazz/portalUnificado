@@ -16,6 +16,333 @@
   min-width: 0;
 }
 
+.standby-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-16;
+  margin-bottom: $space-24;
+}
+
+.relevo-access {
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  background: $surface;
+  box-shadow: $shadow-sm;
+}
+
+.relevo-access__content {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: $space-20;
+
+  padding: $space-24 $space-32;
+  height: 100%;
+}
+
+.relevo-access__icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: $radius-md;
+  background: $negro-cib;
+}
+
+.relevo-access__icon span {
+  display: block;
+  width: 22px;
+  height: 22px;
+
+  border: 2px solid $amarillo-macondo;
+  border-radius: 50%;
+
+  position: relative;
+}
+
+.relevo-access__icon span::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 10px;
+  height: 2px;
+  margin-left: 2px;
+
+  background: $amarillo-macondo;
+  transform: translateY(-50%);
+}
+
+.relevo-access__copy {
+  min-width: 0;
+}
+
+.relevo-access__eyebrow {
+  margin: 0 0 $space-8;
+
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $text-secondary;
+}
+
+.relevo-access h2 {
+  margin: 0 0 $space-8;
+
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+}
+
+.relevo-access__copy > p {
+  margin: 0;
+  max-width: 36rem;
+
+  font-size: $font-size-sm;
+  line-height: 1.5;
+  color: $text-secondary;
+}
+
+.relevo-access__cta {
+  @include button-base;
+
+  flex-shrink: 0;
+
+  min-height: 44px;
+  padding: $space-12 $space-20;
+
+  background: $surface;
+  border: 1px solid $border-color;
+  color: $text-primary;
+  white-space: nowrap;
+}
+
+.relevo-access__cta:hover {
+  background: $amarillo-macondo;
+  border-color: $amarillo-macondo;
+  color: $on-yellow;
+}
+
+.relevo-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-16;
+
+  margin-bottom: $space-24;
+  padding: $space-16 $space-20;
+
+  border-radius: $radius-md;
+  border: 1px solid $border-light;
+  border-left: 3px solid $amarillo-macondo;
+  background: $surface;
+}
+
+.relevo-status--incoming {
+  border-left-color: $link-color;
+}
+
+.relevo-status__copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.relevo-status__copy strong {
+  display: block;
+  margin-bottom: 4px;
+
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.relevo-status__copy p {
+  margin: 0;
+
+  font-size: $font-size-sm;
+  line-height: 1.45;
+  color: $text-secondary;
+}
+
+.relevo-status__action {
+  @include button-base;
+
+  flex-shrink: 0;
+
+  padding: $space-8 $space-16;
+  min-height: 38px;
+
+  background: $surface;
+  border: 1px solid $border-color;
+  color: $text-primary;
+
+  font-size: $font-size-sm;
+  white-space: nowrap;
+}
+
+.relevo-status__action:hover {
+  border-color: $text-primary;
+}
+
+.policies-access {
+  position: relative;
+  overflow: hidden;
+
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  background: $surface;
+  box-shadow: $shadow-sm;
+  margin-bottom: 0;
+}
+
+.policies-access__glow {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      115deg,
+      rgba(253, 218, 36, 0.16) 0%,
+      transparent 42%
+    ),
+    linear-gradient(
+      300deg,
+      rgba(144, 99, 205, 0.08) 0%,
+      transparent 45%
+    );
+
+  pointer-events: none;
+}
+
+.policies-access__content {
+  position: relative;
+  z-index: 1;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: $space-20;
+
+  padding: $space-24 $space-32;
+}
+
+.policies-access__icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: $radius-md;
+  background: $negro-cib;
+  box-shadow: inset 0 0 0 2px rgba(253, 218, 36, 0.35);
+}
+
+.policies-access__icon span {
+  display: block;
+  width: 22px;
+  height: 26px;
+
+  border: 2px solid $amarillo-macondo;
+  border-radius: 3px;
+
+  position: relative;
+}
+
+.policies-access__icon span::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: $amarillo-macondo;
+  box-shadow: 0 5px 0 $amarillo-macondo, 0 10px 0 $amarillo-macondo;
+}
+
+.policies-access__copy {
+  min-width: 0;
+}
+
+.policies-access__eyebrow {
+  margin: 0 0 $space-8;
+
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $link-color;
+}
+
+.policies-access h2 {
+  margin: 0 0 $space-8;
+
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+}
+
+.policies-access__copy > p {
+  margin: 0 0 $space-12;
+  max-width: 36rem;
+
+  font-size: $font-size-sm;
+  line-height: 1.5;
+  color: $text-secondary;
+}
+
+.policies-access__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-8;
+}
+
+.policies-access__chips span {
+  padding: 4px 10px;
+
+  border-radius: $radius-pill;
+  border: 1px solid $border-color;
+  background: $background-body;
+
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.policies-access__cta {
+  @include button-base;
+
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  gap: $space-8;
+
+  min-height: 44px;
+  padding: $space-12 $space-20;
+
+  background: $amarillo-macondo;
+  border: 1px solid $amarillo-macondo;
+  color: $on-yellow;
+  text-decoration: none;
+  white-space: nowrap;
+
+  @include transition;
+}
+
+.policies-access__cta:hover {
+  background: $negro-cib;
+  border-color: $negro-cib;
+  color: $amarillo-macondo;
+}
+
 .standby-section {
   margin-bottom: $space-24;
 }
@@ -380,6 +707,31 @@
 @media (max-width: 1100px) {
   .standby-page {
     flex-direction: column;
+  }
+
+  .standby-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .policies-access__content,
+  .relevo-access__content {
+    grid-template-columns: auto 1fr;
+  }
+
+  .policies-access__cta,
+  .relevo-access__cta {
+    grid-column: 1 / -1;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .relevo-status {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .relevo-status__action {
+    width: 100%;
   }
 
   .standby-panel {

@@ -22,13 +22,39 @@
 
       <p>{{ message() }}</p>
 
-      <button
-        type="button"
-        class="btn-corporate"
-        (click)="close()"
-      >
-        Aceptar
-      </button>
+      @if (confirmMode()) {
+
+        <div class="alert-actions">
+
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="cancel()"
+          >
+            {{ cancelLabel() }}
+          </button>
+
+          <button
+            type="button"
+            class="btn-corporate"
+            (click)="confirm()"
+          >
+            {{ confirmLabel() }}
+          </button>
+
+        </div>
+
+      } @else {
+
+        <button
+          type="button"
+          class="btn-corporate"
+          (click)="close()"
+        >
+          Aceptar
+        </button>
+
+      }
 
     </div>
 

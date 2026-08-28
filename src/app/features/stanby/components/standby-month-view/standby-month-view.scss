@@ -159,7 +159,48 @@
 
   @include flex-column;
 
+  gap: $space-12;
+}
+
+.standby-group-header {
+  @include flex-column;
+  gap: $space-4;
+}
+
+.standby-group-badge {
+  display: inline-flex;
+  width: fit-content;
+
+  padding: 2px 8px;
+
+  border-radius: $radius-pill;
+  border: 1px solid rgba(0, 153, 216, 0.35);
+  background: rgba(0, 153, 216, 0.1);
+
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $link-color;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.standby-group-people {
+  @include flex-column;
+  gap: $space-12;
+}
+
+.standby-person-row {
+  display: flex;
   gap: $space-8;
+  align-items: flex-start;
+
+  padding-top: $space-8;
+  border-top: 1px solid $border-light;
+}
+
+.standby-person-row:first-child {
+  padding-top: 0;
+  border-top: 0;
 }
 
 .assignment-header {
@@ -182,6 +223,12 @@
 .assignment-dates {
   font-size: $font-size-sm;
   color: $text-secondary;
+}
+
+.assignment-dates--prominent {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
 }
 
 .color-dot {
@@ -347,6 +394,19 @@
 
 .tooltip small {
   color: rgba(255, 255, 255, 0.8);
+}
+
+.tooltip-person {
+  @include flex-column;
+  gap: 2px;
+
+  padding-bottom: $space-4;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.tooltip-person:last-of-type {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 
 .calendar-day:hover .tooltip {

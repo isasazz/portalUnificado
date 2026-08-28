@@ -46,6 +46,30 @@ export class ContactosService {
 
   });
 
+  addContacto(
+    data: Omit<Contacto, 'id'>
+  ): Contacto {
+
+    const nextId =
+      this.contactosSource().reduce(
+        (max, item) => Math.max(max, item.id),
+        0
+      ) + 1;
+
+    const created: Contacto = {
+      id: nextId,
+      ...data
+    };
+
+    this.contactosSource.update(list => [
+      created,
+      ...list
+    ]);
+
+    return created;
+
+  }
+
   updateContacto(
     id: number,
     patch: Partial<Contacto>

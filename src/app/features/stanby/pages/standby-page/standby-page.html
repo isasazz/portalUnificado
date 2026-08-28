@@ -5,7 +5,141 @@
 
   <div class="standby-main">
 
-    @if (activeView === 'available' && hasSelection && !showSidePanel) {
+    <div class="standby-tools">
+
+      <aside
+        class="policies-access"
+        aria-label="Políticas de standby"
+      >
+
+        <div class="policies-access__glow"></div>
+
+        <div class="policies-access__content">
+
+          <div class="policies-access__icon" aria-hidden="true">
+            <span></span>
+          </div>
+
+          <div class="policies-access__copy">
+
+            <p class="policies-access__eyebrow">
+              Centro de conocimiento
+            </p>
+
+            <h2>Políticas de Standby</h2>
+
+            <p>
+              Consulta los lineamientos corporativos antes de
+              programar: cobertura de 7 días, turnos viernes a
+              jueves, responsables y escalamiento.
+            </p>
+
+            <div class="policies-access__chips">
+
+              @for (item of policyHighlights; track item.label) {
+                <span>{{ item.label }}</span>
+              }
+
+            </div>
+
+          </div>
+
+          <a
+            routerLink="/standby/politicas"
+            class="policies-access__cta"
+          >
+            Leer políticas
+            <span aria-hidden="true">→</span>
+          </a>
+
+        </div>
+
+      </aside>
+
+      <aside
+        class="relevo-access"
+        aria-label="Delegar programación de standby"
+      >
+
+        <div class="relevo-access__content">
+
+          <div class="relevo-access__icon" aria-hidden="true">
+            <span></span>
+          </div>
+
+          <div class="relevo-access__copy">
+
+            <p class="relevo-access__eyebrow">
+              Delegación temporal
+            </p>
+
+            <h2>Delegar programación</h2>
+
+            <p>
+              Si te ausentas, asigna a otro líder la programación
+              de standby de tu equipo. Tú conservas tu rol de líder
+              titular.
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            class="relevo-access__cta"
+            (click)="openRelevoModal()"
+          >
+            Delegar
+          </button>
+
+        </div>
+
+      </aside>
+
+    </div>
+
+    @if (delegationService.activeOutgoing(); as outgoing) {
+
+      <div class="relevo-status relevo-status--outgoing">
+
+        <div class="relevo-status__copy">
+          <strong>Delegación activa</strong>
+          <p>
+            {{ outgoing.toLeader }} programa standby por ti hasta el
+            {{ formatDelegationDate(outgoing.fechaFin) }}
+            ({{ delegationService.reasonLabel(outgoing.motivo) }}).
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="relevo-status__action"
+          (click)="revokeRelevo()"
+        >
+          Recuperar programación
+        </button>
+
+      </div>
+
+    }
+
+    @if (delegationService.activeIncoming(); as incoming) {
+
+      <div class="relevo-status relevo-status--incoming">
+
+        <div class="relevo-status__copy">
+          <strong>Delegación recibida</strong>
+          <p>
+            Programas standby en nombre de
+            {{ incoming.fromLeader }} hasta el
+            {{ formatDelegationDate(incoming.fechaFin) }}.
+          </p>
+        </div>
+
+      </div>
+
+    }
+
+    @if (activeView === 'available' && hasSelection && !showSidePanel && !delegationService.hasDelegatedOut()) {
 
       <div class="page-header">
 
@@ -32,7 +166,16 @@
         <header class="section-header">
           <h2 class="section-title">Aplicaciones disponibles</h2>
           <p class="section-subtitle">
-            Selecciona una o más aplicaciones para programar standby.
+            @if (delegationService.hasDelegatedOut()) {
+              Tienes una delegación activa: otro líder programa por ti.
+              Puedes consultar el estado, pero no agregar nuevas
+              programaciones hasta recuperarla.
+            } @else if (delegationService.isActingForAnotherLeader()) {
+              Programa standby en nombre de
+              <strong>{{ delegationService.activeIncoming()?.fromLeader }}</strong>.
+            } @else {
+              Selecciona una o más aplicaciones para programar standby.
+            }
           </p>
         </header>
 
@@ -99,6 +242,7 @@
             <input
               type="checkbox"
               [checked]="allSelected"
+              [disabled]="delegationService.hasDelegatedOut()"
               (change)="toggleSelectAll($any($event.target).checked)"
             />
             <span>Seleccionar todas</span>
@@ -260,6 +404,12 @@
     [aplicacionCodigo]="viewAppCodigo"
     [aplicacionNombre]="viewAppNombre"
     (closed)="closeViewModal()"
+  />
+
+  <app-standby-relevo-modal
+    [visible]="showRelevoModal"
+    (closed)="closeRelevoModal()"
+    (delegated)="onRelevoDelegated()"
   />
 
 </div>

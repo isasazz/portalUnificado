@@ -147,7 +147,12 @@
   background: $verde-andino;
   color: $blanco;
 
-  &:hover {
+  &:hover:not(:disabled) {
     filter: brightness(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
   }
 }

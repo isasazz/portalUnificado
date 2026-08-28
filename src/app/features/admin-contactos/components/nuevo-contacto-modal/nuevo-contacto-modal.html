@@ -17,6 +17,7 @@
       </div>
 
       <button
+        type="button"
         class="close-button"
         (click)="close()"
       >
@@ -25,7 +26,10 @@
 
     </div>
 
-    <div class="modal-body">
+    <div
+      class="modal-body"
+      [formGroup]="form"
+    >
 
       <div class="form-grid">
 
@@ -33,8 +37,14 @@
 
           <label>EVC</label>
 
-          <select>
-            <option>Seleccione un EVC</option>
+          <select
+            formControlName="evc"
+            (change)="onEvcChange()"
+          >
+            <option value="">Seleccione un EVC</option>
+            @for (evc of evcOptions; track evc) {
+              <option [value]="evc">{{ evc }}</option>
+            }
           </select>
 
         </div>
@@ -43,8 +53,14 @@
 
           <label>Línea</label>
 
-          <select>
-            <option>Seleccione una línea</option>
+          <select
+            formControlName="linea"
+            (change)="onLineaChange()"
+          >
+            <option value="">Seleccione una línea</option>
+            @for (linea of lineaOptions(); track linea) {
+              <option [value]="linea">{{ linea }}</option>
+            }
           </select>
 
         </div>
@@ -55,16 +71,21 @@
 
         <label>Aplicación</label>
 
-        <select>
-          <option>Seleccione una aplicación</option>
+        <select
+          formControlName="codigoAplicacion"
+          (change)="onAppChange()"
+        >
+          <option value="">Seleccione una aplicación</option>
+          @for (app of appOptions(); track app.codigoAplicacion) {
+            <option [value]="app.codigoAplicacion">
+              {{ app.codigoAplicacion }} — {{ app.nombreAplicacion }}
+            </option>
+          }
         </select>
 
       </div>
 
-      <div
-        class="form-grid"
-        [formGroup]="form"
-      >
+      <div class="form-grid">
 
         <div class="field">
 
@@ -72,6 +93,7 @@
 
           <input
             type="text"
+            formControlName="nombre"
             placeholder="Nombre completo"
           />
 
@@ -95,40 +117,21 @@
 
         <input
           type="email"
+          formControlName="correo"
           placeholder="correo@bancolombia.com.co"
         />
 
       </div>
 
-      <div class="form-grid">
+      <div class="field">
 
-        <div class="field">
+        <label>Horario</label>
 
-          <label>Horario</label>
-
-          <select>
-
-            <option>24/7</option>
-
-            <option>Personalizado</option>
-
-          </select>
-
-        </div>
-
-        <div class="field">
-
-          <label>Estado</label>
-
-          <select>
-
-            <option>Activo</option>
-
-            <option>Inactivo</option>
-
-          </select>
-
-        </div>
+        <select formControlName="horario">
+          <option value="24/7">24/7</option>
+          <option value="L-V 8-18">L-V 8-18</option>
+          <option value="Personalizado">Personalizado</option>
+        </select>
 
       </div>
 
@@ -136,22 +139,24 @@
 
     <div class="modal-footer">
 
-  <button
-    class="btn-secondary"
-    (click)="close()"
-  >
-    Cancelar
-  </button>
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="close()"
+      >
+        Cancelar
+      </button>
 
-  <button
-    type="button"
-    class="btn-save"
-    (click)="save()"
-  >
-    Guardar contacto
-  </button>
+      <button
+        type="button"
+        class="btn-save"
+        [disabled]="!canSave()"
+        (click)="save()"
+      >
+        Guardar contacto
+      </button>
 
-</div>
+    </div>
 
   </div>
 

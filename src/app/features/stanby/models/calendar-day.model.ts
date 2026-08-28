@@ -11,6 +11,8 @@ export interface CalendarDay {
 
   assignment?: StandbyAssignment;
 
+  assignments?: StandbyAssignment[];
+
   isRangeStart?: boolean;
 
   isRangeEnd?: boolean;

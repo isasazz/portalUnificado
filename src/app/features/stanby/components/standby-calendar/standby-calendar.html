@@ -1,4 +1,7 @@
-<div class="calendar-wrapper">
+<div
+  class="calendar-wrapper"
+  [class.calendar-wrapper--locked]="lockSelection()"
+>
 
   <div class="calendar-header">
 
@@ -50,6 +53,7 @@
 
         <div
           class="calendar-day"
+          [class.friday]="isFriday(day.date)"
           [class.disabled]="
             !isOccupied(day) &&
             !isInSelectedRange(day) &&
@@ -61,10 +65,29 @@
           [class.selectable]="isSelectableDay(day)"
           [class.selected]="isInSelectedRange(day) && !isOccupied(day)"
           [class.occupied]="isOccupied(day)"
+          [class.calendar-day--last-selected]="
+            isLastSelectedDay(day)
+          "
           (click)="selectDate(day)"
         >
 
-          {{ day.dayNumber }}
+          <span class="calendar-day__number">
+            {{ day.dayNumber }}
+          </span>
+
+          @if (
+            isLastSelectedDay(day) &&
+            showAddPerson()
+          ) {
+            <button
+              type="button"
+              class="calendar-add-person"
+              title="Añadir otra persona"
+              (click)="onAddPersonClick($event)"
+            >
+              +
+            </button>
+          }
 
         </div>
 

@@ -75,6 +75,43 @@
   font-weight: $font-weight-semibold;
 }
 
+.product-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-8;
+}
+
+.product-tab {
+  padding: 6px 12px;
+
+  border: 1px solid $border-color;
+  border-radius: $radius-pill;
+  background: $surface;
+
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+
+  cursor: pointer;
+}
+
+.product-tab--active {
+  border-color: $amarillo-macondo;
+  background: rgba(253, 218, 36, 0.25);
+  color: $text-primary;
+}
+
+.product-tab--done:not(.product-tab--active) {
+  border-color: $verde-andino;
+  color: $text-primary;
+}
+
+.product-tabs-hint {
+  margin: $space-8 0 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
 .close-button {
   width: 40px;
   height: 40px;
@@ -108,6 +145,54 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+
+  scroll-margin-top: $space-16;
+}
+
+.users-section--pick {
+  border-right-color: $link-color;
+  background: rgba(0, 153, 216, 0.04);
+  box-shadow: inset 3px 0 0 $link-color;
+}
+
+.co-responsable-callout {
+  @include flex-column;
+  gap: $space-8;
+
+  margin-bottom: $space-16;
+  padding: $space-12 $space-16;
+
+  border: 1px solid rgba(0, 153, 216, 0.35);
+  border-radius: $radius-md;
+  background: rgba(0, 153, 216, 0.1);
+}
+
+.co-responsable-callout strong {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+}
+
+.co-responsable-callout p {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1.45;
+}
+
+.co-responsable-callout__dates {
+  display: inline-flex;
+  width: fit-content;
+
+  padding: 4px 10px;
+
+  border-radius: $radius-pill;
+  background: $surface;
+  border: 1px solid rgba(0, 153, 216, 0.25);
+
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $link-color;
 }
 
 .users-section h3 {
@@ -183,6 +268,11 @@
   font-weight: $font-weight-semibold;
 }
 
+.user-card--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .selection-summary {
   padding: 0 $space-24 $space-8;
 
@@ -244,8 +334,108 @@
   font-weight: $font-weight-semibold;
 }
 
-.accept-button {
+.week-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-12;
+}
+
+.summary-people,
+.trace-responsables {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-8;
+
+  margin-top: $space-12;
+}
+
+.person-chip {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 4px 10px;
+
+  border-radius: $radius-pill;
+  border: 1px solid rgba(253, 218, 36, 0.6);
+  background: rgba(253, 218, 36, 0.2);
+
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.add-person-btn {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: 1px solid $border-color;
+  border-radius: 50%;
+  background: $surface;
+
+  font-size: $font-size-lg;
+  line-height: 1;
+  color: $link-color;
+  cursor: pointer;
+}
+
+.add-person-btn:hover {
+  border-color: $link-color;
+  background: rgba(0, 153, 216, 0.08);
+}
+
+.add-person-btn--inline {
+  width: 24px;
+  height: 24px;
+  font-size: $font-size-md;
+}
+
+.standby-flow-hint {
+  margin: $space-12 0 0;
+  padding: $space-12 $space-16;
+
+  border-radius: $radius-sm;
+  border: 1px solid $border-light;
+  background: $background-body;
+
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1.45;
+}
+
+.summary-hint {
+  margin: $space-8 0 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.summary-hint--muted {
+  color: $text-secondary;
+  font-style: italic;
+}
+
+.summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-12;
+
   margin-top: $space-16;
+}
+
+.add-person-link {
+  margin-top: 0;
+}
+
+.accept-button {
+  margin-top: 0;
 }
 
 .confirmation {
@@ -316,6 +506,11 @@
   color: $text-primary;
 }
 
+.app-chip--trace {
+  align-self: flex-start;
+  margin-bottom: $space-4;
+}
+
 .summary-card.empty p {
   font-size: $font-size-md;
   font-weight: $font-weight-regular;
@@ -331,6 +526,10 @@
 
 .btn-primary {
   @include button-primary;
+}
+
+.btn-secondary {
+  @include button-secondary;
 }
 
 .btn-primary:disabled {

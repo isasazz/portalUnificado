@@ -61,84 +61,145 @@ export class StandbyMonthViewComponent {
 
   }
 
-  get monthPeople(): {
-    responsable: string;
-    celular: string;
-    color: string;
-    weeks: { start: Date; end: Date }[];
-    aplicaciones: {
-      codigoAplicacion: string;
-      nombreAplicacion: string;
+  get monthStandbyGroups(): {
+
+    start: Date;
+
+    end: Date;
+
+    responsables: {
+
+      nombre: string;
+
+      celular: string;
+
+      color: string;
+
     }[];
+
+    aplicaciones: {
+
+      codigoAplicacion: string;
+
+      nombreAplicacion: string;
+
+    }[];
+
   }[] {
 
-    const people =
-      new Map<
-        string,
-        {
-          color: string;
-          celular: string;
-          weeks: { start: Date; end: Date }[];
-          apps: Map<string, string>;
-        }
-      >();
+    const map = new Map<string, {
 
-    this.monthAssignments.forEach(
-      assignment => {
+      start: Date;
 
-        let entry =
-          people.get(assignment.responsable);
+      end: Date;
 
-        if (!entry) {
+      responsables: {
 
-          entry = {
-            color: assignment.color,
-            celular: assignment.celular,
-            weeks: [],
-            apps: new Map()
-          };
+        nombre: string;
 
-          people.set(
-            assignment.responsable,
-            entry
-          );
+        celular: string;
 
-        }
+        color: string;
 
-        entry.weeks.push({
+      }[];
+
+      apps: Map<string, string>;
+
+    }>();
+
+    this.monthAssignments.forEach(assignment => {
+
+      const key =
+
+        `${assignment.fechaInicio.getTime()}-${assignment.fechaFin.getTime()}`;
+
+      let group = map.get(key);
+
+      if (!group) {
+
+        group = {
+
           start: assignment.fechaInicio,
-          end: assignment.fechaFin
-        });
 
-        assignment.aplicaciones?.forEach(app => {
+          end: assignment.fechaFin,
 
-          entry!.apps.set(
-            app.codigoAplicacion,
-            app.nombreAplicacion
-          );
+          responsables: [],
+
+          apps: new Map()
+
+        };
+
+        map.set(key, group);
+
+      }
+
+      if (
+
+        !group.responsables.some(
+
+          person => person.nombre === assignment.responsable
+
+        )
+
+      ) {
+
+        group.responsables.push({
+
+          nombre: assignment.responsable,
+
+          celular: assignment.celular,
+
+          color: assignment.color
 
         });
 
       }
-    );
 
-    return [...people.entries()].map(
-      ([responsable, entry]) => ({
-        responsable,
-        celular: entry.celular,
-        color: entry.color,
-        weeks: entry.weeks.sort(
-          (a, b) =>
-            a.start.getTime() - b.start.getTime()
-        ),
-        aplicaciones: [...entry.apps.entries()].map(
+      assignment.aplicaciones?.forEach(app => {
+
+        group!.apps.set(
+
+          app.codigoAplicacion,
+
+          app.nombreAplicacion
+
+        );
+
+      });
+
+    });
+
+    return [...map.values()]
+
+      .map(group => ({
+
+        start: group.start,
+
+        end: group.end,
+
+        responsables: group.responsables,
+
+        aplicaciones: [...group.apps.entries()].map(
+
           ([codigoAplicacion, nombreAplicacion]) => ({
+
             codigoAplicacion,
+
             nombreAplicacion
+
           })
+
         )
-      })
-    );
+
+      }))
+
+      .sort(
+
+        (a, b) =>
+
+          a.start.getTime() - b.start.getTime()
+
+      );
 
   }
 
@@ -280,14 +341,18 @@ export class StandbyMonthViewComponent {
 
       const date = new Date(year, month, day);
 
-      const assignment =
-        this.getAssignmentForDate(date);
+      const assignments =
+
+        this.getAssignmentsForDate(date);
+
+      const assignment = assignments[0];
 
       this.calendarDays.push({
         date,
         dayNumber: day,
         currentMonth: true,
         assignment,
+        assignments,
         isRangeStart: assignment
           ? this.isSameDate(
               date,
@@ -306,20 +371,37 @@ export class StandbyMonthViewComponent {
 
   }
 
+  private getAssignmentsForDate(
+
+    date: Date
+
+  ): StandbyAssignment[] {
+
+    const dayTime =
+
+      this.startOfDay(date);
+
+    return this.monthAssignments.filter(
+
+      assignment =>
+
+        dayTime >=
+
+          this.startOfDay(assignment.fechaInicio) &&
+
+        dayTime <=
+
+          this.startOfDay(assignment.fechaFin)
+
+    );
+
+  }
+
   private getAssignmentForDate(
     date: Date
   ): StandbyAssignment | undefined {
 
-    const dayTime =
-      this.startOfDay(date);
-
-    return this.monthAssignments.find(
-      assignment =>
-        dayTime >=
-          this.startOfDay(assignment.fechaInicio) &&
-        dayTime <=
-          this.startOfDay(assignment.fechaFin)
-    );
+    return this.getAssignmentsForDate(date)[0];
 
   }
 

@@ -4,11 +4,15 @@ import {
 
   Component,
 
+  effect,
+
   inject,
 
   input,
 
   output,
+
+  ElementRef,
 
   ViewChild
 
@@ -58,11 +62,25 @@ import {
 
 interface GroupedAcceptance {
 
-  responsable: string;
+  codigoAplicacion: string;
 
-  weeks: { start: Date; end: Date }[];
+  nombreAplicacion: string;
 
-  aplicaciones: StandbyAssociatedApp[];
+  start: Date;
+
+  end: Date;
+
+  responsables: string[];
+
+}
+
+interface ProductSelectionState {
+
+  selectedUser?: string;
+
+  coResponsables: string[];
+
+  selectedWeekStarts: Date[];
 
 }
 
@@ -123,13 +141,48 @@ export class StandbyModalComponent {
 
 
 
+  @ViewChild('usersSection')
+
+  usersSection?: ElementRef<HTMLElement>;
+
+
+
+  @ViewChild('userSearchInput')
+
+  userSearchInput?: ElementRef<HTMLInputElement>;
+
+
+
   private readonly scheduleService =
 
     inject(StandbyScheduleService);
 
 
 
+  activeAppIndex = 0;
+
+
+
+  private readonly productStates =
+
+    new Map<string, ProductSelectionState>();
+
+
+
   selectedUser?: string;
+
+
+
+  /** Personas adicionales para el mismo periodo de standby. */
+  coResponsables: string[] = [];
+
+
+
+  addingCoResponsable = false;
+
+
+
+  addingToExistingWeek: GroupedAcceptance | null = null;
 
 
 
@@ -142,6 +195,10 @@ export class StandbyModalComponent {
 
 
   showAcceptAlert = false;
+
+
+
+  showAcceptConfirmAlert = false;
 
 
 
@@ -170,6 +227,64 @@ export class StandbyModalComponent {
     'Miguel Ángel García'
 
   ];
+
+
+
+  constructor() {
+
+    effect(() => {
+
+      if (this.visible()) {
+
+        this.resetModalState();
+
+      }
+
+    });
+
+  }
+
+
+
+  get hasMultipleProducts(): boolean {
+
+    return this.aplicaciones().length > 1;
+
+  }
+
+
+
+  get activeApp(): StandbyApplication | undefined {
+
+    return this.aplicaciones()[this.activeAppIndex];
+
+  }
+
+
+
+  get activeAppCodigo(): string {
+
+    return this.activeApp?.codigoAplicacion ?? '';
+
+  }
+
+
+
+  isAppConfigured(codigo: string): boolean {
+
+    return this.scheduleService.draftAssignments.some(
+
+      assignment =>
+
+        assignment.aplicaciones?.some(
+
+          app => app.codigoAplicacion === codigo
+
+        )
+
+    );
+
+  }
 
 
 
@@ -203,6 +318,14 @@ export class StandbyModalComponent {
 
   get occupiedRanges(): OccupiedRange[] {
 
+    const codigo = this.activeAppCodigo;
+
+    if (!codigo) {
+
+      return [];
+
+    }
+
 
 
     return [
@@ -211,15 +334,27 @@ export class StandbyModalComponent {
 
       ...this.scheduleService.savedAssignments
 
-    ].map(assignment => ({
+    ]
 
-      start: assignment.fechaInicio,
+      .filter(assignment =>
 
-      end: assignment.fechaFin,
+        assignment.aplicaciones?.some(
 
-      responsable: assignment.responsable
+          app => app.codigoAplicacion === codigo
 
-    }));
+        )
+
+      )
+
+      .map(assignment => ({
+
+        start: assignment.fechaInicio,
+
+        end: assignment.fechaFin,
+
+        responsable: assignment.responsable
+
+      }));
 
 
 
@@ -243,9 +378,27 @@ export class StandbyModalComponent {
 
 
 
-        let group =
+        const app =
 
-          map.get(assignment.responsable);
+          assignment.aplicaciones?.[0];
+
+
+
+        if (!app) {
+
+          return;
+
+        }
+
+
+
+        const key =
+
+          `${assignment.fechaInicio.getTime()}-${app.codigoAplicacion}`;
+
+
+
+        let group = map.get(key);
 
 
 
@@ -255,25 +408,21 @@ export class StandbyModalComponent {
 
           group = {
 
-            responsable: assignment.responsable,
+            codigoAplicacion: app.codigoAplicacion,
 
-            weeks: [],
+            nombreAplicacion: app.nombreAplicacion,
 
-            aplicaciones:
+            start: assignment.fechaInicio,
 
-              assignment.aplicaciones ?? []
+            end: assignment.fechaFin,
+
+            responsables: []
 
           };
 
 
 
-          map.set(
-
-            assignment.responsable,
-
-            group
-
-          );
+          map.set(key, group);
 
 
 
@@ -281,13 +430,23 @@ export class StandbyModalComponent {
 
 
 
-        group.weeks.push({
+        if (
 
-          start: assignment.fechaInicio,
+          !group.responsables.includes(
 
-          end: assignment.fechaFin
+            assignment.responsable
 
-        });
+          )
+
+        ) {
+
+          group.responsables.push(
+
+            assignment.responsable
+
+          );
+
+        }
 
 
 
@@ -297,7 +456,253 @@ export class StandbyModalComponent {
 
 
 
-    return [...map.values()];
+    return [...map.values()].sort(
+
+      (a, b) => {
+
+        const byApp =
+
+          a.codigoAplicacion.localeCompare(
+
+            b.codigoAplicacion
+
+          );
+
+        if (byApp !== 0) {
+
+          return byApp;
+
+        }
+
+        return a.start.getTime() - b.start.getTime();
+
+      }
+
+    );
+
+
+
+  }
+
+
+
+  get groupedAcceptedForActiveApp(): GroupedAcceptance[] {
+
+    const codigo = this.activeAppCodigo;
+
+    return this.groupedAccepted.filter(
+
+      group => group.codigoAplicacion === codigo
+
+    );
+
+  }
+
+
+
+  get responsablesForSummary(): string[] {
+
+
+
+    const list: string[] = [];
+
+
+
+    if (this.selectedUser) {
+
+      list.push(this.selectedUser);
+
+    }
+
+
+
+    for (const name of this.coResponsables) {
+
+      if (!list.includes(name)) {
+
+        list.push(name);
+
+      }
+
+    }
+
+
+
+    return list;
+
+
+
+  }
+
+
+
+  get responsablesForSummaryDisplay(): string[] {
+
+
+
+    const combined = [
+
+      ...(this.addingToExistingWeek?.responsables ?? [])
+
+    ];
+
+
+
+    for (const name of this.responsablesForSummary) {
+
+      if (!combined.includes(name)) {
+
+        combined.push(name);
+
+      }
+
+    }
+
+
+
+    return combined;
+
+
+
+  }
+
+
+
+  get acceptAlertMessage(): string {
+
+    if (!this.hasMultipleProducts) {
+
+      return 'Continúa con otros usuarios para programar standby.';
+
+    }
+
+    const pending = this.aplicaciones().filter(
+
+      app => !this.isAppConfigured(app.codigoAplicacion)
+
+    );
+
+    if (pending.length === 0) {
+
+      return 'Todos los productos tienen selección. Revisa y guarda.';
+
+    }
+
+    return `Listo para ${this.activeApp?.codigoAplicacion ?? 'este producto'}. Cambia de producto arriba para programar ${pending.length} restante(s).`;
+
+  }
+
+
+
+  get canAddCoResponsable(): boolean {
+
+
+
+    return (
+
+      !!this.selectedUser &&
+
+      this.standbyWeeks.length > 0
+
+    );
+
+
+
+  }
+
+
+
+  get showAddPersonOnCalendar(): boolean {
+
+
+
+    return (
+
+      this.canAddCoResponsable &&
+
+      !this.addingCoResponsable
+
+    );
+
+
+
+  }
+
+
+
+  get lockCalendarSelection(): boolean {
+
+
+
+    if (this.addingCoResponsable) {
+
+      return true;
+
+    }
+
+
+
+    return (
+
+      this.standbyWeeks.length > 0 &&
+
+      !!this.selectedUser
+
+    );
+
+
+
+  }
+
+
+
+  get hasPendingStandbyDraft(): boolean {
+
+
+
+    return (
+
+      this.standbyWeeks.length > 0 &&
+
+      this.responsablesForSummary.length > 0
+
+    );
+
+
+
+  }
+
+
+
+  selectActiveApp(index: number): void {
+
+
+
+    if (
+
+      index === this.activeAppIndex ||
+
+      index < 0 ||
+
+      index >= this.aplicaciones().length
+
+    ) {
+
+      return;
+
+    }
+
+
+
+    this.persistActiveProductState();
+
+    this.activeAppIndex = index;
+
+    this.addingCoResponsable = false;
+
+    this.addingToExistingWeek = null;
+
+    this.restoreProductState(this.activeAppCodigo);
 
 
 
@@ -306,6 +711,48 @@ export class StandbyModalComponent {
 
 
   selectUser(user: string): void {
+
+
+
+    if (
+
+      this.addingCoResponsable &&
+
+      this.selectedWeekStarts.length > 0
+
+    ) {
+
+
+
+      if (
+
+        this.responsablesForSummary.includes(user)
+
+      ) {
+
+        this.addingCoResponsable = false;
+
+        return;
+
+      }
+
+
+
+      this.coResponsables = [
+
+        ...this.coResponsables,
+
+        user
+
+      ];
+
+      this.addingCoResponsable = false;
+
+      this.persistActiveProductState();
+
+      return;
+
+    }
 
 
 
@@ -319,9 +766,109 @@ export class StandbyModalComponent {
 
     this.selectedUser = user;
 
+    this.coResponsables = [];
+
+    this.addingCoResponsable = false;
+
+    this.addingToExistingWeek = null;
+
     this.calendar?.clearSelection();
 
     this.selectedWeekStarts = [];
+
+
+
+    this.persistActiveProductState();
+
+
+
+  }
+
+
+
+  startAddCoResponsable(): void {
+
+
+
+    if (!this.canAddCoResponsable) {
+
+      return;
+
+    }
+
+
+
+    this.addingCoResponsable = true;
+
+    this.addingToExistingWeek = null;
+
+    this.calendar?.setSelection(
+
+      this.selectedWeekStarts
+
+    );
+
+    this.persistActiveProductState();
+
+    this.focusUsersForCoResponsable();
+
+
+
+  }
+
+
+
+  startAddToAcceptedWeek(
+
+    group: GroupedAcceptance
+
+  ): void {
+
+
+
+    const index = this.aplicaciones().findIndex(
+
+      app =>
+
+        app.codigoAplicacion ===
+
+        group.codigoAplicacion
+
+    );
+
+
+
+    if (index >= 0) {
+
+      this.selectActiveApp(index);
+
+    }
+
+
+
+    this.selectedUser = undefined;
+
+    this.coResponsables = [];
+
+    this.addingCoResponsable = true;
+
+    this.addingToExistingWeek = group;
+
+    this.selectedWeekStarts = [
+
+      new Date(group.start)
+
+    ];
+
+    this.persistActiveProductState();
+
+    this.calendar?.setSelection(
+
+      this.selectedWeekStarts
+
+    );
+
+    this.focusUsersForCoResponsable();
 
 
 
@@ -343,6 +890,22 @@ export class StandbyModalComponent {
 
 
 
+    if (this.selectedWeekStarts.length === 0) {
+
+      this.coResponsables = [];
+
+      this.addingCoResponsable = false;
+
+      this.addingToExistingWeek = null;
+
+    }
+
+
+
+    this.persistActiveProductState();
+
+
+
   }
 
 
@@ -356,6 +919,8 @@ export class StandbyModalComponent {
     this.showConflictAlert = true;
 
     this.showAcceptAlert = false;
+
+    this.showAcceptConfirmAlert = false;
 
     this.showSaveAlert = false;
 
@@ -427,7 +992,7 @@ export class StandbyModalComponent {
 
     return (
 
-      !!this.selectedUser &&
+      this.responsablesForSummary.length > 0 &&
 
       this.standbyWeeks.length > 0
 
@@ -455,7 +1020,7 @@ export class StandbyModalComponent {
 
 
 
-    if (!this.canAccept || !this.selectedUser) {
+    if (!this.canAccept) {
 
       return;
 
@@ -463,27 +1028,129 @@ export class StandbyModalComponent {
 
 
 
-    this.scheduleService.acceptWeeks(
+    this.showAcceptConfirmAlert = true;
 
-      this.selectedUser,
 
-      this.standbyWeeks,
 
-      this.aplicaciones().map(app => ({
+  }
 
-        codigoAplicacion: app.codigoAplicacion,
 
-        nombreAplicacion: app.nombreAplicacion
 
-      }))
+  confirmAcceptSelection(): void {
+
+
+
+    this.showAcceptConfirmAlert = false;
+
+    this.persistAcceptedSelection();
+
+
+
+  }
+
+
+
+  onCancelAcceptConfirm(): void {
+
+
+
+    this.showAcceptConfirmAlert = false;
+
+    this.startAddCoResponsable();
+
+
+
+  }
+
+
+
+  closeAcceptConfirmAlert(): void {
+
+
+
+    this.showAcceptConfirmAlert = false;
+
+
+
+  }
+
+
+
+  private persistAcceptedSelection(): void {
+
+
+
+    const responsables = this.responsablesForSummary.filter(
+
+      name =>
+
+        !this.addingToExistingWeek?.responsables.includes(
+
+          name
+
+        )
 
     );
+
+
+
+    if (!responsables.length) {
+
+      return;
+
+    }
+
+
+
+    const activeApp = this.activeApp;
+
+
+
+    if (!activeApp) {
+
+      return;
+
+    }
+
+
+
+    const apps: StandbyAssociatedApp[] = [{
+
+      codigoAplicacion: activeApp.codigoAplicacion,
+
+      nombreAplicacion: activeApp.nombreAplicacion
+
+    }];
+
+
+
+    for (const responsable of responsables) {
+
+      this.scheduleService.acceptWeeks(
+
+        responsable,
+
+        this.standbyWeeks,
+
+        apps
+
+      );
+
+    }
 
 
 
     this.calendar?.clearSelection();
 
     this.selectedWeekStarts = [];
+
+    this.coResponsables = [];
+
+    this.addingCoResponsable = false;
+
+    this.addingToExistingWeek = null;
+
+    this.productStates.delete(this.activeAppCodigo);
 
 
 
@@ -565,7 +1232,149 @@ export class StandbyModalComponent {
 
 
 
+    this.resetModalState();
+
     this.closed.emit();
+
+
+
+  }
+
+
+
+  private persistActiveProductState(): void {
+
+
+
+    const codigo = this.activeAppCodigo;
+
+    if (!codigo) {
+
+      return;
+
+    }
+
+
+
+    this.productStates.set(codigo, {
+
+      selectedUser: this.selectedUser,
+
+      coResponsables: [...this.coResponsables],
+
+      selectedWeekStarts: this.selectedWeekStarts.map(
+
+        date => new Date(date)
+
+      )
+
+    });
+
+
+
+  }
+
+
+
+  private focusUsersForCoResponsable(): void {
+
+
+
+    setTimeout(() => {
+
+      this.usersSection?.nativeElement.scrollIntoView({
+
+        behavior: 'smooth',
+
+        block: 'start'
+
+      });
+
+      this.userSearchInput?.nativeElement.focus({
+
+        preventScroll: true
+
+      });
+
+    }, 0);
+
+
+
+  }
+
+
+
+  private restoreProductState(codigo: string): void {
+
+
+
+    const state = this.productStates.get(codigo);
+
+
+
+    this.selectedUser = state?.selectedUser;
+
+    this.coResponsables = state?.coResponsables
+
+      ? [...state.coResponsables]
+
+      : [];
+
+    this.selectedWeekStarts = state?.selectedWeekStarts
+
+      ? state.selectedWeekStarts.map(
+
+          date => new Date(date)
+
+        )
+
+      : [];
+
+
+
+    if (this.selectedWeekStarts.length > 0) {
+
+      this.calendar?.setSelection(
+
+        this.selectedWeekStarts
+
+      );
+
+    } else {
+
+      this.calendar?.clearSelection();
+
+    }
+
+
+
+  }
+
+
+
+  private resetModalState(): void {
+
+
+
+    this.activeAppIndex = 0;
+
+    this.productStates.clear();
+
+    this.selectedUser = undefined;
+
+    this.coResponsables = [];
+
+    this.addingCoResponsable = false;
+
+    this.addingToExistingWeek = null;
+
+    this.selectedWeekStarts = [];
+
+    this.userSearch = '';
+
+    this.showAcceptConfirmAlert = false;
+
+    this.calendar?.clearSelection();
 
 
 

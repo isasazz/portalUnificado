@@ -35,6 +35,13 @@ export const routes: Routes = [
           ).then(m => m.StandbyPageComponent)
       },
       {
+        path: 'standby/politicas',
+        loadComponent: () =>
+          import(
+            './features/stanby/pages/standby-policies-page/standby-policies-page'
+          ).then(m => m.StandbyPoliciesPageComponent)
+      },
+      {
         path: 'perfil',
         loadComponent: () =>
           import(

@@ -25,11 +25,22 @@ from '../../components/standby-modal/standby-modal';
 import { StandbyViewModalComponent }
 from '../../components/standby-view-modal/standby-view-modal';
 
+import { StandbyRelevoModalComponent }
+from '../../components/standby-relevo-modal/standby-relevo-modal';
+
 import { StandbyScheduleService }
 from '../../services/standby-schedule.service';
 
+import { StandbyDelegationService }
+from '../../services/standby-delegation.service';
+
 import { SaveSuccessService }
 from '../../../../shared/services/save-success.service';
+
+import { STANDBY_POLICY_PRINCIPLES }
+from '../../data/standby-policies.data';
+
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-standby-page',
@@ -37,7 +48,9 @@ from '../../../../shared/services/save-success.service';
   imports: [
     StandbyCardComponent,
     StandbyModalComponent,
-    StandbyViewModalComponent
+    StandbyViewModalComponent,
+    StandbyRelevoModalComponent,
+    RouterLink
   ],
   templateUrl: './standby-page.html',
   styleUrl: './standby-page.scss',
@@ -47,6 +60,7 @@ export class StandbyPageComponent implements OnInit {
 
   private readonly route = inject(ActivatedRoute);
   private readonly scheduleService = inject(StandbyScheduleService);
+  readonly delegationService = inject(StandbyDelegationService);
   private readonly saveSuccess = inject(SaveSuccessService);
   private readonly cdr = inject(ChangeDetectorRef);
 
@@ -54,6 +68,8 @@ export class StandbyPageComponent implements OnInit {
     [...STANDBY_APPLICATIONS];
 
   showStandbyModal = false;
+
+  showRelevoModal = false;
 
   showViewModal = false;
 
@@ -72,6 +88,8 @@ export class StandbyPageComponent implements OnInit {
   private highlightTimer: ReturnType<typeof setTimeout> | null = null;
 
   activeView: 'available' | 'programmed' = 'available';
+
+  readonly policyHighlights = STANDBY_POLICY_PRINCIPLES;
 
   ngOnInit(): void {
 
@@ -181,6 +199,10 @@ export class StandbyPageComponent implements OnInit {
 
   toggleCard(id: number): void {
 
+    if (this.delegationService.hasDelegatedOut()) {
+      return;
+    }
+
     this.applications = this.applications.map(application => {
 
       if (
@@ -203,6 +225,10 @@ export class StandbyPageComponent implements OnInit {
   }
 
   toggleSelectAll(checked: boolean): void {
+
+    if (this.delegationService.hasDelegatedOut()) {
+      return;
+    }
 
     const selectableIds = new Set(
       this.selectableApplications.map(app => app.id)
@@ -268,6 +294,10 @@ export class StandbyPageComponent implements OnInit {
   }
 
   addToStandbyPanel(): void {
+
+    if (this.delegationService.hasDelegatedOut()) {
+      return;
+    }
 
     this.showSidePanel = true;
     this.syncPanelWithSelection();
@@ -417,6 +447,48 @@ export class StandbyPageComponent implements OnInit {
     this.viewAssignments = [];
     this.viewAppCodigo = '';
     this.viewAppNombre = '';
+
+  }
+
+  openRelevoModal(): void {
+
+    this.showRelevoModal = true;
+    this.cdr.markForCheck();
+
+  }
+
+  closeRelevoModal(): void {
+
+    this.showRelevoModal = false;
+    this.cdr.markForCheck();
+
+  }
+
+  onRelevoDelegated(): void {
+
+    this.cdr.markForCheck();
+
+  }
+
+  revokeRelevo(): void {
+
+    this.delegationService.revokeOutgoing();
+    this.cdr.markForCheck();
+
+    this.saveSuccess.show({
+      title: 'Programación recuperada',
+      message: 'Vuelves a programar standby directamente.'
+    });
+
+  }
+
+  formatDelegationDate(date: Date): string {
+
+    return date.toLocaleDateString('es-CO', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
 
   }
 

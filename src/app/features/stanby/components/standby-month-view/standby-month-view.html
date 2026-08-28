@@ -14,69 +14,84 @@
     <div class="sidebar-list">
 
     @for (
-      person of monthPeople;
-      track person.responsable
+      group of monthStandbyGroups;
+      track group.start.getTime()
     ) {
 
       <div class="assignment-card">
 
-        <div class="assignment-header">
+        <div class="standby-group-header">
 
-          <span
-            class="color-dot"
-            [style.background]="person.color"
-          ></span>
-
-          <div class="assignment-info">
-
-            <strong>
-              {{ person.responsable }}
-            </strong>
-
-            <span class="phone-number">
-              {{ person.celular }}
+          @if (group.responsables.length > 1) {
+            <span class="standby-group-badge">
+              Mismo standby ·
+              {{ group.responsables.length }} personas
             </span>
+          }
 
-            @for (
-              week of person.weeks;
-              track $index
-            ) {
-
-              <span class="assignment-dates">
-                {{ week.start | date:'dd/MM/yyyy' }}
-                →
-                {{ week.end | date:'dd/MM/yyyy' }}
-              </span>
-
-            }
-
-            @if (person.aplicaciones.length > 0 && !hideAppChips()) {
-
-              <div class="person-apps">
-                <span class="person-apps__label">
-                  Aplicaciones asociadas
-                </span>
-                @for (
-                  app of person.aplicaciones;
-                  track app.codigoAplicacion
-                ) {
-                  <span class="app-chip">
-                    {{ app.codigoAplicacion }}
-                  </span>
-                }
-              </div>
-
-            }
-
-          </div>
+          <span class="assignment-dates assignment-dates--prominent">
+            {{ group.start | date:'dd/MM/yyyy' }}
+            →
+            {{ group.end | date:'dd/MM/yyyy' }}
+          </span>
 
         </div>
+
+        <div class="standby-group-people">
+
+          @for (
+            person of group.responsables;
+            track person.nombre
+          ) {
+
+            <div class="standby-person-row">
+
+              <span
+                class="color-dot"
+                [style.background]="group.responsables[0].color"
+              ></span>
+
+              <div class="assignment-info">
+
+                <strong>
+                  {{ person.nombre }}
+                </strong>
+
+                <span class="phone-number">
+                  {{ person.celular }}
+                </span>
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+        @if (group.aplicaciones.length > 0 && !hideAppChips()) {
+
+          <div class="person-apps">
+            <span class="person-apps__label">
+              Aplicaciones asociadas
+            </span>
+            @for (
+              app of group.aplicaciones;
+              track app.codigoAplicacion
+            ) {
+              <span class="app-chip">
+                {{ app.codigoAplicacion }}
+              </span>
+            }
+          </div>
+
+        }
 
       </div>
 
     }
 
-    @if (monthPeople.length === 0) {
+    @if (monthStandbyGroups.length === 0) {
 
       <p class="empty-list">
         No hay personas programadas
@@ -178,13 +193,29 @@
                 [class.tooltip--below]="tooltipBelow()"
               >
 
-                <strong>
-                  {{ day.assignment.responsable }}
-                </strong>
+                @if (
+                  day.assignments &&
+                  day.assignments.length > 1
+                ) {
+                  <strong>
+                    {{ day.assignments.length }} personas
+                    en standby
+                  </strong>
+                }
 
-                <small>
-                  {{ day.assignment.celular }}
-                </small>
+                @for (
+                  item of day.assignments ?? [day.assignment];
+                  track item.id
+                ) {
+                  <div class="tooltip-person">
+                    <strong>
+                      {{ item.responsable }}
+                    </strong>
+                    <small>
+                      {{ item.celular }}
+                    </small>
+                  </div>
+                }
 
                 <small>
                   {{ day.assignment.fechaInicio | date:'dd/MM/yyyy' }}

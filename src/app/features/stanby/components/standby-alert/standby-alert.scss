@@ -100,3 +100,26 @@
   border-color: $negro-cib;
   color: $amarillo-macondo;
 }
+
+.alert-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $space-12;
+  width: 100%;
+}
+
+.btn-secondary {
+  @include button-base;
+
+  background: $surface;
+  color: $text-primary;
+  border: 1px solid $border-color;
+
+  min-width: 160px;
+}
+
+.btn-secondary:hover {
+  border-color: $link-color;
+  color: $link-color;
+}

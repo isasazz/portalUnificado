@@ -12,16 +12,53 @@
 
         @if (aplicaciones().length > 0) {
 
-          <div class="app-codes">
-            @for (
-              app of aplicaciones();
-              track app.codigoAplicacion
-            ) {
-              <span class="app-code-chip">
-                {{ app.codigoAplicacion }}
-              </span>
-            }
-          </div>
+          @if (hasMultipleProducts) {
+
+            <div
+              class="product-tabs"
+              role="tablist"
+              aria-label="Productos a programar"
+            >
+              @for (
+                app of aplicaciones();
+                track app.codigoAplicacion;
+                let i = $index
+              ) {
+                <button
+                  type="button"
+                  class="product-tab"
+                  role="tab"
+                  [class.product-tab--active]="activeAppIndex === i"
+                  [class.product-tab--done]="
+                    isAppConfigured(app.codigoAplicacion)
+                  "
+                  [attr.aria-selected]="activeAppIndex === i"
+                  (click)="selectActiveApp(i)"
+                >
+                  {{ app.codigoAplicacion }}
+                </button>
+              }
+            </div>
+
+            <p class="product-tabs-hint">
+              Programa cada producto por separado. Las personas
+              y co-responsables son independientes por producto.
+            </p>
+
+          } @else {
+
+            <div class="app-codes">
+              @for (
+                app of aplicaciones();
+                track app.codigoAplicacion
+              ) {
+                <span class="app-code-chip">
+                  {{ app.codigoAplicacion }}
+                </span>
+              }
+            </div>
+
+          }
 
         }
 
@@ -39,11 +76,48 @@
 
     <div class="modal-content">
 
-      <div class="users-section">
+      <div
+        #usersSection
+        class="users-section"
+        [class.users-section--pick]="addingCoResponsable"
+      >
 
         <h3>Responsables</h3>
 
+        @if (addingCoResponsable && standbyWeeks.length > 0) {
+
+          <div
+            class="co-responsable-callout"
+            role="status"
+            aria-live="polite"
+          >
+
+            <strong>Añadir al mismo standby</strong>
+
+            <p>
+              Selecciona otra persona en esta lista para el
+              mismo turno. Las fechas ya están definidas.
+              Para pasar a otro standby, usa «Aceptar selección».
+            </p>
+
+            @if (standbyWeeks.length === 1) {
+              <span class="co-responsable-callout__dates">
+                {{ standbyWeeks[0].start | date:'dd/MM/yyyy' }}
+                →
+                {{ standbyWeeks[0].end | date:'dd/MM/yyyy' }}
+              </span>
+            } @else {
+              <span class="co-responsable-callout__dates">
+                {{ standbyWeeks.length }} periodos seleccionados
+              </span>
+            }
+
+          </div>
+
+        }
+
         <input
+          #userSearchInput
           class="user-search"
           type="text"
           placeholder="Buscar contacto..."
@@ -60,7 +134,14 @@
 
             <div
               class="user-card"
-              [class.selected]="selectedUser === user"
+              [class.selected]="
+                selectedUser === user ||
+                coResponsables.includes(user)
+              "
+              [class.user-card--disabled]="
+                addingCoResponsable &&
+                responsablesForSummary.includes(user)
+              "
               (click)="selectUser(user)"
             >
               {{ user }}
@@ -80,32 +161,44 @@
 
       <div class="calendar-section">
 
-        @if (!selectedUser) {
+        @if (!selectedUser && !addingCoResponsable) {
 
           <div class="info-message">
 
+            @if (hasMultipleProducts && activeApp) {
+              Producto activo:
+              <strong>{{ activeApp.codigoAplicacion }}</strong>
+              ·
+            }
             Selecciona un responsable para habilitar
             la programación de standby.
-            Luego elige el día de inicio.
+            Luego elige un viernes de inicio.
 
           </div>
 
-        } @else {
+        } @else if (selectedUser && !addingCoResponsable) {
 
           <div class="info-message success">
 
+            @if (hasMultipleProducts && activeApp) {
+              <strong>{{ activeApp.codigoAplicacion }}</strong>
+              ·
+            }
             Responsable seleccionado:
             {{ selectedUser }}
-            · Selecciona el día de inicio
+            · Selecciona un viernes (standby de viernes a jueves)
 
           </div>
 
         }
 
         <app-standby-calendar
-          [enabled]="!!selectedUser"
+          [enabled]="!!selectedUser || addingCoResponsable"
           [occupiedRanges]="occupiedRanges"
+          [showAddPerson]="showAddPersonOnCalendar"
+          [lockSelection]="lockCalendarSelection"
           (selectionChange)="onSelectionChange($event)"
+          (addPerson)="startAddCoResponsable()"
           (conflict)="onConflict($event)">
         </app-standby-calendar>
 
@@ -119,14 +212,29 @@
 
         <div class="summary-card">
 
-          <label>Resumen de programación</label>
+          <label>
+            Resumen de programación
+            @if (hasMultipleProducts && activeApp) {
+              · {{ activeApp.codigoAplicacion }}
+            }
+          </label>
 
           <small>
-            Cada standby dura 7 días desde el día seleccionado
-            @if (selectedUser) {
-              · {{ selectedUser }}
-            }
+            Cada standby dura 7 días: de viernes a jueves
           </small>
+
+          @if (responsablesForSummaryDisplay.length > 0) {
+            <div class="summary-people">
+              @for (
+                name of responsablesForSummaryDisplay;
+                track name
+              ) {
+                <span class="person-chip">
+                  {{ name }}
+                </span>
+              }
+            </div>
+          }
 
           <ul class="week-list">
 
@@ -135,24 +243,63 @@
               track week.start
             ) {
 
-              <li>
-                De
-                {{ week.start | date:'dd/MM/yyyy' }}
-                a
-                {{ week.end | date:'dd/MM/yyyy' }}
+              <li class="week-row">
+                <span>
+                  De
+                  {{ week.start | date:'dd/MM/yyyy' }}
+                  a
+                  {{ week.end | date:'dd/MM/yyyy' }}
+                </span>
+
+                @if (showAddPersonOnCalendar) {
+                  <button
+                    type="button"
+                    class="add-person-btn"
+                    title="Añadir otra persona"
+                    (click)="startAddCoResponsable()"
+                  >
+                    +
+                  </button>
+                }
               </li>
 
             }
 
           </ul>
 
-          <button
-            type="button"
-            class="btn-primary accept-button"
-            (click)="acceptSelection()"
-          >
-            Aceptar selección
-          </button>
+          @if (hasPendingStandbyDraft && !addingCoResponsable) {
+            <p class="standby-flow-hint">
+              Puedes seguir agregando personas a este standby con +.
+              Para pasar a otro standby o cambiar fechas, selecciona
+              «Aceptar selección».
+            </p>
+          }
+
+          @if (addingCoResponsable) {
+            <p class="summary-hint summary-hint--muted">
+              Elige la persona en el listado de la izquierda.
+            </p>
+          }
+
+          <div class="summary-actions">
+            <button
+              type="button"
+              class="btn-secondary add-person-link"
+              [disabled]="!showAddPersonOnCalendar"
+              (click)="startAddCoResponsable()"
+            >
+              + Añadir otra persona
+            </button>
+
+            <button
+              type="button"
+              class="btn-primary accept-button"
+              [disabled]="!canAccept"
+              (click)="acceptSelection()"
+            >
+              Aceptar selección
+            </button>
+          </div>
 
         </div>
 
@@ -168,48 +315,45 @@
 
             @for (
               group of groupedAccepted;
-              track group.responsable
+              track group.codigoAplicacion + group.start.getTime()
             ) {
 
               <li class="trace-item">
 
+                @if (hasMultipleProducts) {
+                  <span class="app-chip app-chip--trace">
+                    {{ group.codigoAplicacion }}
+                    ·
+                    {{ group.nombreAplicacion }}
+                  </span>
+                }
+
                 <div class="trace-item__main">
-                  {{ group.responsable }}
+                  De
+                  {{ group.start | date:'dd/MM/yyyy' }}
+                  a
+                  {{ group.end | date:'dd/MM/yyyy' }}
                 </div>
 
-                <ul class="trace-weeks">
+                <div class="trace-responsables">
                   @for (
-                    week of group.weeks;
-                    track week.start
+                    name of group.responsables;
+                    track name
                   ) {
-                    <li>
-                      De
-                      {{ week.start | date:'dd/MM/yyyy' }}
-                      a
-                      {{ week.end | date:'dd/MM/yyyy' }}
-                    </li>
-                  }
-                </ul>
-
-                @if (group.aplicaciones.length > 0) {
-
-                  <div class="trace-apps">
-                    <span class="trace-apps__label">
-                      Aplicaciones asociadas
+                    <span class="person-chip">
+                      {{ name }}
                     </span>
-                    @for (
-                      app of group.aplicaciones;
-                      track app.codigoAplicacion
-                    ) {
-                      <span class="app-chip">
-                        {{ app.codigoAplicacion }}
-                        ·
-                        {{ app.nombreAplicacion }}
-                      </span>
-                    }
-                  </div>
+                  }
 
-                }
+                  <button
+                    type="button"
+                    class="add-person-btn add-person-btn--inline"
+                    title="Añadir otra persona"
+                    (click)="startAddToAcceptedWeek(group)"
+                  >
+                    +
+                  </button>
+                </div>
 
               </li>
 
@@ -243,9 +387,21 @@
 }
 
 <app-standby-alert
+  [visible]="showAcceptConfirmAlert"
+  [confirmMode]="true"
+  title="¿Finalizar este standby?"
+  message="¿Seguro que no quieres agregar otra persona a este standby? Para programar otro periodo, confirma con «Aceptar selección»."
+  confirmLabel="Sí, aceptar selección"
+  cancelLabel="No, agregar otra persona"
+  (confirmed)="confirmAcceptSelection()"
+  (cancelled)="onCancelAcceptConfirm()"
+  (closed)="closeAcceptConfirmAlert()"
+/>
+
+<app-standby-alert
   [visible]="showAcceptAlert"
   title="Selección aceptada"
-  message="Continúa con otros usuarios para programar standby."
+  [message]="acceptAlertMessage"
   (closed)="closeAcceptAlert()">
 </app-standby-alert>
 

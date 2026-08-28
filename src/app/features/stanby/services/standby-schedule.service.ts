@@ -54,14 +54,17 @@ export class StandbyScheduleService {
     aplicaciones: StandbyAssociatedApp[] = []
   ): void {
 
-    const color =
-      this.getColor(responsable);
-
     const celular =
       STANDBY_USER_PHONES[responsable] ??
       '+57 300 000 0000';
 
     weeks.forEach(week => {
+
+      const weekColor = this.resolveWeekColor(
+        responsable,
+        week,
+        aplicaciones
+      );
 
       this.draftAssignments = [
         ...this.draftAssignments,
@@ -71,7 +74,7 @@ export class StandbyScheduleService {
           celular,
           fechaInicio: week.start,
           fechaFin: week.end,
-          color,
+          color: weekColor,
           aplicaciones: [...aplicaciones]
         }
       ];
@@ -177,6 +180,60 @@ export class StandbyScheduleService {
       date.getMonth(),
       date.getDate()
     ).getTime();
+
+  }
+
+  private resolveWeekColor(
+    responsable: string,
+    week: { start: Date; end: Date },
+    aplicaciones: StandbyAssociatedApp[]
+  ): string {
+
+    const existing = [
+      ...this.draftAssignments,
+      ...this.savedAssignments
+    ].find(assignment =>
+      this.sameWeek(assignment, week) &&
+      this.sharesApp(assignment, aplicaciones)
+    );
+
+    if (existing) {
+      return existing.color;
+    }
+
+    return this.getColor(responsable);
+
+  }
+
+  private sameWeek(
+    assignment: StandbyAssignment,
+    week: { start: Date; end: Date }
+  ): boolean {
+
+    return (
+      this.startOfDay(assignment.fechaInicio) ===
+        this.startOfDay(week.start) &&
+      this.startOfDay(assignment.fechaFin) ===
+        this.startOfDay(week.end)
+    );
+
+  }
+
+  private sharesApp(
+    assignment: StandbyAssignment,
+    aplicaciones: StandbyAssociatedApp[]
+  ): boolean {
+
+    if (!aplicaciones.length) {
+      return true;
+    }
+
+    return aplicaciones.some(app =>
+      assignment.aplicaciones?.some(
+        item =>
+          item.codigoAplicacion === app.codigoAplicacion
+      )
+    );
 
   }
 
