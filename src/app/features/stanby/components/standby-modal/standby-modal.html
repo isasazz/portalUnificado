@@ -14,6 +14,25 @@
 
           @if (hasMultipleProducts) {
 
+            <div class="program-scope" role="group" aria-label="Alcance de programación">
+              <button
+                type="button"
+                class="program-scope__btn"
+                [class.program-scope__btn--active]="programMode === 'all'"
+                (click)="setProgramMode('all')"
+              >
+                Todas juntas
+              </button>
+              <button
+                type="button"
+                class="program-scope__btn"
+                [class.program-scope__btn--active]="programMode === 'single'"
+                (click)="setProgramMode('single')"
+              >
+                Una a una
+              </button>
+            </div>
+
             <div
               class="product-tabs"
               role="tablist"
@@ -28,11 +47,15 @@
                   type="button"
                   class="product-tab"
                   role="tab"
-                  [class.product-tab--active]="activeAppIndex === i"
+                  [class.product-tab--active]="
+                    isProgramAll || activeAppIndex === i
+                  "
                   [class.product-tab--done]="
                     isAppConfigured(app.codigoAplicacion)
                   "
-                  [attr.aria-selected]="activeAppIndex === i"
+                  [attr.aria-selected]="
+                    isProgramAll || activeAppIndex === i
+                  "
                   (click)="selectActiveApp(i)"
                 >
                   {{ app.codigoAplicacion }}
@@ -41,8 +64,14 @@
             </div>
 
             <p class="product-tabs-hint">
-              Programa cada producto por separado. Las personas
-              y co-responsables son independientes por producto.
+              @if (isProgramAll) {
+                Misma persona y fechas para todas las aplicaciones
+                seleccionadas.
+              } @else {
+                Programa cada producto por separado. Las personas
+                y co-responsables son independientes por producto.
+                Pulsa un código para enfocarlo.
+              }
             </p>
 
           } @else {
@@ -165,10 +194,16 @@
 
           <div class="info-message">
 
-            @if (hasMultipleProducts && activeApp) {
-              Producto activo:
-              <strong>{{ activeApp.codigoAplicacion }}</strong>
-              ·
+            @if (hasMultipleProducts && appsForProgrammingLabel) {
+              @if (isProgramAll) {
+                Aplicaciones:
+                <strong>{{ appsForProgrammingLabel }}</strong>
+                ·
+              } @else if (activeApp) {
+                Producto activo:
+                <strong>{{ activeApp.codigoAplicacion }}</strong>
+                ·
+              }
             }
             Selecciona un responsable para habilitar
             la programación de standby.
@@ -180,8 +215,8 @@
 
           <div class="info-message success">
 
-            @if (hasMultipleProducts && activeApp) {
-              <strong>{{ activeApp.codigoAplicacion }}</strong>
+            @if (hasMultipleProducts && appsForProgrammingLabel) {
+              <strong>{{ appsForProgrammingLabel }}</strong>
               ·
             }
             Responsable seleccionado:
@@ -214,8 +249,8 @@
 
           <label>
             Resumen de programación
-            @if (hasMultipleProducts && activeApp) {
-              · {{ activeApp.codigoAplicacion }}
+            @if (hasMultipleProducts && appsForProgrammingLabel) {
+              · {{ appsForProgrammingLabel }}
             }
           </label>
 

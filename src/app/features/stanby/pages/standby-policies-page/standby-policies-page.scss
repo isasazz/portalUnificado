@@ -11,18 +11,7 @@
   position: relative;
   overflow: hidden;
 
-  background:
-    radial-gradient(
-      ellipse 70% 80% at 100% 0%,
-      rgba(253, 218, 36, 0.22),
-      transparent 55%
-    ),
-    radial-gradient(
-      ellipse 50% 60% at 0% 100%,
-      rgba(0, 153, 216, 0.1),
-      transparent 50%
-    ),
-    $surface;
+  background: $surface;
 
   border-bottom: 1px solid $border-light;
 }

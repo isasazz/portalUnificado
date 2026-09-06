@@ -62,13 +62,17 @@
   flex-shrink: 0;
 
   border: none;
-  border-radius: 50%;
-  background: $amarillo-macondo;
-  color: $on-yellow;
+  border-radius: $radius-sm;
+  background: $background-body;
+  color: $text-primary;
 
   cursor: pointer;
   font-size: $font-size-md;
   font-weight: $font-weight-bold;
+}
+
+.relevo-modal__close:hover {
+  background: $border-light;
 }
 
 .relevo-modal__body {
@@ -234,14 +238,19 @@
 .field textarea {
   @include input-base;
   width: 100%;
-  height: auto;
+}
+
+.field input,
+.field select {
+  height: 44px;
 }
 
 .field textarea {
-  min-height: 88px;
-  padding-top: $space-12;
-  padding-bottom: $space-12;
-  border-radius: $radius-md;
+  height: auto;
+  min-height: 96px;
+  padding: $space-12 $space-16;
+  resize: vertical;
+  line-height: 1.45;
 }
 
 .field-error {

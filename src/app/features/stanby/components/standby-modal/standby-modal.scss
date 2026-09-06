@@ -66,11 +66,11 @@
 
   padding: 4px 10px;
 
-  border-radius: $radius-pill;
-  border: 1px solid rgba(0, 153, 216, 0.35);
-  background: rgba(0, 153, 216, 0.08);
+  border-radius: $radius-sm;
+  border: 1px solid $border-color;
+  background: $background-body;
 
-  color: $link-color;
+  color: $text-primary;
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
 }
@@ -79,6 +79,45 @@
   display: flex;
   flex-wrap: wrap;
   gap: $space-8;
+}
+
+.program-scope {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: $space-12;
+  padding: 4px;
+
+  border: 1px solid $border-light;
+  border-radius: $radius-sm;
+  background: $background-body;
+}
+
+.program-scope__btn {
+  @include button-base;
+
+  min-height: 32px;
+  padding: 6px 12px;
+
+  border: 0;
+  border-radius: $radius-sm;
+  background: transparent;
+
+  font-size: 12px;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+}
+
+.program-scope__btn:hover {
+  color: $text-primary;
+  background: $surface;
+}
+
+.program-scope__btn--active {
+  background: $surface;
+  color: $text-primary;
+  font-weight: $font-weight-semibold;
+  box-shadow: $shadow-sm;
 }
 
 .product-tab {

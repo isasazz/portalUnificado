@@ -48,27 +48,32 @@
     }
 
     @if (
-      panelView() === 'apps' &&
-      activeView === 'available' &&
+      panelView() === 'program' &&
       hasSelection &&
-      !showSidePanel &&
       !delegationService.hasDelegatedOut()
     ) {
 
-      <div class="page-header">
-
-        <div class="page-actions">
-
+      <div class="selection-banner">
+        <p>
+          {{ selectedApplications.length }} aplicación(es) lista(s)
+          para programar
+        </p>
+        <div class="selection-banner__actions">
+          <button
+            type="button"
+            class="btn-ghost"
+            (click)="cancelSelectionMode()"
+          >
+            Limpiar selección
+          </button>
           <button
             type="button"
             class="btn-add"
-            (click)="addToStandbyPanel()"
+            (click)="continueSelection()"
           >
-            Agregar al standby
+            Continuar programación
           </button>
-
         </div>
-
       </div>
 
     }
@@ -81,27 +86,25 @@
 
           @if (panelView() === 'apps') {
 
-            @if (activeView === 'available') {
-              <h2 class="section-title">Aplicaciones disponibles</h2>
-              <p class="section-subtitle">
-                @if (delegationService.hasDelegatedOut()) {
-                  Tienes una delegación activa: otro líder programa por ti.
-                  Puedes consultar el estado, pero no agregar nuevas
-                  programaciones hasta recuperarla.
-                } @else if (delegationService.isActingForAnotherLeader()) {
-                  Programa standby en nombre de
-                  <strong>{{ delegationService.activeIncoming()?.fromLeader }}</strong>.
-                } @else {
-                  Selecciona una o más aplicaciones para programar standby.
-                }
-              </p>
-            } @else {
-              <h2 class="section-title">Standby programados</h2>
-              <p class="section-subtitle">
-                Aplicaciones con standby activo en
-                <strong>{{ currentMonthLabel }}</strong>.
-              </p>
-            }
+            <h2 class="section-title">Standby programados</h2>
+            <p class="section-subtitle">
+              Cobertura activa y próxima por persona, aplicación
+              y célula.
+            </p>
+
+          } @else if (panelView() === 'program') {
+
+            <h2 class="section-title">Programar standby</h2>
+            <p class="section-subtitle">
+              @if (delegationService.hasDelegatedOut()) {
+                Tienes una delegación activa: otro líder programa por ti.
+              } @else if (delegationService.isActingForAnotherLeader()) {
+                Programa standby en nombre de
+                <strong>{{ delegationService.activeIncoming()?.fromLeader }}</strong>.
+              } @else {
+                Filtra y selecciona las aplicaciones que quieres programar.
+              }
+            </p>
 
           } @else if (panelView() === 'policies') {
 
@@ -129,7 +132,16 @@
             [class.section-tabs__btn--active]="panelView() === 'apps'"
             (click)="setPanelView('apps')"
           >
-            Aplicaciones
+            Standby
+          </button>
+
+          <button
+            type="button"
+            class="section-tabs__btn"
+            [class.section-tabs__btn--active]="panelView() === 'program'"
+            (click)="setPanelView('program')"
+          >
+            Programar
           </button>
 
           <button
@@ -171,103 +183,141 @@
 
         </div>
 
-        <div class="view-switcher">
-
+        <div class="list-toolbar">
           <button
             type="button"
-            class="view-switcher__btn view-switcher__btn--available"
-            [class.view-switcher__btn--active]="activeView === 'available'"
-            (click)="setActiveView('available')"
+            class="btn-person-sm"
+            (click)="openPersonModal()"
           >
-            Aplicaciones disponibles
+            + Agregar persona
           </button>
+        </div>
 
-          @if (programmedApplications.length > 0) {
+        <div class="standby-board">
 
-            <button
-              type="button"
-              class="view-switcher__btn view-switcher__btn--programmed"
-              [class.view-switcher__btn--active]="activeView === 'programmed'"
-              (click)="setActiveView('programmed')"
+          <div class="standby-board__head" aria-hidden="true">
+            <span>Fecha</span>
+            <span>Nombre completo</span>
+            <span>Aplicación</span>
+            <span>BVC</span>
+            <span>LdC</span>
+            <span>Célula</span>
+            <span>Servicio</span>
+          </div>
+
+          @for (row of standbyListRows; track row.id) {
+            <article
+              class="standby-row"
+              [attr.id]="'standby-row-' + row.id"
+              [class.standby-row--flash]="
+                highlightedAppCodigo &&
+                row.appCodes.includes(highlightedAppCodigo)
+              "
             >
-              Ver standby programados
-            </button>
+              <div class="standby-row__date">
+                <strong>{{ row.fechaLabel }}</strong>
+              </div>
 
+              <div class="standby-row__person">
+                <span class="standby-row__avatar">
+                  {{ initials(row.nombre) }}
+                </span>
+                <strong>{{ row.nombre }}</strong>
+              </div>
+
+              <div class="standby-row__apps">
+                @for (code of row.appCodes; track code) {
+                  <span>{{ code }}</span>
+                }
+                @if (row.appNames[0]) {
+                  <small>{{ row.appNames[0] }}</small>
+                }
+              </div>
+
+              <span>{{ row.bvc }}</span>
+              <span>{{ row.ldc }}</span>
+              <span>{{ row.celula }}</span>
+              <span>{{ row.service }}</span>
+
+              <p class="standby-row__footer">
+                {{ row.footerLabel }}
+              </p>
+            </article>
+          }
+
+          @if (standbyListRows.length === 0) {
+            <div class="standby-board__empty">
+              Aún no hay standby programado. Ve a Programar para empezar.
+            </div>
           }
 
         </div>
 
-        @if (activeView === 'available') {
+      } @else if (panelView() === 'program') {
 
-          <div class="select-all-row">
+        <div class="filters">
 
-            <label class="select-all">
-              <input
-                type="checkbox"
-                [checked]="allSelected"
-                [disabled]="delegationService.hasDelegatedOut()"
-                (change)="toggleSelectAll($any($event.target).checked)"
-              />
-              <span>Seleccionar todas</span>
-            </label>
+          <app-portal-filter-bar />
 
-            @if (hasSelection) {
-              <small>
-                {{ selectedApplications.length }} seleccionada(s)
-              </small>
-            }
+          <input
+            type="text"
+            class="filters__search"
+            [class.filters__search--expanded]="appSearch().trim().length > 0"
+            placeholder="Buscar..."
+            [ngModel]="appSearch()"
+            (ngModelChange)="appSearch.set($event)"
+          />
 
+        </div>
+
+        <div class="list-toolbar">
+          <button
+            type="button"
+            class="btn-person-sm"
+            (click)="openPersonModal()"
+          >
+            + Agregar persona
+          </button>
+        </div>
+
+        <div class="select-all-row">
+          <label class="select-all">
+            <input
+              type="checkbox"
+              [checked]="allSelected"
+              [disabled]="delegationService.hasDelegatedOut()"
+              (change)="toggleSelectAll($any($event.target).checked)"
+            />
+            <span>Seleccionar todas</span>
+          </label>
+          @if (hasSelection) {
+            <small>
+              {{ selectedApplications.length }} seleccionada(s)
+            </small>
+          }
+        </div>
+
+        <div class="cards-list">
+
+          @for (
+            application of unprogrammedApplications;
+            track application.id
+          ) {
+            <app-standby-card
+              [application]="application"
+              [hasStandby]="false"
+              [activeThisMonth]="false"
+              [isSelected]="application.selected"
+              (selected)="toggleCard($event)"
+            />
+          }
+
+        </div>
+
+        @if (unprogrammedApplications.length === 0) {
+          <div class="standby-board__empty">
+            No hay aplicaciones disponibles con los filtros actuales.
           </div>
-
-          <div class="cards-list">
-
-            @for (
-              application of unprogrammedApplications;
-              track application.id
-            ) {
-
-              <app-standby-card
-                [application]="application"
-                [hasStandby]="false"
-                [activeThisMonth]="false"
-                [isSelected]="application.selected"
-                (selected)="toggleCard($event)"
-              />
-
-            }
-
-          </div>
-
-        } @else {
-
-          <p class="standby-hint">
-            <span class="standby-hint__dot"></span>
-            Las aplicaciones con borde morado tienen standby
-            programado en
-            <strong>{{ currentMonthLabel }}</strong>.
-          </p>
-
-          <div class="cards-list">
-
-            @for (
-              application of programmedApplications;
-              track application.id
-            ) {
-
-              <app-standby-card
-                [attr.id]="'standby-card-' + application.id"
-                [application]="application"
-                [hasStandby]="true"
-                [activeThisMonth]="hasAppStandbyThisMonth(application.codigoAplicacion)"
-                [highlighted]="highlightedAppCodigo === application.codigoAplicacion"
-                (view)="openViewForApp($event)"
-                (edit)="openEditForApp($event)"
-              />
-
-            }
-
-          </div>
-
         }
 
       } @else if (panelView() === 'policies') {
@@ -467,6 +517,12 @@
     [visible]="showRelevoModal"
     (closed)="closeRelevoModal()"
     (delegated)="onRelevoDelegated()"
+  />
+
+  <app-standby-person-modal
+    [visible]="showPersonModal"
+    (closed)="closePersonModal()"
+    (saved)="onPersonSaved($event)"
   />
 
 </div>

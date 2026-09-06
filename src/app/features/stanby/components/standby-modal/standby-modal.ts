@@ -161,7 +161,8 @@ export class StandbyModalComponent {
 
   activeAppIndex = 0;
 
-
+  /** Una app a la vez, o todas con la misma persona/fechas. */
+  programMode: 'single' | 'all' = 'all';
 
   private readonly productStates =
 
@@ -252,7 +253,42 @@ export class StandbyModalComponent {
 
   }
 
+  get isProgramAll(): boolean {
 
+    return this.hasMultipleProducts && this.programMode === 'all';
+
+  }
+
+  get appsForProgramming(): StandbyApplication[] {
+
+    if (this.isProgramAll) {
+      return this.aplicaciones();
+    }
+
+    const active = this.activeApp;
+    return active ? [active] : [];
+
+  }
+
+  get appsForProgrammingLabel(): string {
+
+    const apps = this.appsForProgramming;
+
+    if (apps.length === 0) {
+      return '';
+    }
+
+    if (apps.length === 1) {
+      return apps[0].codigoAplicacion;
+    }
+
+    if (apps.length <= 3) {
+      return apps.map(app => app.codigoAplicacion).join(', ');
+    }
+
+    return `${apps.length} aplicaciones`;
+
+  }
 
   get activeApp(): StandbyApplication | undefined {
 
@@ -283,6 +319,23 @@ export class StandbyModalComponent {
         )
 
     );
+
+  }
+
+  setProgramMode(mode: 'single' | 'all'): void {
+
+    if (mode === this.programMode || !this.hasMultipleProducts) {
+      return;
+    }
+
+    this.persistActiveProductState();
+    this.programMode = mode;
+    this.addingCoResponsable = false;
+    this.addingToExistingWeek = null;
+
+    if (mode === 'single') {
+      this.restoreProductState(this.activeAppCodigo);
+    }
 
   }
 
@@ -318,9 +371,11 @@ export class StandbyModalComponent {
 
   get occupiedRanges(): OccupiedRange[] {
 
-    const codigo = this.activeAppCodigo;
+    const codes = new Set(
+      this.appsForProgramming.map(app => app.codigoAplicacion)
+    );
 
-    if (!codigo) {
+    if (codes.size === 0) {
 
       return [];
 
@@ -340,7 +395,7 @@ export class StandbyModalComponent {
 
         assignment.aplicaciones?.some(
 
-          app => app.codigoAplicacion === codigo
+          app => codes.has(app.codigoAplicacion)
 
         )
 
@@ -488,6 +543,10 @@ export class StandbyModalComponent {
 
   get groupedAcceptedForActiveApp(): GroupedAcceptance[] {
 
+    if (this.isProgramAll) {
+      return this.groupedAccepted;
+    }
+
     const codigo = this.activeAppCodigo;
 
     return this.groupedAccepted.filter(
@@ -573,6 +632,12 @@ export class StandbyModalComponent {
     if (!this.hasMultipleProducts) {
 
       return 'Continúa con otros usuarios para programar standby.';
+
+    }
+
+    if (this.isProgramAll) {
+
+      return 'La selección quedó aplicada a todas las aplicaciones. Revisa y guarda, o sigue agregando personas.';
 
     }
 
@@ -676,7 +741,9 @@ export class StandbyModalComponent {
 
   selectActiveApp(index: number): void {
 
-
+    if (this.isProgramAll) {
+      this.setProgramMode('single');
+    }
 
     if (
 
@@ -1102,11 +1169,9 @@ export class StandbyModalComponent {
 
 
 
-    const activeApp = this.activeApp;
+    const sourceApps = this.appsForProgramming;
 
-
-
-    if (!activeApp) {
+    if (!sourceApps.length) {
 
       return;
 
@@ -1114,13 +1179,13 @@ export class StandbyModalComponent {
 
 
 
-    const apps: StandbyAssociatedApp[] = [{
+    const apps: StandbyAssociatedApp[] = sourceApps.map(app => ({
 
-      codigoAplicacion: activeApp.codigoAplicacion,
+      codigoAplicacion: app.codigoAplicacion,
 
-      nombreAplicacion: activeApp.nombreAplicacion
+      nombreAplicacion: app.nombreAplicacion
 
-    }];
+    }));
 
 
 
@@ -1150,7 +1215,11 @@ export class StandbyModalComponent {
 
     this.addingToExistingWeek = null;
 
-    this.productStates.delete(this.activeAppCodigo);
+    if (this.isProgramAll) {
+      this.productStates.clear();
+    } else {
+      this.productStates.delete(this.activeAppCodigo);
+    }
 
 
 
@@ -1357,6 +1426,8 @@ export class StandbyModalComponent {
 
 
     this.activeAppIndex = 0;
+
+    this.programMode = this.aplicaciones().length > 1 ? 'all' : 'single';
 
     this.productStates.clear();
 

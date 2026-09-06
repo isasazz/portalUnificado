@@ -54,13 +54,7 @@
 
 .modal-header--person {
   padding: $space-24 $space-32;
-  background:
-    linear-gradient(
-      135deg,
-      rgba(0, 153, 216, 0.08) 0%,
-      rgba(0, 195, 137, 0.05) 100%
-    ),
-    $surface;
+  background: $surface;
 }
 
 .modal-header__info {

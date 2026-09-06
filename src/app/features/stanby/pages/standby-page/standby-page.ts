@@ -30,6 +30,9 @@ from '../../components/standby-view-modal/standby-view-modal';
 import { StandbyRelevoModalComponent }
 from '../../components/standby-relevo-modal/standby-relevo-modal';
 
+import { StandbyPersonModalComponent }
+from '../../components/standby-person-modal/standby-person-modal';
+
 import { StandbyScheduleService }
 from '../../services/standby-schedule.service';
 
@@ -51,7 +54,10 @@ import {
   STANDBY_POLICY_SECTIONS
 } from '../../data/standby-policies.data';
 
-type StandbyPanelView = 'apps' | 'policies' | 'delegate';
+import { StandbyPersonRecord }
+from '../../mocks/standby-person-catalog.mock';
+
+type StandbyPanelView = 'apps' | 'program' | 'policies' | 'delegate';
 
 @Component({
   selector: 'app-standby-page',
@@ -62,6 +68,7 @@ type StandbyPanelView = 'apps' | 'policies' | 'delegate';
     StandbyModalComponent,
     StandbyViewModalComponent,
     StandbyRelevoModalComponent,
+    StandbyPersonModalComponent,
     PortalFilterBarComponent
   ],
   templateUrl: './standby-page.html',
@@ -87,12 +94,16 @@ export class StandbyPageComponent implements OnInit {
 
   readonly policyHighlights = STANDBY_POLICY_PRINCIPLES;
 
+  readonly registeredPeople = signal<StandbyPersonRecord[]>([]);
+
   applications: StandbyApplication[] =
     [...STANDBY_APPLICATIONS];
 
   showStandbyModal = false;
 
   showRelevoModal = false;
+
+  showPersonModal = false;
 
   showViewModal = false;
 
@@ -110,11 +121,16 @@ export class StandbyPageComponent implements OnInit {
 
   private highlightTimer: ReturnType<typeof setTimeout> | null = null;
 
-  activeView: 'available' | 'programmed' = 'available';
+  activeView: 'available' | 'programmed' = 'programmed';
 
   setPanelView(view: StandbyPanelView): void {
 
     this.panelView.set(view);
+
+    if (view !== 'program') {
+      this.clearSelection();
+    }
+
     this.cdr.markForCheck();
 
   }
@@ -148,6 +164,7 @@ export class StandbyPageComponent implements OnInit {
           ? { ...app, selected: true }
           : app
       );
+      this.panelView.set('program');
       this.addToStandbyPanel();
       this.cdr.markForCheck();
 
@@ -344,6 +361,174 @@ export class StandbyPageComponent implements OnInit {
 
   }
 
+  get standbyListRows() {
+
+    this.portalFilter.filters();
+    this.appSearch();
+
+    const term = this.appSearch().trim().toLowerCase();
+
+    return this.scheduleService.savedAssignments
+      .filter(assignment => {
+
+        const apps = (assignment.aplicaciones ?? [])
+          .map(app =>
+            this.applications.find(
+              item =>
+                item.codigoAplicacion === app.codigoAplicacion
+            )
+          )
+          .filter(Boolean) as StandbyApplication[];
+
+        const matchPortal =
+          apps.length === 0 ||
+          apps.some(app => this.portalFilter.matches({
+            ...app,
+            responsable: assignment.responsable
+          }));
+
+        if (!matchPortal) {
+          return false;
+        }
+
+        if (!term) {
+          return true;
+        }
+
+        const haystack = [
+          assignment.responsable,
+          ...apps.map(app => app.codigoAplicacion),
+          ...apps.map(app => app.nombreAplicacion),
+          ...apps.map(app => app.celula),
+          ...apps.map(app => app.service)
+        ]
+          .join(' ')
+          .toLowerCase();
+
+        return haystack.includes(term);
+
+      })
+      .sort(
+        (a, b) =>
+          b.fechaInicio.getTime() - a.fechaInicio.getTime()
+      )
+      .map(assignment => {
+
+        const apps = (assignment.aplicaciones ?? [])
+          .map(app =>
+            this.applications.find(
+              item =>
+                item.codigoAplicacion === app.codigoAplicacion
+            )
+          )
+          .filter(Boolean) as StandbyApplication[];
+
+        const primary = apps[0];
+
+        return {
+          id: assignment.id,
+          fechaLabel: this.formatDateRange(
+            assignment.fechaInicio,
+            assignment.fechaFin
+          ),
+          nombre: assignment.responsable,
+          appCodes: (assignment.aplicaciones ?? []).map(
+            app => app.codigoAplicacion
+          ),
+          appNames: (assignment.aplicaciones ?? []).map(
+            app => app.nombreAplicacion
+          ),
+          bvc: primary?.bvc ?? '—',
+          ldc: primary?.ldc ?? '—',
+          celula: primary?.celula ?? '—',
+          service: primary?.service ?? '—',
+          areaLabel: primary
+            ? `${primary.bvc} · ${primary.ldc}`
+            : '—',
+          footerLabel: primary
+            ? `${primary.celula} · ${primary.ldc}`
+            : 'Standby programado',
+          color: assignment.color
+        };
+
+      });
+
+  }
+  startAddStandby(): void {
+
+    if (this.delegationService.hasDelegatedOut()) {
+      return;
+    }
+
+    this.clearSelection();
+    this.panelView.set('program');
+    this.activeView = 'available';
+    this.panelApplications = [];
+    this.showSidePanel = false;
+    this.cdr.markForCheck();
+
+  }
+
+  cancelSelectionMode(): void {
+
+    this.clearSelection();
+    this.panelApplications = [];
+    this.showSidePanel = false;
+    this.cdr.markForCheck();
+
+  }
+
+  continueSelection(): void {
+
+    if (
+      this.delegationService.hasDelegatedOut() ||
+      !this.hasSelection
+    ) {
+      return;
+    }
+
+    this.panelApplications = [
+      ...this.selectedApplications
+    ];
+
+    this.showSidePanel = false;
+    this.showStandbyModal = true;
+    this.cdr.markForCheck();
+
+  }
+
+  private clearSelection(): void {
+
+    this.applications = this.applications.map(app => ({
+      ...app,
+      selected: false
+    }));
+
+  }
+
+  private formatDateRange(start: Date, end: Date): string {
+
+    const fmt = (date: Date) => {
+      const day = `${date.getDate()}`.padStart(2, '0');
+      const month = `${date.getMonth() + 1}`.padStart(2, '0');
+      return `${day}/${month}`;
+    };
+
+    return `${fmt(start)} — ${fmt(end)}`;
+
+  }
+
+  initials(name: string): string {
+
+    return name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0]?.toUpperCase() ?? '')
+      .join('');
+
+  }
+
   addToStandbyPanel(): void {
 
     if (this.delegationService.hasDelegatedOut()) {
@@ -402,6 +587,7 @@ export class StandbyPageComponent implements OnInit {
     this.showStandbyModal = false;
     this.applications = [...this.applications];
     this.activeView = 'programmed';
+    this.panelView.set('apps');
 
     if (payload.appCodigo) {
       this.focusSavedStandby(payload.appCodigo);
@@ -425,17 +611,19 @@ export class StandbyPageComponent implements OnInit {
 
     this.highlightedAppCodigo = appCodigo;
 
-    const app = this.applications.find(
-      item => item.codigoAplicacion === appCodigo
+    const assignment = this.scheduleService.savedAssignments.find(item =>
+      (item.aplicaciones ?? []).some(
+        app => app.codigoAplicacion === appCodigo
+      )
     );
 
     setTimeout(() => {
-      if (!app) {
+      if (!assignment) {
         return;
       }
 
       document
-        .getElementById(`standby-card-${app.id}`)
+        .getElementById(`standby-row-${assignment.id}`)
         ?.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
@@ -511,6 +699,27 @@ export class StandbyPageComponent implements OnInit {
   closeRelevoModal(): void {
 
     this.showRelevoModal = false;
+    this.cdr.markForCheck();
+
+  }
+
+  openPersonModal(): void {
+
+    this.showPersonModal = true;
+    this.cdr.markForCheck();
+
+  }
+
+  closePersonModal(): void {
+
+    this.showPersonModal = false;
+    this.cdr.markForCheck();
+
+  }
+
+  onPersonSaved(person: StandbyPersonRecord): void {
+
+    this.registeredPeople.update(list => [person, ...list]);
     this.cdr.markForCheck();
 
   }

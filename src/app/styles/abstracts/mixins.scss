@@ -67,7 +67,7 @@
 
   border: 1px solid $border-color;
 
-  border-radius: $radius-pill;
+  border-radius: $radius-sm;
 
   background: $surface;
   color: $text-primary;
@@ -84,7 +84,8 @@
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(253, 218, 36, 0.35);
+    border-color: $border-color;
+    box-shadow: 0 0 0 3px rgba(44, 42, 41, 0.08);
   }
 }
 

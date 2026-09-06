@@ -310,6 +310,18 @@
   box-shadow: $shadow-sm;
 }
 
+.section-tabs__btn--action {
+  margin-left: 4px;
+  border: 1px solid $border-color;
+  background: $surface;
+  color: $text-primary;
+}
+
+.section-tabs__btn--action:hover {
+  border-color: $amarillo-macondo;
+  background: rgba(253, 218, 36, 0.2);
+}
+
 .inline-panel {
   @include flex-column;
   gap: $space-24;
@@ -624,11 +636,134 @@
   background: transparent;
 }
 
+.selection-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-16;
+  flex-wrap: wrap;
+
+  margin-bottom: $space-20;
+  padding: $space-12 $space-20;
+
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  background: $surface;
+  box-shadow: $shadow-sm;
+}
+
+.selection-banner p {
+  margin: 0;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.selection-banner__actions {
+  display: flex;
+  align-items: center;
+  gap: $space-8;
+}
+
+.btn-ghost {
+  @include button-base;
+
+  background: transparent;
+  border: 1px solid $border-color;
+  color: $text-secondary;
+}
+
+.btn-ghost:hover {
+  color: $text-primary;
+  border-color: $text-primary;
+}
+
+.list-toolbar {
+  display: flex;
+  align-items: center;
+  margin: 0 0 $space-12;
+}
+
+.btn-person-sm {
+  @include button-base;
+
+  min-height: 32px;
+  padding: 6px 12px;
+
+  background: $surface;
+  border: 1px solid $border-color;
+  border-radius: $radius-sm;
+
+  font-size: 12px;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+}
+
+.btn-person-sm:hover {
+  color: $text-primary;
+  border-color: $amarillo-macondo;
+  background: rgba(253, 218, 36, 0.14);
+}
+
+.standby-board {
+  position: relative;
+  overflow: hidden;
+
+  padding: $space-16;
+  margin-bottom: $space-20;
+
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  background: $surface;
+  box-shadow: $shadow-sm;
+}
+
+.standby-board__head {
+  display: grid;
+  grid-template-columns:
+    minmax(88px, 0.9fr)
+    minmax(140px, 1.3fr)
+    minmax(160px, 1.6fr)
+    repeat(4, minmax(72px, 1fr));
+  gap: $space-12;
+  align-items: center;
+
+  margin: 0 $space-4 $space-12;
+  padding: 0 $space-16;
+
+  font-size: 11px;
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $text-secondary;
+}
+
+.standby-board__head--select,
+.standby-row--select {
+  grid-template-columns:
+    minmax(180px, 1.8fr)
+    repeat(4, minmax(80px, 1fr))
+    minmax(120px, 1.2fr);
+}
+
+.standby-board__empty {
+  padding: $space-40 $space-20;
+  text-align: center;
+
+  border: 1px dashed $border-color;
+  border-radius: $radius-lg;
+  background: $background-body;
+
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
 .cards-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: $space-20;
   align-items: stretch;
+  margin-bottom: $space-20;
 }
 
 @media (max-width: 1100px) {
@@ -640,6 +775,321 @@
 @media (max-width: 700px) {
   .cards-list {
     grid-template-columns: 1fr;
+  }
+}
+
+.standby-row {
+  position: relative;
+  display: grid;
+  grid-template-columns:
+    minmax(88px, 0.9fr)
+    minmax(140px, 1.3fr)
+    minmax(160px, 1.6fr)
+    repeat(4, minmax(72px, 1fr));
+  gap: $space-12 $space-12;
+  align-items: start;
+
+  width: 100%;
+  margin-bottom: $space-12;
+  padding: $space-16 $space-16 $space-12;
+
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  background: $surface;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  text-align: left;
+  color: inherit;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.standby-row:hover {
+  transform: translateY(-1px);
+  border-color: $border-color;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+}
+
+.standby-row--flash {
+  animation: standby-row-flash 1.2s ease;
+  border-color: $amarillo-macondo;
+  box-shadow: 0 0 0 3px rgba(253, 218, 36, 0.28);
+}
+
+.standby-row--selectable {
+  cursor: pointer;
+  font: inherit;
+}
+
+.standby-row--selectable:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.standby-row--selected {
+  border-color: $amarillo-macondo;
+  background: rgba(253, 218, 36, 0.14);
+  box-shadow: 0 0 0 2px rgba(253, 218, 36, 0.28);
+}
+
+.standby-row > span,
+.standby-row__date,
+.standby-row__person,
+.standby-row__apps,
+.standby-row__main {
+  min-width: 0;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  line-height: 1.35;
+}
+
+.standby-row__date strong {
+  display: inline-block;
+  padding: 4px 10px;
+
+  border-radius: $radius-pill;
+  background: $background-body;
+  font-size: 12px;
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.standby-row__person {
+  display: flex;
+  align-items: center;
+  gap: $space-8;
+}
+
+.standby-row__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+  background: $amarillo-macondo;
+  color: $on-yellow;
+
+  font-size: 11px;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.02em;
+}
+
+.standby-row__person strong,
+.standby-row__main strong {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+}
+
+.standby-row__main {
+  @include flex-column;
+  gap: 2px;
+}
+
+.standby-row__main span,
+.standby-row__apps small {
+  color: $text-secondary;
+  font-size: $font-size-xs;
+}
+
+.standby-row__apps {
+  @include flex-column;
+  gap: 6px;
+}
+
+.standby-row__apps span {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+
+  padding: 2px 8px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  border-radius: $radius-sm;
+  background: $background-body;
+  color: $text-primary;
+
+  font-size: 11px;
+  font-weight: $font-weight-semibold;
+}
+
+.standby-row__footer {
+  grid-column: 1 / -1;
+
+  margin: $space-4 0 0;
+  padding-top: $space-8;
+
+  border-top: 1px dashed $border-color;
+
+  font-size: 11px;
+  font-weight: $font-weight-medium;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: $text-secondary;
+}
+
+.standby-dock {
+  position: sticky;
+  bottom: $space-16;
+  z-index: 5;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $space-12;
+
+  margin-top: $space-8;
+  padding: $space-12 $space-16;
+
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: $radius-lg;
+  background:
+    linear-gradient(
+      120deg,
+      rgba(15, 23, 42, 0.92),
+      rgba(30, 41, 59, 0.94)
+    );
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.standby-dock__person,
+.standby-dock__cancel,
+.standby-dock__add {
+  @include button-base;
+
+  min-height: 46px;
+  padding: $space-12 $space-20;
+
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+}
+
+.standby-dock__person {
+  margin-right: auto;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.standby-dock__person:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.standby-dock__cancel {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.standby-dock__cancel:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.standby-dock__add {
+  min-width: 190px;
+
+  background: $amarillo-macondo;
+  border: 1px solid $amarillo-macondo;
+  color: $on-yellow;
+
+  box-shadow:
+    0 0 0 0 rgba(253, 218, 36, 0.45),
+    0 10px 24px rgba(253, 218, 36, 0.28);
+  animation: standby-dock-pulse 2.4s ease-in-out infinite;
+}
+
+.standby-dock__add:hover:not(:disabled) {
+  background: #fff;
+  border-color: #fff;
+  color: $negro-cib;
+  animation: none;
+}
+
+.standby-dock__add:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  animation: none;
+  box-shadow: none;
+}
+
+@keyframes standby-dock-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(253, 218, 36, 0.35),
+      0 10px 24px rgba(253, 218, 36, 0.24);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 8px rgba(253, 218, 36, 0),
+      0 14px 28px rgba(253, 218, 36, 0.32);
+  }
+}
+
+@keyframes standby-row-flash {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.01);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 1100px) {
+  .standby-board__head {
+    display: none;
+  }
+
+  .standby-row,
+  .standby-row--selectable {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .standby-row__footer {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .standby-row,
+  .standby-row--selectable {
+    grid-template-columns: 1fr;
+  }
+
+  .standby-dock {
+    justify-content: stretch;
+  }
+
+  .standby-dock__person,
+  .standby-dock__cancel,
+  .standby-dock__add {
+    width: 100%;
+    margin-right: 0;
   }
 }
 
@@ -870,5 +1320,67 @@
 
   .section-tabs__btn {
     flex: 1;
+  }
+}
+
+:host-context([data-theme='dark']) {
+  .btn-person-sm {
+    background: $surface;
+    border-color: $border-color;
+    color: $text-secondary;
+  }
+
+  .btn-person-sm:hover {
+    color: $text-primary;
+    border-color: $amarillo-macondo;
+    background: rgba(253, 218, 36, 0.12);
+  }
+
+  .selection-banner {
+    border-color: $border-color;
+    background: $surface;
+  }
+
+  .standby-board {
+    background: $surface;
+  }
+
+  .standby-row {
+    border-color: $border-color;
+    background: #343230;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  }
+
+  .standby-row:hover {
+    border-color: $border-color;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.36);
+  }
+
+  .standby-row--selected {
+    background: rgba(253, 218, 36, 0.12);
+    box-shadow: 0 0 0 2px rgba(253, 218, 36, 0.3);
+  }
+
+  .standby-row--flash {
+    box-shadow: 0 0 0 3px rgba(253, 218, 36, 0.35);
+  }
+
+  .standby-row__apps span {
+    background: $background-body;
+    color: $text-primary;
+  }
+
+  .standby-dock {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: #1f1e1d;
+    box-shadow:
+      0 18px 40px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .standby-dock__add:hover:not(:disabled) {
+    background: $amarillo-macondo;
+    border-color: $amarillo-macondo;
+    color: $on-yellow;
   }
 }
