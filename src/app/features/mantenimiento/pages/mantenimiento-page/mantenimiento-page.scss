@@ -64,9 +64,10 @@
 .list-toolbar .filters-grid {
   flex: 1;
   min-width: 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: $space-16;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-12;
   margin-bottom: 0;
 }
 
@@ -76,18 +77,35 @@
 }
 
 .list-filters > .filters-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: $space-16;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-12;
   margin-bottom: $space-24;
 }
 
 .list-filters > .filters-grid select,
 .list-filters > .filters-grid input,
 .list-toolbar .filters-grid select,
-.list-toolbar .filters-grid input {
+.list-toolbar .filters-grid input,
+.filters-grid__search {
   @include input-base;
-  width: 100%;
+
+  width: 160px;
+  flex: 0 1 auto;
+
+  transition:
+    width 0.28s ease,
+    min-width 0.28s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.filters-grid__search:focus,
+.filters-grid__search--expanded {
+  width: min(100%, 360px);
+  border-color: $link-color;
+  box-shadow: 0 0 0 3px rgba(0, 153, 216, 0.12);
 }
 
 .filter-toolbar {

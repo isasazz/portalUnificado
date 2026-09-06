@@ -3,9 +3,11 @@ import {
   ChangeDetectorRef,
   Component,
   inject,
-  OnInit
+  OnInit,
+  signal
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { STANDBY_APPLICATIONS }
 from '../../mocks/standby-applications.mock';
@@ -37,19 +39,25 @@ from '../../services/standby-delegation.service';
 import { SaveSuccessService }
 from '../../../../shared/services/save-success.service';
 
+import { PortalFilterService }
+from '../../../../shared/services/portal-filter.service';
+
+import { PortalFilterBarComponent }
+from '../../../../shared/components/portal-filter-bar/portal-filter-bar';
+
 import { STANDBY_POLICY_PRINCIPLES }
 from '../../data/standby-policies.data';
-
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-standby-page',
   standalone: true,
   imports: [
+    FormsModule,
     StandbyCardComponent,
     StandbyModalComponent,
     StandbyViewModalComponent,
     StandbyRelevoModalComponent,
+    PortalFilterBarComponent,
     RouterLink
   ],
   templateUrl: './standby-page.html',
@@ -62,7 +70,10 @@ export class StandbyPageComponent implements OnInit {
   private readonly scheduleService = inject(StandbyScheduleService);
   readonly delegationService = inject(StandbyDelegationService);
   private readonly saveSuccess = inject(SaveSuccessService);
+  private readonly portalFilter = inject(PortalFilterService);
   private readonly cdr = inject(ChangeDetectorRef);
+
+  readonly appSearch = signal('');
 
   applications: StandbyApplication[] =
     [...STANDBY_APPLICATIONS];
@@ -156,7 +167,8 @@ export class StandbyPageComponent implements OnInit {
 
     return this.applications.filter(
       app =>
-        !this.hasAppStandby(app.codigoAplicacion)
+        !this.hasAppStandby(app.codigoAplicacion) &&
+        this.matchesAppFilters(app)
     );
 
   }
@@ -165,7 +177,8 @@ export class StandbyPageComponent implements OnInit {
 
     const list = this.applications.filter(
       app =>
-        this.hasAppStandby(app.codigoAplicacion)
+        this.hasAppStandby(app.codigoAplicacion) &&
+        this.matchesAppFilters(app)
     );
 
     if (!this.highlightedAppCodigo) {
@@ -187,6 +200,27 @@ export class StandbyPageComponent implements OnInit {
   get selectableApplications(): StandbyApplication[] {
 
     return this.unprogrammedApplications;
+
+  }
+
+  private matchesAppFilters(app: StandbyApplication): boolean {
+
+    if (!this.portalFilter.matches(app)) {
+      return false;
+    }
+
+    const term = this.appSearch().trim().toLowerCase();
+
+    if (!term) {
+      return true;
+    }
+
+    return (
+      app.codigoAplicacion.toLowerCase().includes(term) ||
+      app.nombreAplicacion.toLowerCase().includes(term) ||
+      app.celula.toLowerCase().includes(term) ||
+      app.responsable.toLowerCase().includes(term)
+    );
 
   }
 

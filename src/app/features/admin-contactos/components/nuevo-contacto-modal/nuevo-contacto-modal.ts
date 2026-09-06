@@ -201,8 +201,12 @@ export class NuevoContactoModalComponent {
       nombre: values.nombre.trim(),
       correo: values.correo.trim(),
       horario: values.horario,
-      evc: app.evc,
-      linea: app.linea
+      bvc: app.bvc,
+      ldc: app.ldc,
+      celula: app.celula,
+      service: app.service,
+      evc: app.celula,
+      linea: app.ldc
     });
 
     this.saved.emit();

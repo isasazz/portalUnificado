@@ -8,7 +8,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'Núcleo Único',
     descripcion:
       'Núcleo transaccional central que concentra operaciones críticas del banco y servicios compartidos entre canales.',
-    evc: 'EVC Core Bancario',
+    bvc: 'Operaciones',
+    ldc: 'Aplicaciones',
+    celula: 'Célula Core',
+    service: 'Transaccional',
+    evc: 'Célula Core',
     linea: 'Aplicaciones',
     responsable: 'Daniel Lopez Montes',
     selected: false
@@ -19,7 +23,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'Portal Transaccional',
     descripcion:
       'Portal web para consultas y transacciones de clientes, con autenticación y flujos de autogestión.',
-    evc: 'EVC Canales',
+    bvc: 'Canales Digitales',
+    ldc: 'Aplicaciones',
+    celula: 'Célula Canales',
+    service: 'Transaccional',
+    evc: 'Célula Canales',
     linea: 'Aplicaciones',
     responsable: 'Bibiana Montoya',
     selected: false
@@ -30,7 +38,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'App Personas',
     descripcion:
       'Aplicación móvil de banca personas para pagos, transferencias y seguimiento de productos.',
-    evc: 'EVC Digital',
+    bvc: 'Banca Personas',
+    ldc: 'Aplicaciones',
+    celula: 'Célula Digital',
+    service: 'Transaccional',
+    evc: 'Célula Digital',
     linea: 'Aplicaciones',
     responsable: 'Dylan Martinez',
     selected: false
@@ -41,7 +53,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'Gestión de Alertas',
     descripcion:
       'Plataforma de monitoreo y notificación de eventos operativos para equipos de soporte y operación.',
-    evc: 'EVC Operaciones',
+    bvc: 'Operaciones',
+    ldc: 'Monitoreo',
+    celula: 'Célula Operaciones',
+    service: 'Monitoreo',
+    evc: 'Célula Operaciones',
     linea: 'Monitoreo',
     responsable: 'Jahiver Horacio Lopez',
     selected: false
@@ -52,7 +68,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'Pasarela de Pagos',
     descripcion:
       'Servicio de mediación de pagos que integra medios de pago internos y externos en tiempo real.',
-    evc: 'EVC Canales',
+    bvc: 'Canales Digitales',
+    ldc: 'Aplicaciones',
+    celula: 'Célula Canales',
+    service: 'Pagos',
+    evc: 'Célula Canales',
     linea: 'Aplicaciones',
     responsable: 'Miguel Ángel García',
     selected: false
@@ -63,7 +83,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'Créditos Digitales',
     descripcion:
       'Plataforma de originación y desembolso de créditos de consumo con evaluación automatizada de riesgo.',
-    evc: 'EVC Productos',
+    bvc: 'Banca Personas',
+    ldc: 'Aplicaciones',
+    celula: 'Célula Productos',
+    service: 'Créditos',
+    evc: 'Célula Productos',
     linea: 'Aplicaciones',
     responsable: 'Laura Camila Ruiz',
     selected: false
@@ -74,7 +98,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'Tesorería Corporativa',
     descripcion:
       'Consola de gestión de liquidez, inversiones y operaciones de mesa para equipos de tesorería.',
-    evc: 'EVC Finanzas',
+    bvc: 'Tesorería',
+    ldc: 'Backoffice',
+    celula: 'Célula Finanzas',
+    service: 'Transaccional',
+    evc: 'Célula Finanzas',
     linea: 'Backoffice',
     responsable: 'Carlos Eduardo Vargas',
     selected: false
@@ -85,7 +113,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'Reportería Regulatoria',
     descripcion:
       'Generación y envío de reportes normativos a entes de control con trazabilidad y auditoría.',
-    evc: 'EVC Riesgos',
+    bvc: 'Operaciones',
+    ldc: 'Cumplimiento',
+    celula: 'Célula Riesgos',
+    service: 'Reportería',
+    evc: 'Célula Riesgos',
     linea: 'Cumplimiento',
     responsable: 'Mariana Soto',
     selected: false
@@ -96,7 +128,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'Onboarding Empresas',
     descripcion:
       'Flujo digital de vinculación de clientes corporativos con validación documental y firma electrónica.',
-    evc: 'EVC Empresas',
+    bvc: 'Banca Empresas',
+    ldc: 'Aplicaciones',
+    celula: 'Célula Empresas',
+    service: 'Onboarding',
+    evc: 'Célula Empresas',
     linea: 'Aplicaciones',
     responsable: 'Andrés Felipe Mejía',
     selected: false
@@ -107,7 +143,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'API Gateway Interno',
     descripcion:
       'Punto de entrada unificado para servicios internos con autenticación, rate limiting y observabilidad.',
-    evc: 'EVC Integración',
+    bvc: 'Operaciones',
+    ldc: 'Infraestructura',
+    celula: 'Célula Integración',
+    service: 'Integración',
+    evc: 'Célula Integración',
     linea: 'Infraestructura',
     responsable: 'Santiago Herrera',
     selected: false
@@ -118,7 +158,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'Gestión Documental',
     descripcion:
       'Repositorio centralizado de documentos operativos con versionamiento, búsqueda y retención.',
-    evc: 'EVC Operaciones',
+    bvc: 'Operaciones',
+    ldc: 'Backoffice',
+    celula: 'Célula Operaciones',
+    service: 'Onboarding',
+    evc: 'Célula Operaciones',
     linea: 'Backoffice',
     responsable: 'Paula Andrea Giraldo',
     selected: false
@@ -129,7 +173,11 @@ export const STANDBY_APPLICATIONS: StandbyApplication[] = [
     nombreAplicacion: 'CRM Comercial',
     descripcion:
       'Seguimiento de oportunidades comerciales, campañas y gestión de cartera para equipos de ventas.',
-    evc: 'EVC Comercial',
+    bvc: 'Banca Empresas',
+    ldc: 'Aplicaciones',
+    celula: 'Célula Comercial',
+    service: 'CRM',
+    evc: 'Célula Comercial',
     linea: 'Aplicaciones',
     responsable: 'Felipe Restrepo',
     selected: false

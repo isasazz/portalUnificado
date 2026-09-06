@@ -35,13 +35,13 @@
 
         <div class="field">
 
-          <label>EVC</label>
+          <label>Célula</label>
 
           <select
             formControlName="evc"
             (change)="onEvcChange()"
           >
-            <option value="">Seleccione un EVC</option>
+            <option value="">Seleccione una célula</option>
             @for (evc of evcOptions; track evc) {
               <option [value]="evc">{{ evc }}</option>
             }
@@ -51,13 +51,13 @@
 
         <div class="field">
 
-          <label>Línea</label>
+          <label>LdC</label>
 
           <select
             formControlName="linea"
             (change)="onLineaChange()"
           >
-            <option value="">Seleccione una línea</option>
+            <option value="">Seleccione una LdC</option>
             @for (linea of lineaOptions(); track linea) {
               <option [value]="linea">{{ linea }}</option>
             }

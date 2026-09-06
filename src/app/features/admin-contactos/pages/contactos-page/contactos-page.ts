@@ -20,6 +20,9 @@ from '../../components/nuevo-contacto-modal/nuevo-contacto-modal';
 import { PhoneInputComponent }
 from '../../../../shared/components/phone-input/phone-input';
 
+import { PortalFilterBarComponent }
+from '../../../../shared/components/portal-filter-bar/portal-filter-bar';
+
 import { Contacto }
 from '../../models/contacto.model';
 
@@ -36,7 +39,8 @@ from '../../../../shared/services/save-success.service';
     ReactiveFormsModule,
     ContactoModalComponent,
     NuevoContactoModalComponent,
-    PhoneInputComponent
+    PhoneInputComponent,
+    PortalFilterBarComponent
   ],
   templateUrl: './contactos-page.html',
   styleUrl: './contactos-page.scss',

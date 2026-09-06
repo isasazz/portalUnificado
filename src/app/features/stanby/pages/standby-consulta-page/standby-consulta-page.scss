@@ -36,6 +36,7 @@
 
 .consulta-search__field {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: $space-12;
   margin-bottom: $space-12;
@@ -43,7 +44,22 @@
 
 .consulta-search__input {
   @include input-base;
-  flex: 1;
+
+  width: 160px;
+  flex: 0 1 auto;
+
+  transition:
+    width 0.28s ease,
+    min-width 0.28s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.consulta-search__input:focus,
+.consulta-search__input--expanded {
+  width: min(100%, 360px);
+  border-color: $link-color;
+  box-shadow: 0 0 0 3px rgba(0, 153, 216, 0.12);
 }
 
 .consulta-search__clear {

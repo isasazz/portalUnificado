@@ -30,10 +30,16 @@ from '../../services/mantenimiento.service';
 import { SaveSuccessService }
 from '../../../../shared/services/save-success.service';
 
+import { PortalFilterService }
+from '../../../../shared/services/portal-filter.service';
+
+import { PortalFilterBarComponent }
+from '../../../../shared/components/portal-filter-bar/portal-filter-bar';
+
 @Component({
   selector: 'app-mantenimiento-page',
   standalone: true,
-  imports: [ReactiveFormsModule, NgClass],
+  imports: [ReactiveFormsModule, NgClass, PortalFilterBarComponent],
   templateUrl: './mantenimiento-page.html',
   styleUrl: './mantenimiento-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -45,6 +51,8 @@ export class MantenimientoPageComponent {
   readonly mantenimiento = inject(MantenimientoService);
 
   private readonly saveSuccess = inject(SaveSuccessService);
+
+  private readonly portalFilter = inject(PortalFilterService);
 
   readonly applications: StandbyApplication[] =
     STANDBY_APPLICATIONS.map(app => ({ ...app }));
@@ -105,34 +113,41 @@ export class MantenimientoPageComponent {
     linea: [{ value: '', disabled: true }]
   });
 
-  readonly evcOptions = computed(() =>
+  readonly celulaOptions = computed(() =>
     [
-      ...new Set(this.applications.map(app => app.evc))
+      ...new Set(this.applications.map(app => app.celula))
     ].sort()
   );
 
-  readonly lineaOptions = computed(() =>
+  readonly ldcOptions = computed(() =>
     [
-      ...new Set(this.applications.map(app => app.linea))
+      ...new Set(this.applications.map(app => app.ldc))
     ].sort()
   );
 
   readonly filteredApplications = computed(() => {
 
     this.formRevision();
+    this.portalFilter.filters();
 
     const term = this.searchApp().trim().toLowerCase();
-    const evc = this.filterEvc();
-    const linea = this.filterLinea();
+    const celula = this.filterEvc();
+    const ldc = this.filterLinea();
+    const hasLocal = Boolean(term || celula || ldc);
+    const hasPortal = this.portalFilter.hasActiveFilters();
 
-    if (!term && !evc && !linea) {
+    if (!hasLocal && !hasPortal) {
       return [];
     }
 
     return this.applications.filter(app => {
 
-      const matchEvc = !evc || app.evc === evc;
-      const matchLinea = !linea || app.linea === linea;
+      if (!this.portalFilter.matches(app)) {
+        return false;
+      }
+
+      const matchCelula = !celula || app.celula === celula;
+      const matchLdc = !ldc || app.ldc === ldc;
       const matchSearch =
         !term ||
         app.codigoAplicacion
@@ -142,7 +157,7 @@ export class MantenimientoPageComponent {
           .toLowerCase()
           .includes(term);
 
-      return matchEvc && matchLinea && matchSearch;
+      return matchCelula && matchLdc && matchSearch;
 
     });
 
@@ -152,7 +167,8 @@ export class MantenimientoPageComponent {
     Boolean(
       this.searchApp().trim() ||
       this.filterEvc() ||
-      this.filterLinea()
+      this.filterLinea() ||
+      this.portalFilter.hasActiveFilters()
     )
   );
 
@@ -259,19 +275,9 @@ export class MantenimientoPageComponent {
   }
 
   setListFilter(
-    field: 'evc' | 'linea' | 'searchApp',
+    field: 'searchApp',
     value: string
   ): void {
-
-    if (field === 'evc') {
-      this.mantenimiento.listFilterEvc.set(value);
-      return;
-    }
-
-    if (field === 'linea') {
-      this.mantenimiento.listFilterLinea.set(value);
-      return;
-    }
 
     this.mantenimiento.listSearchApp.set(value);
 
@@ -472,8 +478,12 @@ export class MantenimientoPageComponent {
       id: newId,
       aplicacion: app.codigoAplicacion,
       nombreAplicacion: app.nombreAplicacion,
-      evc: app.evc,
-      linea: app.linea,
+      bvc: app.bvc,
+      ldc: app.ldc,
+      celula: app.celula,
+      service: app.service,
+      evc: app.celula,
+      linea: app.ldc,
       frecuencia: values.frecuencia ?? 'Semanal',
       fechaInicio: MantenimientoService.formatDateTime(
         values.fechaInicio ?? ''
@@ -493,8 +503,6 @@ export class MantenimientoPageComponent {
 
     this.mantenimiento.listFilterTipo.set(tipo);
     this.mantenimiento.listFilterEstado.set(estado);
-    this.mantenimiento.listFilterEvc.set('');
-    this.mantenimiento.listFilterLinea.set('');
     this.mantenimiento.listSearchApp.set('');
 
     this.showTypeModal.set(false);

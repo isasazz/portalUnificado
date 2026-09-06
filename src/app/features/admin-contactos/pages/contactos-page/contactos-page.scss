@@ -60,12 +60,39 @@
 
 .filters-container {
   display: flex;
-  gap: $space-16;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-12;
   margin-bottom: $space-24;
 }
 
 .search-container {
-  flex: 1;
+  width: 160px;
+  flex: 0 1 auto;
+
+  transition:
+    width 0.28s ease,
+    min-width 0.28s ease;
+}
+
+.search-container:focus-within,
+.search-container--expanded {
+  width: min(100%, 360px);
+}
+
+.search-container input {
+  @include input-base;
+  width: 100%;
+
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.search-container:focus-within input,
+.search-container--expanded input {
+  border-color: $link-color;
+  box-shadow: 0 0 0 3px rgba(0, 153, 216, 0.12);
 }
 
 .search-container input {
@@ -400,7 +427,13 @@
   }
 
   .filters-container {
-    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search-container,
+  .search-container:focus-within,
+  .search-container--expanded {
+    width: 100%;
   }
 
   .filter-select {

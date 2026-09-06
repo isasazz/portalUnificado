@@ -1,6 +1,7 @@
 import {
   computed,
   Injectable,
+  inject,
   signal
 } from '@angular/core';
 
@@ -9,6 +10,9 @@ from '../models/contacto.model';
 
 import { CONTACTOS_MOCK }
 from '../mocks/contactos.mock';
+
+import { PortalFilterService }
+from '../../../shared/services/portal-filter.service';
 
 export interface BulkContactoUpdate {
   celular?: string;
@@ -20,6 +24,9 @@ export interface BulkContactoUpdate {
 })
 export class ContactosService {
 
+  private readonly portalFilter =
+    inject(PortalFilterService);
+
   private readonly contactosSource =
     signal<Contacto[]>([...CONTACTOS_MOCK]);
 
@@ -30,19 +37,36 @@ export class ContactosService {
   readonly filteredContactos = computed(() => {
 
     const term = this.searchApp().trim().toLowerCase();
+    this.portalFilter.filters();
 
-    if (!term) {
-      return this.contactos();
-    }
+    return this.contactos().filter(contacto => {
 
-    return this.contactos().filter(contacto =>
-      contacto.codigoAplicacion
-        .toLowerCase()
-        .includes(term) ||
-      contacto.nombreAplicacion
-        .toLowerCase()
-        .includes(term)
-    );
+      const matchPortal = this.portalFilter.matches({
+        ...contacto,
+        responsable: contacto.nombre
+      });
+
+      if (!matchPortal) {
+        return false;
+      }
+
+      if (!term) {
+        return true;
+      }
+
+      return (
+        contacto.codigoAplicacion
+          .toLowerCase()
+          .includes(term) ||
+        contacto.nombreAplicacion
+          .toLowerCase()
+          .includes(term) ||
+        contacto.nombre.toLowerCase().includes(term) ||
+        contacto.celula.toLowerCase().includes(term) ||
+        contacto.bvc.toLowerCase().includes(term)
+      );
+
+    });
 
   });
 

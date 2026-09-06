@@ -1,13 +1,32 @@
 import { MaintenanceWindow }
 from '../models/maintenance-window.model';
 
+import { STANDBY_APPLICATIONS }
+from '../../stanby/mocks/standby-applications.mock';
+
+function fromApp(codigo: string) {
+
+  const app = STANDBY_APPLICATIONS.find(
+    item => item.codigoAplicacion === codigo
+  );
+
+  return {
+    bvc: app?.bvc ?? '',
+    ldc: app?.ldc ?? '',
+    celula: app?.celula ?? '',
+    service: app?.service ?? '',
+    evc: app?.celula ?? '',
+    linea: app?.ldc ?? '',
+    nombreAplicacion: app?.nombreAplicacion ?? ''
+  };
+
+}
+
 export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
   {
     id: 1,
     aplicacion: 'NU0113001',
-    nombreAplicacion: 'Núcleo Único',
-    evc: 'EVC Core Bancario',
-    linea: 'Aplicaciones',
+    ...fromApp('NU0113001'),
     frecuencia: 'Semanal',
     fechaInicio: '20/08/2026 22:00',
     fechaFin: '21/08/2026 02:00',
@@ -20,9 +39,7 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
   {
     id: 2,
     aplicacion: 'NU0113002',
-    nombreAplicacion: 'Portal Transaccional',
-    evc: 'EVC Canales',
-    linea: 'Aplicaciones',
+    ...fromApp('NU0113002'),
     frecuencia: 'Mensual',
     fechaInicio: '05/09/2026 23:00',
     fechaFin: '06/09/2026 03:00',
@@ -35,9 +52,7 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
   {
     id: 3,
     aplicacion: 'NU0113003',
-    nombreAplicacion: 'App Personas',
-    evc: 'EVC Digital',
-    linea: 'Aplicaciones',
+    ...fromApp('NU0113003'),
     frecuencia: 'Una vez',
     fechaInicio: '12/09/2026 01:00',
     fechaFin: '12/09/2026 05:00',
@@ -50,9 +65,7 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
   {
     id: 4,
     aplicacion: 'NU0113004',
-    nombreAplicacion: 'Gestión de Alertas',
-    evc: 'EVC Operaciones',
-    linea: 'Monitoreo',
+    ...fromApp('NU0113004'),
     frecuencia: 'Semanal',
     fechaInicio: '18/09/2026 22:00',
     fechaFin: '19/09/2026 01:00',
@@ -65,9 +78,7 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
   {
     id: 5,
     aplicacion: 'NU0113005',
-    nombreAplicacion: 'Pasarela de Pagos',
-    evc: 'EVC Canales',
-    linea: 'Aplicaciones',
+    ...fromApp('NU0113005'),
     frecuencia: 'Diaria',
     fechaInicio: '21/08/2026 00:00',
     fechaFin: '21/08/2026 02:00',
@@ -81,9 +92,7 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
   {
     id: 6,
     aplicacion: 'NU0113001',
-    nombreAplicacion: 'Núcleo Único',
-    evc: 'EVC Core Bancario',
-    linea: 'Aplicaciones',
+    ...fromApp('NU0113001'),
     frecuencia: 'Mensual',
     fechaInicio: '01/10/2026 21:00',
     fechaFin: '02/10/2026 01:00',
@@ -96,9 +105,7 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
   {
     id: 7,
     aplicacion: 'NU0113006',
-    nombreAplicacion: 'Créditos Digitales',
-    evc: 'EVC Productos',
-    linea: 'Aplicaciones',
+    ...fromApp('NU0113006'),
     frecuencia: 'Una vez',
     fechaInicio: '28/09/2026 20:00',
     fechaFin: '28/09/2026 23:00',

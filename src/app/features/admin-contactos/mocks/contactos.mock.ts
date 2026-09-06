@@ -9,7 +9,11 @@ export const CONTACTOS_MOCK: Contacto[] = [
     nombre: 'Daniel Lopez Montes',
     correo: 'dlmontes@bancolombia.com.co',
     horario: '24/7',
-    evc: 'EVC Core Bancario',
+    bvc: 'Operaciones',
+    ldc: 'Aplicaciones',
+    celula: 'Célula Core',
+    service: 'Transaccional',
+    evc: 'Célula Core',
     linea: 'Aplicaciones'
   },
   {
@@ -20,7 +24,11 @@ export const CONTACTOS_MOCK: Contacto[] = [
     nombre: 'María Pérez',
     correo: 'mperez@bancolombia.com.co',
     horario: '24/7',
-    evc: 'EVC Canales',
+    bvc: 'Canales Digitales',
+    ldc: 'Aplicaciones',
+    celula: 'Célula Canales',
+    service: 'Transaccional',
+    evc: 'Célula Canales',
     linea: 'Aplicaciones'
   },
   {
@@ -31,7 +39,11 @@ export const CONTACTOS_MOCK: Contacto[] = [
     nombre: 'Bibiana Montoya',
     correo: 'bmontoya@bancolombia.com.co',
     horario: 'L-V 8-18',
-    evc: 'EVC Digital',
+    bvc: 'Banca Personas',
+    ldc: 'Aplicaciones',
+    celula: 'Célula Digital',
+    service: 'Transaccional',
+    evc: 'Célula Digital',
     linea: 'Aplicaciones'
   },
   {
@@ -42,7 +54,11 @@ export const CONTACTOS_MOCK: Contacto[] = [
     nombre: 'Dylan Martinez',
     correo: 'dmartinez@bancolombia.com.co',
     horario: '24/7',
-    evc: 'EVC Core Bancario',
+    bvc: 'Operaciones',
+    ldc: 'Aplicaciones',
+    celula: 'Célula Core',
+    service: 'Transaccional',
+    evc: 'Célula Core',
     linea: 'Aplicaciones'
   }
 ];

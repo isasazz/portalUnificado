@@ -16,11 +16,16 @@
 
     <div class="consulta-search__field">
 
+      <app-portal-filter-bar />
+
       <input
         id="person-search"
         type="search"
         class="consulta-search__input"
-        placeholder="Buscar responsable..."
+        [class.consulta-search__input--expanded]="
+          searchTerm().trim().length > 0
+        "
+        placeholder="Buscar..."
         [ngModel]="searchTerm()"
         (ngModelChange)="onSearchChange($event)"
       />

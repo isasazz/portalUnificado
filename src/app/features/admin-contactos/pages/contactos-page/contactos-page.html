@@ -94,65 +94,21 @@
 
   <div class="filters-container">
 
-
+    <app-portal-filter-bar />
 
     <form
-
       class="search-container"
-
+      [class.search-container--expanded]="
+        !!searchForm.controls.searchApp.value?.trim()
+      "
       [formGroup]="searchForm"
-
     >
-
       <input
-
         type="text"
-
-        placeholder="Buscar aplicación (código o nombre)"
-
+        placeholder="Buscar..."
         formControlName="searchApp"
-
       />
-
     </form>
-
-
-
-    <div class="filter-select">
-
-      <select>
-
-        <option>Todos los EVC</option>
-
-      </select>
-
-    </div>
-
-
-
-    <div class="filter-select">
-
-      <select>
-
-        <option>Todas las líneas</option>
-
-      </select>
-
-    </div>
-
-
-
-    <div class="filter-select">
-
-      <select>
-
-        <option>Todas las aplicaciones</option>
-
-      </select>
-
-    </div>
-
-
 
   </div>
 
@@ -190,7 +146,7 @@
 
       <div>Horario</div>
 
-      <div>EVC / Línea</div>
+      <div>Célula / LdC</div>
 
       <div class="contact-row__actions-header">Acciones</div>
 
@@ -296,9 +252,9 @@
 
         <div class="contact-row__meta">
 
-          <strong>{{ contacto.evc }}</strong>
+          <strong>{{ contacto.celula }}</strong>
 
-          <small>{{ contacto.linea }}</small>
+          <small>{{ contacto.ldc }} · {{ contacto.bvc }}</small>
 
         </div>
 

@@ -242,31 +242,15 @@
 
       <div class="filters">
 
-        <select>
-          <option>Empresa</option>
-        </select>
-
-
-        <select>
-          <option>Producto soportado</option>
-        </select>
-        <select>
-          <option>Servicios TI</option>
-        </select>
-
-        <select>
-          <option>Todos los EVC</option>
-        </select>
-
-        <select>
-          <option>Todas las líneas</option>
-        </select>
-
-          
+        <app-portal-filter-bar />
 
         <input
           type="text"
-          placeholder="Buscar aplicación"
+          class="filters__search"
+          [class.filters__search--expanded]="appSearch().trim().length > 0"
+          placeholder="Buscar..."
+          [ngModel]="appSearch()"
+          (ngModelChange)="appSearch.set($event)"
         />
 
       </div>
@@ -412,7 +396,7 @@
               <strong>{{ app.codigoAplicacion }}</strong>
               <span>{{ app.nombreAplicacion }}</span>
               <small>
-                {{ app.evc }} · {{ app.responsable }}
+                {{ app.celula }} · {{ app.responsable }}
               </small>
             </div>
 

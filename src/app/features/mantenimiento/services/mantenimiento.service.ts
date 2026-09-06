@@ -1,6 +1,7 @@
 import {
   computed,
   Injectable,
+  inject,
   signal
 } from '@angular/core';
 
@@ -12,10 +13,16 @@ import {
 import { MAINTENANCE_WINDOWS_MOCK }
 from '../mocks/maintenance-windows.mock';
 
+import { PortalFilterService }
+from '../../../shared/services/portal-filter.service';
+
 @Injectable({
   providedIn: 'root'
 })
 export class MantenimientoService {
+
+  private readonly portalFilter =
+    inject(PortalFilterService);
 
   private readonly windowsSource =
     signal<MaintenanceWindow[]>([
@@ -24,8 +31,6 @@ export class MantenimientoService {
 
   readonly windows = this.windowsSource.asReadonly();
 
-  readonly listFilterEvc = signal('');
-  readonly listFilterLinea = signal('');
   readonly listFilterEstado = signal('En ejecución');
   readonly listFilterTipo = signal<MaintenanceWindowType | ''>('');
   readonly listSearchApp = signal('');
@@ -33,15 +38,21 @@ export class MantenimientoService {
   readonly filteredWindows = computed(() => {
 
     const term = this.listSearchApp().trim().toLowerCase();
-    const evc = this.listFilterEvc();
-    const linea = this.listFilterLinea();
     const estado = this.listFilterEstado();
     const tipo = this.listFilterTipo();
+    this.portalFilter.filters();
 
     return this.windows().filter(window => {
 
-      const matchEvc = !evc || window.evc === evc;
-      const matchLinea = !linea || window.linea === linea;
+      const matchPortal = this.portalFilter.matches({
+        bvc: window.bvc,
+        ldc: window.ldc,
+        celula: window.celula,
+        service: window.service,
+        codigoAplicacion: window.aplicacion,
+        nombreAplicacion: window.nombreAplicacion
+      });
+
       const matchEstado = !estado || window.estado === estado;
       const matchTipo = !tipo || window.tipo === tipo;
       const matchSearch =
@@ -49,23 +60,11 @@ export class MantenimientoService {
         window.aplicacion.toLowerCase().includes(term) ||
         window.nombreAplicacion.toLowerCase().includes(term);
 
-      return matchEvc && matchLinea && matchEstado && matchTipo && matchSearch;
+      return matchPortal && matchEstado && matchTipo && matchSearch;
 
     });
 
   });
-
-  readonly listEvcOptions = computed(() =>
-    [
-      ...new Set(this.windows().map(w => w.evc))
-    ].sort()
-  );
-
-  readonly listLineaOptions = computed(() =>
-    [
-      ...new Set(this.windows().map(w => w.linea))
-    ].sort()
-  );
 
   addWindow(window: MaintenanceWindow): void {
 

@@ -14,29 +14,15 @@
 
           <div class="filters-grid">
 
-            <select
-              [value]="mantenimiento.listFilterEvc()"
-              (change)="mantenimiento.listFilterEvc.set($any($event.target).value)"
-            >
-              <option value="">Todos los EVC</option>
-              @for (evc of mantenimiento.listEvcOptions(); track evc) {
-                <option [value]="evc">{{ evc }}</option>
-              }
-            </select>
-
-            <select
-              [value]="mantenimiento.listFilterLinea()"
-              (change)="mantenimiento.listFilterLinea.set($any($event.target).value)"
-            >
-              <option value="">Todas las líneas</option>
-              @for (linea of mantenimiento.listLineaOptions(); track linea) {
-                <option [value]="linea">{{ linea }}</option>
-              }
-            </select>
+            <app-portal-filter-bar />
 
             <input
               type="text"
-              placeholder="Buscar aplicación (código o nombre)"
+              class="filters-grid__search"
+              [class.filters-grid__search--expanded]="
+                !!mantenimiento.listSearchApp().trim()
+              "
+              placeholder="Buscar..."
               [value]="mantenimiento.listSearchApp()"
               (input)="mantenimiento.listSearchApp.set($any($event.target).value)"
             />
@@ -251,7 +237,7 @@
                   </h3>
 
                   <p class="window-tile__org">
-                    {{ window.evc }} · {{ window.linea }}
+                    {{ window.celula }} · {{ window.ldc }}
                   </p>
 
                   @if (isPromesa(window) && window.crq) {
@@ -684,9 +670,9 @@
                     [value]="filterEvc()"
                     (change)="updateAppFilter('evc', $any($event.target).value)"
                   >
-                    <option value="">Todos los EVC</option>
-                    @for (evc of evcOptions(); track evc) {
-                      <option [value]="evc">{{ evc }}</option>
+                    <option value="">Todas las células</option>
+                    @for (celula of celulaOptions(); track celula) {
+                      <option [value]="celula">{{ celula }}</option>
                     }
                   </select>
 
@@ -694,9 +680,9 @@
                     [value]="filterLinea()"
                     (change)="updateAppFilter('linea', $any($event.target).value)"
                   >
-                    <option value="">Todas las líneas</option>
-                    @for (linea of lineaOptions(); track linea) {
-                      <option [value]="linea">{{ linea }}</option>
+                    <option value="">Todas las LdC</option>
+                    @for (ldc of ldcOptions(); track ldc) {
+                      <option [value]="ldc">{{ ldc }}</option>
                     }
                   </select>
 
@@ -739,7 +725,7 @@
                         </div>
 
                         <div class="app-row__meta">
-                          {{ app.evc }} · {{ app.linea }}
+                          {{ app.celula }} · {{ app.ldc }}
                         </div>
 
                       </button>
@@ -757,7 +743,8 @@
                 } @else {
 
                   <p class="form-section__hint">
-                    Selecciona un EVC, una línea o escribe en el buscador
+                    Selecciona una célula, una LdC o escribe en el buscador
+                    (también aplica el filtro global del portal).
                     para ver aplicaciones.
                   </p>
 
@@ -897,10 +884,10 @@
                   </div>
 
                   <div class="preview-item">
-                    <label>EVC / Línea</label>
+                    <label>Célula / LdC</label>
                     <span>
                       @if (selectedApp(); as app) {
-                        {{ app.evc }} · {{ app.linea }}
+                        {{ app.celula }} · {{ app.ldc }}
                       } @else {
                         —
                       }
