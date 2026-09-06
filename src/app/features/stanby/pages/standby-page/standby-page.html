@@ -5,147 +5,6 @@
 
   <div class="standby-main">
 
-    <div class="standby-tools">
-
-      <aside
-        class="standby-tool-card standby-tool-card--policies"
-        aria-label="Políticas de standby"
-      >
-
-        <div class="standby-tool-card__main">
-
-          <div class="standby-tool-card__head">
-
-            <div
-              class="standby-tool-card__icon"
-              aria-hidden="true"
-            >
-              <svg viewBox="0 0 24 24" focusable="false">
-                <path
-                  d="M8 4h8a2 2 0 0 1 2 2v14l-4-2-4 2-4-2-4 2V6a2 2 0 0 1 2-2z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.75"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M9 9h6M9 12h6M9 15h4"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.75"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </div>
-
-            <div class="standby-tool-card__titles">
-
-              <p class="standby-tool-card__eyebrow">
-                Centro de conocimiento
-              </p>
-
-              <h2>Políticas de standby</h2>
-
-            </div>
-
-          </div>
-
-          <p class="standby-tool-card__text">
-            Lineamientos corporativos: cobertura de 7 días,
-            turnos viernes a jueves, responsables y escalamiento.
-          </p>
-
-          <div class="standby-tool-card__chips">
-
-            @for (item of policyHighlights; track item.label) {
-              <span>{{ item.label }}</span>
-            }
-
-          </div>
-
-        </div>
-
-        <a
-          routerLink="/standby/politicas"
-          class="standby-tool-card__action"
-        >
-          Leer políticas
-          <span class="standby-tool-card__action-arrow" aria-hidden="true">→</span>
-        </a>
-
-      </aside>
-
-      <aside
-        class="standby-tool-card standby-tool-card--relevo"
-        aria-label="Delegar programación de standby"
-      >
-
-        <div class="standby-tool-card__main">
-
-          <div class="standby-tool-card__head">
-
-            <div
-              class="standby-tool-card__icon"
-              aria-hidden="true"
-            >
-              <svg viewBox="0 0 24 24" focusable="false">
-                <circle
-                  cx="9"
-                  cy="8"
-                  r="3"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.75"
-                />
-                <circle
-                  cx="16"
-                  cy="11"
-                  r="2.5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.75"
-                />
-                <path
-                  d="M5 19c0-2.2 1.8-4 4-4M13 17.5c0-1.7 1.3-3 3-3"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.75"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </div>
-
-            <div class="standby-tool-card__titles">
-
-              <p class="standby-tool-card__eyebrow">
-                Delegación temporal
-              </p>
-
-              <h2>Delegar programación</h2>
-
-            </div>
-
-          </div>
-
-          <p class="standby-tool-card__text">
-            Asigna a otro líder la programación de standby de tu
-            equipo. Conservas tu rol de líder titular.
-          </p>
-
-        </div>
-
-        <button
-          type="button"
-          class="standby-tool-card__action"
-          (click)="openRelevoModal()"
-        >
-          Delegar
-        </button>
-
-      </aside>
-
-    </div>
-
     @if (delegationService.activeOutgoing(); as outgoing) {
 
       <div class="relevo-status relevo-status--outgoing">
@@ -188,7 +47,13 @@
 
     }
 
-    @if (activeView === 'available' && hasSelection && !showSidePanel && !delegationService.hasDelegatedOut()) {
+    @if (
+      panelView() === 'apps' &&
+      activeView === 'available' &&
+      hasSelection &&
+      !showSidePanel &&
+      !delegationService.hasDelegatedOut()
+    ) {
 
       <div class="page-header">
 
@@ -210,143 +75,288 @@
 
     <section class="standby-section">
 
-      @if (activeView === 'available') {
+      <header class="section-header section-header--split">
 
-        <header class="section-header">
-          <h2 class="section-title">Aplicaciones disponibles</h2>
-          <p class="section-subtitle">
-            @if (delegationService.hasDelegatedOut()) {
-              Tienes una delegación activa: otro líder programa por ti.
-              Puedes consultar el estado, pero no agregar nuevas
-              programaciones hasta recuperarla.
-            } @else if (delegationService.isActingForAnotherLeader()) {
-              Programa standby en nombre de
-              <strong>{{ delegationService.activeIncoming()?.fromLeader }}</strong>.
+        <div class="section-header__copy">
+
+          @if (panelView() === 'apps') {
+
+            @if (activeView === 'available') {
+              <h2 class="section-title">Aplicaciones disponibles</h2>
+              <p class="section-subtitle">
+                @if (delegationService.hasDelegatedOut()) {
+                  Tienes una delegación activa: otro líder programa por ti.
+                  Puedes consultar el estado, pero no agregar nuevas
+                  programaciones hasta recuperarla.
+                } @else if (delegationService.isActingForAnotherLeader()) {
+                  Programa standby en nombre de
+                  <strong>{{ delegationService.activeIncoming()?.fromLeader }}</strong>.
+                } @else {
+                  Selecciona una o más aplicaciones para programar standby.
+                }
+              </p>
             } @else {
-              Selecciona una o más aplicaciones para programar standby.
+              <h2 class="section-title">Standby programados</h2>
+              <p class="section-subtitle">
+                Aplicaciones con standby activo en
+                <strong>{{ currentMonthLabel }}</strong>.
+              </p>
             }
-          </p>
-        </header>
 
-      } @else {
+          } @else if (panelView() === 'policies') {
 
-        <header class="section-header">
-          <h2 class="section-title">Standby programados</h2>
-          <p class="section-subtitle">
-            Aplicaciones con standby activo en
-            <strong>{{ currentMonthLabel }}</strong>.
-          </p>
-        </header>
+            <h2 class="section-title">Políticas de standby</h2>
+            <p class="section-subtitle">
+              {{ policyMeta.subtitle }}
+            </p>
 
-      }
+          } @else {
 
-      <div class="filters">
+            <h2 class="section-title">Delegar programación</h2>
+            <p class="section-subtitle">
+              Asigna a otro líder la programación de standby de tu equipo.
+            </p>
 
-        <app-portal-filter-bar />
+          }
 
-        <input
-          type="text"
-          class="filters__search"
-          [class.filters__search--expanded]="appSearch().trim().length > 0"
-          placeholder="Buscar..."
-          [ngModel]="appSearch()"
-          (ngModelChange)="appSearch.set($event)"
-        />
+        </div>
 
-      </div>
-
-      <div class="view-switcher">
-
-        <button
-          type="button"
-          class="view-switcher__btn view-switcher__btn--available"
-          [class.view-switcher__btn--active]="activeView === 'available'"
-          (click)="setActiveView('available')"
-        >
-          Aplicaciones disponibles
-        </button>
-
-        @if (programmedApplications.length > 0) {
+        <nav class="section-tabs" aria-label="Secciones de standby">
 
           <button
             type="button"
-            class="view-switcher__btn view-switcher__btn--programmed"
-            [class.view-switcher__btn--active]="activeView === 'programmed'"
-            (click)="setActiveView('programmed')"
+            class="section-tabs__btn"
+            [class.section-tabs__btn--active]="panelView() === 'apps'"
+            (click)="setPanelView('apps')"
           >
-            Ver standby programados
+            Aplicaciones
           </button>
 
-        }
+          <button
+            type="button"
+            class="section-tabs__btn"
+            [class.section-tabs__btn--active]="panelView() === 'policies'"
+            (click)="setPanelView('policies')"
+          >
+            Políticas
+          </button>
 
-      </div>
+          <button
+            type="button"
+            class="section-tabs__btn"
+            [class.section-tabs__btn--active]="panelView() === 'delegate'"
+            (click)="setPanelView('delegate')"
+          >
+            Delegar
+          </button>
 
-      @if (activeView === 'available') {
+        </nav>
 
-        <div class="select-all-row">
+      </header>
 
-          <label class="select-all">
-            <input
-              type="checkbox"
-              [checked]="allSelected"
-              [disabled]="delegationService.hasDelegatedOut()"
-              (change)="toggleSelectAll($any($event.target).checked)"
-            />
-            <span>Seleccionar todas</span>
-          </label>
+      @if (panelView() === 'apps') {
 
-          @if (hasSelection) {
-            <small>
-              {{ selectedApplications.length }} seleccionada(s)
-            </small>
+        <div class="filters">
+
+          <app-portal-filter-bar />
+
+          <input
+            type="text"
+            class="filters__search"
+            [class.filters__search--expanded]="appSearch().trim().length > 0"
+            placeholder="Buscar..."
+            [ngModel]="appSearch()"
+            (ngModelChange)="appSearch.set($event)"
+          />
+
+        </div>
+
+        <div class="view-switcher">
+
+          <button
+            type="button"
+            class="view-switcher__btn view-switcher__btn--available"
+            [class.view-switcher__btn--active]="activeView === 'available'"
+            (click)="setActiveView('available')"
+          >
+            Aplicaciones disponibles
+          </button>
+
+          @if (programmedApplications.length > 0) {
+
+            <button
+              type="button"
+              class="view-switcher__btn view-switcher__btn--programmed"
+              [class.view-switcher__btn--active]="activeView === 'programmed'"
+              (click)="setActiveView('programmed')"
+            >
+              Ver standby programados
+            </button>
+
           }
 
         </div>
 
-        <div class="cards-list">
+        @if (activeView === 'available') {
 
-          @for (
-            application of unprogrammedApplications;
-            track application.id
-          ) {
+          <div class="select-all-row">
 
-            <app-standby-card
-              [application]="application"
-              [hasStandby]="false"
-              [activeThisMonth]="false"
-              [isSelected]="application.selected"
-              (selected)="toggleCard($event)"
-            />
+            <label class="select-all">
+              <input
+                type="checkbox"
+                [checked]="allSelected"
+                [disabled]="delegationService.hasDelegatedOut()"
+                (change)="toggleSelectAll($any($event.target).checked)"
+              />
+              <span>Seleccionar todas</span>
+            </label>
 
-          }
+            @if (hasSelection) {
+              <small>
+                {{ selectedApplications.length }} seleccionada(s)
+              </small>
+            }
+
+          </div>
+
+          <div class="cards-list">
+
+            @for (
+              application of unprogrammedApplications;
+              track application.id
+            ) {
+
+              <app-standby-card
+                [application]="application"
+                [hasStandby]="false"
+                [activeThisMonth]="false"
+                [isSelected]="application.selected"
+                (selected)="toggleCard($event)"
+              />
+
+            }
+
+          </div>
+
+        } @else {
+
+          <p class="standby-hint">
+            <span class="standby-hint__dot"></span>
+            Las aplicaciones con borde morado tienen standby
+            programado en
+            <strong>{{ currentMonthLabel }}</strong>.
+          </p>
+
+          <div class="cards-list">
+
+            @for (
+              application of programmedApplications;
+              track application.id
+            ) {
+
+              <app-standby-card
+                [attr.id]="'standby-card-' + application.id"
+                [application]="application"
+                [hasStandby]="true"
+                [activeThisMonth]="hasAppStandbyThisMonth(application.codigoAplicacion)"
+                [highlighted]="highlightedAppCodigo === application.codigoAplicacion"
+                (view)="openViewForApp($event)"
+                (edit)="openEditForApp($event)"
+              />
+
+            }
+
+          </div>
+
+        }
+
+      } @else if (panelView() === 'policies') {
+
+        <div class="inline-panel">
+
+          <div class="inline-panel__meta">
+            <span>{{ policyMeta.version }}</span>
+            <span>·</span>
+            <span>Actualizado {{ policyMeta.lastUpdated }}</span>
+            <span>·</span>
+            <span>{{ policyMeta.owner }}</span>
+          </div>
+
+          <div class="inline-panel__principles">
+            @for (item of policyHighlights; track item.label) {
+              <article class="principle-chip">
+                <strong>{{ item.label }}</strong>
+                <span>{{ item.detail }}</span>
+              </article>
+            }
+          </div>
+
+          <div class="inline-panel__sections">
+            @for (section of policySections; track section.id) {
+              <article class="policy-block">
+                <header>
+                  <span>{{ section.number }}</span>
+                  <h3>{{ section.title }}</h3>
+                </header>
+                <p>{{ section.summary }}</p>
+                <ul>
+                  @for (bullet of section.bullets; track bullet) {
+                    <li>{{ bullet }}</li>
+                  }
+                </ul>
+                @if (section.highlight) {
+                  <p class="policy-block__highlight">
+                    {{ section.highlight }}
+                  </p>
+                }
+              </article>
+            }
+          </div>
 
         </div>
 
       } @else {
 
-        <p class="standby-hint">
-          <span class="standby-hint__dot"></span>
-          Las aplicaciones con borde morado tienen standby
-          programado en
-          <strong>{{ currentMonthLabel }}</strong>.
-        </p>
+        <div class="inline-panel inline-panel--delegate">
 
-        <div class="cards-list">
+          <p class="inline-panel__lead">
+            Conservas tu rol de líder titular. La persona delegada podrá
+            programar standby de tu equipo durante el periodo que indiques.
+          </p>
 
-          @for (
-            application of programmedApplications;
-            track application.id
-          ) {
+          @if (delegationService.activeOutgoing(); as outgoing) {
 
-            <app-standby-card
-              [attr.id]="'standby-card-' + application.id"
-              [application]="application"
-              [hasStandby]="true"
-              [activeThisMonth]="hasAppStandbyThisMonth(application.codigoAplicacion)"
-              [highlighted]="highlightedAppCodigo === application.codigoAplicacion"
-              (view)="openViewForApp($event)"
-              (edit)="openEditForApp($event)"
-            />
+            <div class="delegate-card">
+              <strong>Ya tienes una delegación activa</strong>
+              <p>
+                {{ outgoing.toLeader }} programa por ti hasta el
+                {{ formatDelegationDate(outgoing.fechaFin) }}.
+              </p>
+              <button
+                type="button"
+                class="btn-add"
+                (click)="revokeRelevo()"
+              >
+                Recuperar programación
+              </button>
+            </div>
+
+          } @else {
+
+            <div class="delegate-card">
+              <strong>Nueva delegación</strong>
+              <p>
+                Elige un líder, el motivo y las fechas para transferir
+                temporalmente la programación.
+              </p>
+              <button
+                type="button"
+                class="btn-add"
+                (click)="openRelevoModal()"
+              >
+                Iniciar delegación
+              </button>
+            </div>
 
           }
 

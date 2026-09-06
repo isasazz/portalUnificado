@@ -6,7 +6,7 @@ import {
   OnInit,
   signal
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { STANDBY_APPLICATIONS }
@@ -45,8 +45,13 @@ from '../../../../shared/services/portal-filter.service';
 import { PortalFilterBarComponent }
 from '../../../../shared/components/portal-filter-bar/portal-filter-bar';
 
-import { STANDBY_POLICY_PRINCIPLES }
-from '../../data/standby-policies.data';
+import {
+  STANDBY_POLICY_META,
+  STANDBY_POLICY_PRINCIPLES,
+  STANDBY_POLICY_SECTIONS
+} from '../../data/standby-policies.data';
+
+type StandbyPanelView = 'apps' | 'policies' | 'delegate';
 
 @Component({
   selector: 'app-standby-page',
@@ -57,8 +62,7 @@ from '../../data/standby-policies.data';
     StandbyModalComponent,
     StandbyViewModalComponent,
     StandbyRelevoModalComponent,
-    PortalFilterBarComponent,
-    RouterLink
+    PortalFilterBarComponent
   ],
   templateUrl: './standby-page.html',
   styleUrl: './standby-page.scss',
@@ -74,6 +78,14 @@ export class StandbyPageComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
 
   readonly appSearch = signal('');
+
+  readonly panelView = signal<StandbyPanelView>('apps');
+
+  readonly policyMeta = STANDBY_POLICY_META;
+
+  readonly policySections = STANDBY_POLICY_SECTIONS;
+
+  readonly policyHighlights = STANDBY_POLICY_PRINCIPLES;
 
   applications: StandbyApplication[] =
     [...STANDBY_APPLICATIONS];
@@ -100,7 +112,12 @@ export class StandbyPageComponent implements OnInit {
 
   activeView: 'available' | 'programmed' = 'available';
 
-  readonly policyHighlights = STANDBY_POLICY_PRINCIPLES;
+  setPanelView(view: StandbyPanelView): void {
+
+    this.panelView.set(view);
+    this.cdr.markForCheck();
+
+  }
 
   ngOnInit(): void {
 
