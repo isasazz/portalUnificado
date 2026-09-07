@@ -81,7 +81,7 @@ export class StandbyPageComponent implements OnInit {
   private readonly scheduleService = inject(StandbyScheduleService);
   readonly delegationService = inject(StandbyDelegationService);
   private readonly saveSuccess = inject(SaveSuccessService);
-  private readonly portalFilter = inject(PortalFilterService);
+  readonly portalFilter = inject(PortalFilterService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   readonly appSearch = signal('');

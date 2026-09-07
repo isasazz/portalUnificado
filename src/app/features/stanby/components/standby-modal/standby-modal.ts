@@ -58,6 +58,9 @@ import {
 
 } from '../../models/standby-assignment.model';
 
+import { STANDBY_APPLICATIONS }
+from '../../mocks/standby-applications.mock';
+
 
 
 interface GroupedAcceptance {
@@ -65,6 +68,10 @@ interface GroupedAcceptance {
   codigoAplicacion: string;
 
   nombreAplicacion: string;
+
+  aplicaciones: StandbyAssociatedApp[];
+
+  appsKey: string;
 
   start: Date;
 
@@ -164,8 +171,14 @@ export class StandbyModalComponent {
   /** Una app a la vez, o todas con la misma persona/fechas. */
   programMode: 'single' | 'all' = 'all';
 
-  private readonly productStates =
+  /** Apps de esta sesión (incluye las añadidas dentro del modal). */
+  sessionApps: StandbyApplication[] = [];
 
+  showAddAppMenu = false;
+
+  addAppSearch = '';
+
+  private readonly productStates =
     new Map<string, ProductSelectionState>();
 
 
@@ -249,7 +262,7 @@ export class StandbyModalComponent {
 
   get hasMultipleProducts(): boolean {
 
-    return this.aplicaciones().length > 1;
+    return this.sessionApps.length > 1;
 
   }
 
@@ -262,7 +275,7 @@ export class StandbyModalComponent {
   get appsForProgramming(): StandbyApplication[] {
 
     if (this.isProgramAll) {
-      return this.aplicaciones();
+      return this.sessionApps;
     }
 
     const active = this.activeApp;
@@ -292,7 +305,7 @@ export class StandbyModalComponent {
 
   get activeApp(): StandbyApplication | undefined {
 
-    return this.aplicaciones()[this.activeAppIndex];
+    return this.sessionApps[this.activeAppIndex];
 
   }
 
@@ -319,6 +332,72 @@ export class StandbyModalComponent {
         )
 
     );
+
+  }
+
+  get addableApplications(): StandbyApplication[] {
+
+    const inSession = new Set(
+      this.sessionApps.map(app => app.codigoAplicacion)
+    );
+
+    return STANDBY_APPLICATIONS.filter(
+      app =>
+        !inSession.has(app.codigoAplicacion) &&
+        !this.scheduleService.isAppProgrammed(app.codigoAplicacion)
+    );
+
+  }
+
+  get filteredAddableApps(): StandbyApplication[] {
+
+    const term = this.addAppSearch.trim().toLowerCase();
+    const list = this.addableApplications;
+
+    if (!term) {
+      return list;
+    }
+
+    return list.filter(
+      app =>
+        app.codigoAplicacion.toLowerCase().includes(term) ||
+        app.nombreAplicacion.toLowerCase().includes(term)
+    );
+
+  }
+
+  toggleAddAppMenu(): void {
+
+    this.showAddAppMenu = !this.showAddAppMenu;
+    this.addAppSearch = '';
+
+  }
+
+  closeAddAppMenu(): void {
+
+    this.showAddAppMenu = false;
+    this.addAppSearch = '';
+
+  }
+
+  addApplication(app: StandbyApplication): void {
+
+    if (
+      this.sessionApps.some(
+        item => item.codigoAplicacion === app.codigoAplicacion
+      )
+    ) {
+      return;
+    }
+
+    this.sessionApps = [...this.sessionApps, { ...app, selected: true }];
+
+    if (this.sessionApps.length > 1) {
+      this.programMode = 'all';
+    }
+
+    this.activeAppIndex = this.sessionApps.length - 1;
+    this.closeAddAppMenu();
 
   }
 
@@ -419,123 +498,68 @@ export class StandbyModalComponent {
 
   get groupedAccepted(): GroupedAcceptance[] {
 
-
-
     const map =
-
       new Map<string, GroupedAcceptance>();
 
-
-
     this.scheduleService.draftAssignments.forEach(
-
       assignment => {
 
+        const apps = [...(assignment.aplicaciones ?? [])];
 
-
-        const app =
-
-          assignment.aplicaciones?.[0];
-
-
-
-        if (!app) {
-
+        if (!apps.length) {
           return;
-
         }
 
-
+        const appsKey = apps
+          .map(app => app.codigoAplicacion)
+          .sort()
+          .join('|');
 
         const key =
-
-          `${assignment.fechaInicio.getTime()}-${app.codigoAplicacion}`;
-
-
+          `${assignment.fechaInicio.getTime()}-${appsKey}`;
 
         let group = map.get(key);
 
-
-
         if (!group) {
-
-
+          const primary = apps[0];
 
           group = {
-
-            codigoAplicacion: app.codigoAplicacion,
-
-            nombreAplicacion: app.nombreAplicacion,
-
+            codigoAplicacion: primary.codigoAplicacion,
+            nombreAplicacion: primary.nombreAplicacion,
+            aplicaciones: apps,
+            appsKey,
             start: assignment.fechaInicio,
-
             end: assignment.fechaFin,
-
             responsables: []
-
           };
 
-
-
           map.set(key, group);
-
-
-
         }
-
-
 
         if (
-
           !group.responsables.includes(
-
             assignment.responsable
-
           )
-
         ) {
-
           group.responsables.push(
-
             assignment.responsable
-
           );
-
         }
 
-
-
       }
-
     );
 
-
-
     return [...map.values()].sort(
-
       (a, b) => {
+        const byApps = a.appsKey.localeCompare(b.appsKey);
 
-        const byApp =
-
-          a.codigoAplicacion.localeCompare(
-
-            b.codigoAplicacion
-
-          );
-
-        if (byApp !== 0) {
-
-          return byApp;
-
+        if (byApps !== 0) {
+          return byApps;
         }
 
         return a.start.getTime() - b.start.getTime();
-
       }
-
     );
-
-
 
   }
 
@@ -550,9 +574,10 @@ export class StandbyModalComponent {
     const codigo = this.activeAppCodigo;
 
     return this.groupedAccepted.filter(
-
-      group => group.codigoAplicacion === codigo
-
+      group =>
+        group.aplicaciones.some(
+          app => app.codigoAplicacion === codigo
+        )
     );
 
   }
@@ -641,7 +666,7 @@ export class StandbyModalComponent {
 
     }
 
-    const pending = this.aplicaciones().filter(
+    const pending = this.sessionApps.filter(
 
       app => !this.isAppConfigured(app.codigoAplicacion)
 
@@ -751,7 +776,7 @@ export class StandbyModalComponent {
 
       index < 0 ||
 
-      index >= this.aplicaciones().length
+      index >= this.sessionApps.length
 
     ) {
 
@@ -891,27 +916,19 @@ export class StandbyModalComponent {
 
   ): void {
 
+    if (group.aplicaciones.length > 1) {
+      this.programMode = 'all';
+    } else {
+      const index = this.sessionApps.findIndex(
+        app =>
+          app.codigoAplicacion ===
+          group.codigoAplicacion
+      );
 
-
-    const index = this.aplicaciones().findIndex(
-
-      app =>
-
-        app.codigoAplicacion ===
-
-        group.codigoAplicacion
-
-    );
-
-
-
-    if (index >= 0) {
-
-      this.selectActiveApp(index);
-
+      if (index >= 0) {
+        this.selectActiveApp(index);
+      }
     }
-
-
 
     this.selectedUser = undefined;
 
@@ -1169,7 +1186,10 @@ export class StandbyModalComponent {
 
 
 
-    const sourceApps = this.appsForProgramming;
+    const sourceApps =
+      this.addingToExistingWeek?.aplicaciones?.length
+        ? this.addingToExistingWeek.aplicaciones
+        : this.appsForProgramming;
 
     if (!sourceApps.length) {
 
@@ -1255,7 +1275,7 @@ export class StandbyModalComponent {
 
 
 
-    const apps = this.aplicaciones();
+    const apps = this.sessionApps;
 
     const first = apps[0];
 
@@ -1423,11 +1443,11 @@ export class StandbyModalComponent {
 
   private resetModalState(): void {
 
-
+    this.sessionApps = this.aplicaciones().map(app => ({ ...app }));
 
     this.activeAppIndex = 0;
 
-    this.programMode = this.aplicaciones().length > 1 ? 'all' : 'single';
+    this.programMode = this.sessionApps.length > 1 ? 'all' : 'single';
 
     this.productStates.clear();
 
@@ -1445,9 +1465,9 @@ export class StandbyModalComponent {
 
     this.showAcceptConfirmAlert = false;
 
+    this.closeAddAppMenu();
+
     this.calendar?.clearSelection();
-
-
 
   }
 

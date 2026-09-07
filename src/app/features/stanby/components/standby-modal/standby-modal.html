@@ -10,7 +10,7 @@
 
         <h2>Agregar Standby</h2>
 
-        @if (aplicaciones().length > 0) {
+        @if (sessionApps.length > 0) {
 
           @if (hasMultipleProducts) {
 
@@ -33,13 +33,17 @@
               </button>
             </div>
 
+          }
+
+          <div class="product-tabs-row">
+
             <div
               class="product-tabs"
               role="tablist"
               aria-label="Productos a programar"
             >
               @for (
-                app of aplicaciones();
+                app of sessionApps;
                 track app.codigoAplicacion;
                 let i = $index
               ) {
@@ -63,30 +67,65 @@
               }
             </div>
 
-            <p class="product-tabs-hint">
-              @if (isProgramAll) {
-                Misma persona y fechas para todas las aplicaciones
-                seleccionadas.
-              } @else {
-                Programa cada producto por separado. Las personas
-                y co-responsables son independientes por producto.
-                Pulsa un código para enfocarlo.
-              }
-            </p>
+            <div class="add-app">
+              <button
+                type="button"
+                class="add-app__trigger"
+                [disabled]="addableApplications.length === 0"
+                (click)="toggleAddAppMenu()"
+              >
+                + App
+              </button>
 
-          } @else {
+              @if (showAddAppMenu) {
+                <div class="add-app__menu" role="listbox">
+                  <input
+                    type="search"
+                    class="add-app__search"
+                    placeholder="Buscar aplicación..."
+                    [ngModel]="addAppSearch"
+                    (ngModelChange)="addAppSearch = $event"
+                  />
 
-            <div class="app-codes">
-              @for (
-                app of aplicaciones();
-                track app.codigoAplicacion
-              ) {
-                <span class="app-code-chip">
-                  {{ app.codigoAplicacion }}
-                </span>
+                  <div class="add-app__list">
+                    @for (app of filteredAddableApps; track app.id) {
+                      <button
+                        type="button"
+                        class="add-app__option"
+                        (click)="addApplication(app)"
+                      >
+                        <strong>{{ app.codigoAplicacion }}</strong>
+                        <span>{{ app.nombreAplicacion }}</span>
+                      </button>
+                    }
+
+                    @if (filteredAddableApps.length === 0) {
+                      <p class="add-app__empty">
+                        No hay más aplicaciones disponibles.
+                      </p>
+                    }
+                  </div>
+                </div>
               }
             </div>
 
+          </div>
+
+          @if (hasMultipleProducts) {
+            <p class="product-tabs-hint">
+              @if (isProgramAll) {
+                Misma persona y fechas para todas las aplicaciones
+                seleccionadas. Usa + App si faltó alguna.
+              } @else {
+                Programa cada producto por separado. Las personas
+                y co-responsables son independientes por producto.
+                Pulsa un código para enfocarlo o + App para añadir otra.
+              }
+            </p>
+          } @else {
+            <p class="product-tabs-hint">
+              Usa + App si quieres incluir otra aplicación en esta programación.
+            </p>
           }
 
         }
@@ -350,17 +389,24 @@
 
             @for (
               group of groupedAccepted;
-              track group.codigoAplicacion + group.start.getTime()
+              track group.appsKey + group.start.getTime()
             ) {
 
               <li class="trace-item">
 
                 @if (hasMultipleProducts) {
-                  <span class="app-chip app-chip--trace">
-                    {{ group.codigoAplicacion }}
-                    ·
-                    {{ group.nombreAplicacion }}
-                  </span>
+                  <div class="trace-apps">
+                    @for (
+                      app of group.aplicaciones;
+                      track app.codigoAplicacion
+                    ) {
+                      <span class="app-chip app-chip--trace">
+                        {{ app.codigoAplicacion }}
+                        ·
+                        {{ app.nombreAplicacion }}
+                      </span>
+                    }
+                  </div>
                 }
 
                 <div class="trace-item__main">

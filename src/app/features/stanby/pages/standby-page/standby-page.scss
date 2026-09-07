@@ -558,21 +558,33 @@
 .filters__search {
   @include input-base;
 
-  width: 160px;
-  flex: 0 1 auto;
+  width: min(100%, 420px);
+  flex: 1 1 280px;
+  max-width: 420px;
 
   transition:
     width 0.28s ease,
-    min-width 0.28s ease,
+    flex-basis 0.28s ease,
+    max-width 0.28s ease,
     box-shadow 0.2s ease,
     border-color 0.2s ease;
 }
 
-.filters__search:focus,
-.filters__search--expanded {
-  width: min(100%, 360px);
-  border-color: $link-color;
-  box-shadow: 0 0 0 3px rgba(0, 153, 216, 0.12);
+.filters__search--compact {
+  width: 168px;
+  flex: 0 1 168px;
+  max-width: 168px;
+}
+
+.filters__search:focus {
+  border-color: $border-color;
+  box-shadow: 0 0 0 3px rgba(44, 42, 41, 0.08);
+}
+
+.filters__search--compact:focus {
+  width: 220px;
+  flex-basis: 220px;
+  max-width: 220px;
 }
 
 .select-all-row {
@@ -953,18 +965,11 @@
   margin-top: $space-8;
   padding: $space-12 $space-16;
 
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: $radius-lg;
-  background:
-    linear-gradient(
-      120deg,
-      rgba(15, 23, 42, 0.92),
-      rgba(30, 41, 59, 0.94)
-    );
-  box-shadow:
-    0 18px 40px rgba(15, 23, 42, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+  background: $surface;
+  box-shadow: $shadow-md;
+  backdrop-filter: none;
 }
 
 .standby-dock__person,
@@ -1299,8 +1304,11 @@
 
   .filters__search,
   .filters__search:focus,
-  .filters__search--expanded {
+  .filters__search--compact,
+  .filters__search--compact:focus {
     width: 100%;
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 }
 

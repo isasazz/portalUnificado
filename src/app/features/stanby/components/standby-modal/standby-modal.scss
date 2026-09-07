@@ -81,6 +81,114 @@
   gap: $space-8;
 }
 
+.product-tabs-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-8;
+}
+
+.add-app {
+  position: relative;
+}
+
+.add-app__trigger {
+  @include button-base;
+
+  min-height: 34px;
+  padding: 6px 12px;
+
+  border: 1px dashed $border-color;
+  border-radius: $radius-pill;
+  background: $surface;
+
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+}
+
+.add-app__trigger:hover:not(:disabled) {
+  border-color: $text-primary;
+  color: $text-primary;
+}
+
+.add-app__trigger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.add-app__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 20;
+
+  width: min(320px, 80vw);
+
+  padding: $space-8;
+
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  background: $surface;
+  box-shadow: $shadow-md;
+}
+
+.add-app__search {
+  @include input-base;
+
+  width: 100%;
+  height: 40px;
+  margin-bottom: $space-8;
+}
+
+.add-app__list {
+  @include flex-column;
+  gap: 2px;
+
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.add-app__option {
+  @include button-base;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+
+  width: 100%;
+  padding: $space-8 $space-12;
+
+  border: 0;
+  border-radius: $radius-sm;
+  background: transparent;
+  text-align: left;
+}
+
+.add-app__option:hover {
+  background: $background-body;
+}
+
+.add-app__option strong {
+  font-size: $font-size-sm;
+  color: $text-primary;
+}
+
+.add-app__option span {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+}
+
+.add-app__empty {
+  margin: 0;
+  padding: $space-12;
+  text-align: center;
+  font-size: $font-size-xs;
+  color: $text-secondary;
+}
+
+
 .program-scope {
   display: inline-flex;
   align-items: center;
@@ -152,21 +260,21 @@
 }
 
 .close-button {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
 
   border: none;
-
-  border-radius: 50%;
-
-  background: $amarillo-macondo;
-
-  color: $on-yellow;
+  border-radius: $radius-sm;
+  background: $background-body;
+  color: $text-primary;
 
   cursor: pointer;
-
-  font-size: $font-size-lg;
+  font-size: $font-size-md;
   flex-shrink: 0;
+}
+
+.close-button:hover {
+  background: $border-light;
 }
 
 .modal-content {

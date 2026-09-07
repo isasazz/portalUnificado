@@ -175,7 +175,10 @@
           <input
             type="text"
             class="filters__search"
-            [class.filters__search--expanded]="appSearch().trim().length > 0"
+            [class.filters__search--compact]="
+              appSearch().trim().length > 0 ||
+              portalFilter.hasActiveFilters()
+            "
             placeholder="Buscar..."
             [ngModel]="appSearch()"
             (ngModelChange)="appSearch.set($event)"
@@ -262,7 +265,10 @@
           <input
             type="text"
             class="filters__search"
-            [class.filters__search--expanded]="appSearch().trim().length > 0"
+            [class.filters__search--compact]="
+              appSearch().trim().length > 0 ||
+              portalFilter.hasActiveFilters()
+            "
             placeholder="Buscar..."
             [ngModel]="appSearch()"
             (ngModelChange)="appSearch.set($event)"
