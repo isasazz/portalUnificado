@@ -297,9 +297,9 @@
 }
 
 .users-section--pick {
-  border-right-color: $link-color;
-  background: rgba(0, 153, 216, 0.04);
-  box-shadow: inset 3px 0 0 $link-color;
+  border-right-color: $border-color;
+  background: $surface;
+  box-shadow: none;
 }
 
 .co-responsable-callout {
@@ -309,9 +309,10 @@
   margin-bottom: $space-16;
   padding: $space-12 $space-16;
 
-  border: 1px solid rgba(0, 153, 216, 0.35);
+  border: 1px solid $border-color;
+  border-left: 3px solid $amarillo-macondo;
   border-radius: $radius-md;
-  background: rgba(0, 153, 216, 0.1);
+  background: $background-body;
 }
 
 .co-responsable-callout strong {
@@ -335,11 +336,11 @@
 
   border-radius: $radius-pill;
   background: $surface;
-  border: 1px solid rgba(0, 153, 216, 0.25);
+  border: 1px solid $border-color;
 
   font-size: $font-size-xs;
   font-weight: $font-weight-semibold;
-  color: $link-color;
+  color: $text-primary;
 }
 
 .users-section h3 {

@@ -11,6 +11,9 @@ from '../mocks/standby-user-phones.mock';
 import { STANDBY_ASSIGNMENTS_MOCK }
 from '../mocks/standby-assignments.mock';
 
+import { toStandbyWeek }
+from '../utils/standby-week.util';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -60,9 +63,11 @@ export class StandbyScheduleService {
 
     weeks.forEach(week => {
 
+      const { start, end } = toStandbyWeek(week.start);
+
       const weekColor = this.resolveWeekColor(
         responsable,
-        week,
+        { start, end },
         aplicaciones
       );
 
@@ -72,8 +77,8 @@ export class StandbyScheduleService {
           id: this.nextId++,
           responsable,
           celular,
-          fechaInicio: week.start,
-          fechaFin: week.end,
+          fechaInicio: start,
+          fechaFin: end,
           color: weekColor,
           aplicaciones: [...aplicaciones]
         }

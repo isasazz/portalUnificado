@@ -1,6 +1,7 @@
 <div
   class="standby-page"
   [class.standby-page--panel-open]="showSidePanel"
+  [class.standby-page--areas]="isAreasMode"
 >
 
   <div class="standby-main">
@@ -55,8 +56,8 @@
 
       <div class="selection-banner">
         <p>
-          {{ selectedApplications.length }} aplicación(es) lista(s)
-          para programar
+          {{ selectedApplications.length }}
+          {{ itemLabel }}(s) listo(s) para programar
         </p>
         <div class="selection-banner__actions">
           <button
@@ -88,8 +89,13 @@
 
             <h2 class="section-title">Standby programados</h2>
             <p class="section-subtitle">
-              Cobertura activa y próxima por persona, aplicación
-              y célula.
+              @if (isAreasMode) {
+                Cobertura activa y próxima por persona, servicio
+                y célula. Cada turno va de viernes a jueves.
+              } @else {
+                Cobertura activa y próxima por persona, aplicación
+                y célula. Cada turno va de viernes a jueves.
+              }
             </p>
 
           } @else if (panelView() === 'program') {
@@ -101,6 +107,8 @@
               } @else if (delegationService.isActingForAnotherLeader()) {
                 Programa standby en nombre de
                 <strong>{{ delegationService.activeIncoming()?.fromLeader }}</strong>.
+              } @else if (isAreasMode) {
+                Filtra y selecciona los servicios que quieres programar.
               } @else {
                 Filtra y selecciona las aplicaciones que quieres programar.
               }
@@ -170,7 +178,9 @@
 
         <div class="filters">
 
-          <app-portal-filter-bar />
+          <app-portal-filter-bar
+            [hiddenDimensions]="filterHiddenDimensions"
+          />
 
           <input
             type="text"
@@ -201,41 +211,54 @@
           <div class="standby-board__head" aria-hidden="true">
             <span>Fecha</span>
             <span>Nombre completo</span>
-            <span>Aplicación</span>
+            @if (!isAreasMode) {
+              <span>Aplicación</span>
+            }
             <span>BVC</span>
             <span>LdC</span>
             <span>Célula</span>
             <span>Servicio</span>
           </div>
 
-          @for (row of standbyListRows; track row.id) {
-            <article
-              class="standby-row"
-              [attr.id]="'standby-row-' + row.id"
-              [class.standby-row--flash]="
-                highlightedAppCodigo &&
-                row.appCodes.includes(highlightedAppCodigo)
-              "
-            >
+            @for (row of standbyListRows; track row.id) {
+              <article
+                class="standby-row"
+                [attr.id]="'standby-row-' + row.id"
+                [class.standby-row--flash]="
+                  highlightedAppCodigo &&
+                  row.appCodes.includes(highlightedAppCodigo)
+                "
+                role="button"
+                tabindex="0"
+                (click)="openStandbyRow(row)"
+                (keydown.enter)="openStandbyRow(row)"
+                (keydown.space)="$event.preventDefault(); openStandbyRow(row)"
+              >
               <div class="standby-row__date">
                 <strong>{{ row.fechaLabel }}</strong>
               </div>
 
               <div class="standby-row__person">
-                <span class="standby-row__avatar">
+                <span
+                  class="standby-row__avatar"
+                  [style.background]="avatarTone(row.nombre).background"
+                  [style.color]="avatarTone(row.nombre).color"
+                >
                   {{ initials(row.nombre) }}
                 </span>
                 <strong>{{ row.nombre }}</strong>
               </div>
 
-              <div class="standby-row__apps">
-                @for (code of row.appCodes; track code) {
-                  <span>{{ code }}</span>
-                }
-                @if (row.appNames[0]) {
-                  <small>{{ row.appNames[0] }}</small>
-                }
-              </div>
+              @if (!isAreasMode) {
+                <div class="standby-row__apps">
+                  @for (code of row.appCodes; track code) {
+                    <span>{{ code }}</span>
+                  }
+                  @if (row.appNames[0]) {
+                    <small>{{ row.appNames[0] }}</small>
+                  }
+                </div>
+              }
 
               <span>{{ row.bvc }}</span>
               <span>{{ row.ldc }}</span>
@@ -260,7 +283,9 @@
 
         <div class="filters">
 
-          <app-portal-filter-bar />
+          <app-portal-filter-bar
+            [hiddenDimensions]="filterHiddenDimensions"
+          />
 
           <input
             type="text"
@@ -294,11 +319,13 @@
               [disabled]="delegationService.hasDelegatedOut()"
               (change)="toggleSelectAll($any($event.target).checked)"
             />
-            <span>Seleccionar todas</span>
+            <span>
+              Seleccionar {{ isAreasMode ? 'todos' : 'todas' }}
+            </span>
           </label>
           @if (hasSelection) {
             <small>
-              {{ selectedApplications.length }} seleccionada(s)
+              {{ selectedApplications.length }} seleccionado(s)
             </small>
           }
         </div>
@@ -314,6 +341,7 @@
               [hasStandby]="false"
               [activeThisMonth]="false"
               [isSelected]="application.selected"
+              [serviceMode]="isAreasMode"
               (selected)="toggleCard($event)"
             />
           }
@@ -322,7 +350,7 @@
 
         @if (unprogrammedApplications.length === 0) {
           <div class="standby-board__empty">
-            No hay aplicaciones disponibles con los filtros actuales.
+            No hay {{ itemsLabel }} disponibles con los filtros actuales.
           </div>
         }
 
@@ -434,7 +462,7 @@
           <h2>Agregadas al standby</h2>
           <p>
             {{ panelApplications.length }}
-            aplicación(es)
+            {{ itemLabel }}(es)
           </p>
         </div>
 
@@ -459,8 +487,13 @@
           <div class="panel-item">
 
             <div class="panel-item__info">
-              <strong>{{ app.codigoAplicacion }}</strong>
-              <span>{{ app.nombreAplicacion }}</span>
+              @if (isAreasMode) {
+                <strong>{{ app.service || app.nombreAplicacion }}</strong>
+                <span>{{ app.celula }} · {{ app.bvc }}</span>
+              } @else {
+                <strong>{{ app.codigoAplicacion }}</strong>
+                <span>{{ app.nombreAplicacion }}</span>
+              }
               <small>
                 {{ app.celula }} · {{ app.responsable }}
               </small>
@@ -481,7 +514,7 @@
 
         @if (panelApplications.length === 0) {
           <p class="panel-empty">
-            No hay aplicaciones en el panel.
+            No hay {{ itemsLabel }} en el panel.
           </p>
         }
 
@@ -507,6 +540,8 @@
   <app-standby-modal
     [visible]="showStandbyModal"
     [aplicaciones]="panelApplications"
+    [catalog]="applications"
+    [serviceMode]="isAreasMode"
     (closed)="closeStandbyModal()"
     (saved)="onStandbySaved($event)"
   />
@@ -516,6 +551,11 @@
     [assignments]="viewAssignments"
     [aplicacionCodigo]="viewAppCodigo"
     [aplicacionNombre]="viewAppNombre"
+    [personName]="viewPersonName"
+    [personPhone]="viewPersonPhone"
+    [rowDetail]="viewRowDetail"
+    [showPeopleList]="false"
+    [serviceMode]="isAreasMode"
     (closed)="closeViewModal()"
   />
 
@@ -527,6 +567,7 @@
 
   <app-standby-person-modal
     [visible]="showPersonModal"
+    [serviceMode]="isAreasMode"
     (closed)="closePersonModal()"
     (saved)="onPersonSaved($event)"
   />

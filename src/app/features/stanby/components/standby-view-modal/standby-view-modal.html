@@ -16,7 +16,12 @@
 
         <div class="person-hero">
 
-          <span class="person-hero__avatar">
+          <span
+            class="person-hero__avatar"
+            [style.background]="personAvatarTone().background"
+            [style.color]="personAvatarTone().color"
+            [style.borderColor]="personAvatarTone().background"
+          >
             {{ personInitials() }}
           </span>
 
@@ -28,39 +33,6 @@
             @if (personPhone()) {
               <p>{{ personPhone() }}</p>
             }
-          </div>
-
-          <div class="person-hero__stats">
-
-            <div class="person-stat">
-              <strong>{{ assignments().length }}</strong>
-              <span>
-                {{ assignments().length === 1 ? 'Turno' : 'Turnos' }}
-              </span>
-            </div>
-
-            @if (currentAssignment(); as current) {
-              <div class="person-stat person-stat--current">
-                <strong>En curso</strong>
-                <span>
-                  {{ current.fechaInicio | date:'dd/MM' }}
-                  →
-                  {{ current.fechaFin | date:'dd/MM' }}
-                </span>
-              </div>
-            }
-
-            @if (!currentAssignment() && nextAssignment(); as next) {
-              <div class="person-stat person-stat--next">
-                <strong>Próximo</strong>
-                <span>
-                  {{ next.fechaInicio | date:'dd/MM' }}
-                  →
-                  {{ next.fechaFin | date:'dd/MM' }}
-                </span>
-              </div>
-            }
-
           </div>
 
         </div>
@@ -99,12 +71,109 @@
 
     <div class="modal-body">
 
-      @if (assignments().length === 0) {
+      @if (hasRowDetail()) {
+
+        <nav class="detail-tabs" aria-label="Detalle del standby">
+          <button
+            type="button"
+            class="detail-tabs__btn"
+            [class.detail-tabs__btn--active]="detailTab() === 'info'"
+            (click)="setDetailTab('info')"
+          >
+            Información
+          </button>
+          <button
+            type="button"
+            class="detail-tabs__btn"
+            [class.detail-tabs__btn--active]="detailTab() === 'standby'"
+            (click)="setDetailTab('standby')"
+          >
+            Standby
+          </button>
+        </nav>
+
+      }
+
+      @if (hasRowDetail() && detailTab() === 'info') {
+
+        @if (rowDetail(); as detail) {
+
+          <div class="row-info">
+
+            <div class="row-info__grid">
+
+              <div class="row-info__item">
+                <span>Fecha</span>
+                <strong>{{ detail.fechaLabel }}</strong>
+              </div>
+
+              <div class="row-info__item">
+                <span>Nombre completo</span>
+                <strong>{{ detail.nombre }}</strong>
+              </div>
+
+              @if (detail.celular) {
+                <div class="row-info__item">
+                  <span>Celular</span>
+                  <strong>{{ detail.celular }}</strong>
+                </div>
+              }
+
+              <div class="row-info__item">
+                <span>BVC</span>
+                <strong>{{ detail.bvc }}</strong>
+              </div>
+
+              <div class="row-info__item">
+                <span>LdC</span>
+                <strong>{{ detail.ldc }}</strong>
+              </div>
+
+              <div class="row-info__item">
+                <span>Célula</span>
+                <strong>{{ detail.celula }}</strong>
+              </div>
+
+              <div class="row-info__item">
+                <span>Servicio</span>
+                <strong>{{ detail.service }}</strong>
+              </div>
+
+              @if (!serviceMode()) {
+                <div class="row-info__item row-info__item--full">
+                  <span>Aplicaciones</span>
+                  <div class="row-info__apps">
+                    @for (code of detail.appCodes; track code; let i = $index) {
+                      <span class="row-info__app">
+                        {{ code }}
+                        @if (detail.appNames[i]) {
+                          · {{ detail.appNames[i] }}
+                        }
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+
+              <div class="row-info__item row-info__item--full">
+                <span>Contexto</span>
+                <strong>{{ detail.footerLabel }}</strong>
+              </div>
+
+            </div>
+
+          </div>
+
+        }
+
+      } @else if (assignments().length === 0) {
 
         <div class="empty-detail">
           <p>
             @if (isPersonView()) {
               Esta persona no tiene standby programado registrado.
+            } @else if (serviceMode()) {
+              No hay standby registrado para este servicio.
             } @else {
               No hay standby registrado para esta aplicación.
             }
@@ -176,7 +245,11 @@
                           track app.codigoAplicacion
                         ) {
                           <span class="turn-card__app">
-                            {{ app.codigoAplicacion }}
+                            @if (serviceMode()) {
+                              {{ app.nombreAplicacion }}
+                            } @else {
+                              {{ app.codigoAplicacion }}
+                            }
                           </span>
                         }
                       </div>
@@ -226,7 +299,11 @@
                           track app.codigoAplicacion
                         ) {
                           <span class="turn-card__app">
-                            {{ app.codigoAplicacion }}
+                            @if (serviceMode()) {
+                              {{ app.nombreAplicacion }}
+                            } @else {
+                              {{ app.codigoAplicacion }}
+                            }
                           </span>
                         }
                       </div>

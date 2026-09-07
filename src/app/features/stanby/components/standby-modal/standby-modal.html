@@ -62,7 +62,11 @@
                   "
                   (click)="selectActiveApp(i)"
                 >
-                  {{ app.codigoAplicacion }}
+                  @if (serviceMode()) {
+                    {{ app.service || app.nombreAplicacion }}
+                  } @else {
+                    {{ app.codigoAplicacion }}
+                  }
                 </button>
               }
             </div>
@@ -74,7 +78,7 @@
                 [disabled]="addableApplications.length === 0"
                 (click)="toggleAddAppMenu()"
               >
-                + App
+                {{ serviceMode() ? '+ Servicio' : '+ App' }}
               </button>
 
               @if (showAddAppMenu) {
@@ -82,7 +86,11 @@
                   <input
                     type="search"
                     class="add-app__search"
-                    placeholder="Buscar aplicación..."
+                    [placeholder]="
+                      serviceMode()
+                        ? 'Buscar servicio...'
+                        : 'Buscar aplicación...'
+                    "
                     [ngModel]="addAppSearch"
                     (ngModelChange)="addAppSearch = $event"
                   />
@@ -94,14 +102,23 @@
                         class="add-app__option"
                         (click)="addApplication(app)"
                       >
-                        <strong>{{ app.codigoAplicacion }}</strong>
-                        <span>{{ app.nombreAplicacion }}</span>
+                        @if (serviceMode()) {
+                          <strong>{{ app.service || app.nombreAplicacion }}</strong>
+                          <span>{{ app.celula }} · {{ app.bvc }}</span>
+                        } @else {
+                          <strong>{{ app.codigoAplicacion }}</strong>
+                          <span>{{ app.nombreAplicacion }}</span>
+                        }
                       </button>
                     }
 
                     @if (filteredAddableApps.length === 0) {
                       <p class="add-app__empty">
-                        No hay más aplicaciones disponibles.
+                        @if (serviceMode()) {
+                          No hay más servicios disponibles.
+                        } @else {
+                          No hay más aplicaciones disponibles.
+                        }
                       </p>
                     }
                   </div>
@@ -114,17 +131,26 @@
           @if (hasMultipleProducts) {
             <p class="product-tabs-hint">
               @if (isProgramAll) {
-                Misma persona y fechas para todas las aplicaciones
-                seleccionadas. Usa + App si faltó alguna.
+                Misma persona y fechas para
+                {{ serviceMode() ? 'todos los servicios' : 'todas las aplicaciones' }}
+                seleccionados. Usa
+                {{ serviceMode() ? '+ Servicio' : '+ App' }}
+                si faltó alguno.
               } @else {
-                Programa cada producto por separado. Las personas
-                y co-responsables son independientes por producto.
-                Pulsa un código para enfocarlo o + App para añadir otra.
+                Programa cada
+                {{ serviceMode() ? 'servicio' : 'producto' }}
+                por separado. Pulsa un ítem para enfocarlo o
+                {{ serviceMode() ? '+ Servicio' : '+ App' }}
+                para añadir otro.
               }
             </p>
           } @else {
             <p class="product-tabs-hint">
-              Usa + App si quieres incluir otra aplicación en esta programación.
+              Usa
+              {{ serviceMode() ? '+ Servicio' : '+ App' }}
+              si quieres incluir otro
+              {{ serviceMode() ? 'servicio' : 'aplicación' }}
+              en esta programación.
             </p>
           }
 
@@ -235,12 +261,18 @@
 
             @if (hasMultipleProducts && appsForProgrammingLabel) {
               @if (isProgramAll) {
-                Aplicaciones:
+                {{ serviceMode() ? 'Servicios' : 'Aplicaciones' }}:
                 <strong>{{ appsForProgrammingLabel }}</strong>
                 ·
               } @else if (activeApp) {
-                Producto activo:
-                <strong>{{ activeApp.codigoAplicacion }}</strong>
+                {{ serviceMode() ? 'Servicio activo' : 'Producto activo' }}:
+                <strong>
+                  {{
+                    serviceMode()
+                      ? (activeApp.service || activeApp.nombreAplicacion)
+                      : activeApp.codigoAplicacion
+                  }}
+                </strong>
                 ·
               }
             }
@@ -401,9 +433,13 @@
                       track app.codigoAplicacion
                     ) {
                       <span class="app-chip app-chip--trace">
-                        {{ app.codigoAplicacion }}
-                        ·
-                        {{ app.nombreAplicacion }}
+                        @if (serviceMode()) {
+                          {{ app.nombreAplicacion }}
+                        } @else {
+                          {{ app.codigoAplicacion }}
+                          ·
+                          {{ app.nombreAplicacion }}
+                        }
                       </span>
                     }
                   </div>

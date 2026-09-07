@@ -9,8 +9,13 @@
       <div>
         <h2>Agregar persona</h2>
         <p>
-          Registra al funcionario con hasta 4 servicios y
-          4 servicios TI (aplicaciones).
+          @if (serviceMode()) {
+            Registra al funcionario con hasta 4 servicios
+            de cobertura.
+          } @else {
+            Registra al funcionario con hasta 4 servicios y
+            4 servicios TI (aplicaciones).
+          }
         </p>
       </div>
 
@@ -88,18 +93,22 @@
 
         </section>
 
-        <section class="form-block">
+        @if (!serviceMode()) {
 
-          <app-capped-slot-adder
-            title="Servicios TI"
-            hint="Aplicaciones de la CMDB. Agrega de a una, máximo 4."
-            emptyLabel="Agregar servicio TI"
-            fullLabel="Ya tienes 4 servicios TI · cupo completo"
-            [options]="tiOptions"
-            [(values)]="serviciosTi"
-          />
+          <section class="form-block">
 
-        </section>
+            <app-capped-slot-adder
+              title="Servicios TI"
+              hint="Aplicaciones de la CMDB. Agrega de a una, máximo 4."
+              emptyLabel="Agregar servicio TI"
+              fullLabel="Ya tienes 4 servicios TI · cupo completo"
+              [options]="tiOptions"
+              [(values)]="serviciosTi"
+            />
+
+          </section>
+
+        }
 
         <section class="form-block">
 

@@ -4,7 +4,7 @@
 >
 
   <div class="portal-filter__chips">
-    @for (chip of allChips; track chip.key) {
+    @for (chip of allChips(); track chip.key) {
       <div
         class="portal-chip"
         [class.portal-chip--open]="openDimension() === chip.key"

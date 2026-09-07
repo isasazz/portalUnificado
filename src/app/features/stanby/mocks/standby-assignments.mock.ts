@@ -1,32 +1,23 @@
 import { StandbyAssignment }
 from '../models/standby-assignment.model';
 
-function monthRange(
-  startDay: number,
-  durationDays = 7,
+import { standbyWeekNearDay }
+from '../utils/standby-week.util';
+
+function week(
+  preferredDay: number,
   monthOffset = 0
 ): { fechaInicio: Date; fechaFin: Date } {
-
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + monthOffset;
-
-  const fechaInicio = new Date(year, month, startDay);
-  const fechaFin = new Date(fechaInicio);
-
-  fechaFin.setDate(fechaFin.getDate() + durationDays - 1);
-
-  return { fechaInicio, fechaFin };
-
+  return standbyWeekNearDay(preferredDay, monthOffset);
 }
 
-/** Asignaciones mock ancladas al mes actual para demo. */
+/** Asignaciones mock: siempre viernes → jueves. */
 export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
   {
     id: 1001,
     responsable: 'Daniel Lopez Montes',
     celular: '+57 310 539 0611',
-    ...monthRange(12),
+    ...week(12),
     color: '#9063cd',
     aplicaciones: [
       {
@@ -39,7 +30,7 @@ export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
     id: 1002,
     responsable: 'Bibiana Montoya',
     celular: '+57 310 987 6543',
-    ...monthRange(19),
+    ...week(19),
     color: '#f586cd',
     aplicaciones: [
       {
@@ -52,7 +43,7 @@ export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
     id: 1003,
     responsable: 'Dylan Martinez',
     celular: '+57 320 111 2233',
-    ...monthRange(5),
+    ...week(5),
     color: '#00c389',
     aplicaciones: [
       {
@@ -66,8 +57,8 @@ export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
     id: 1004,
     responsable: 'Ana Morales',
     celular: '+57 310 539 0611',
-    ...monthRange(15, 7, -3),
-    color: '#9ca3af',
+    ...week(15, -3),
+    color: '#59cbeb',
     aplicaciones: [
       {
         codigoAplicacion: 'NU0113001',
@@ -79,8 +70,8 @@ export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
     id: 1006,
     responsable: 'Ana Morales',
     celular: '+57 310 539 0611',
-    ...monthRange(12, 7, -2),
-    color: '#9ca3af',
+    ...week(12, -2),
+    color: '#f586cd',
     aplicaciones: [
       {
         codigoAplicacion: 'NU0113002',
@@ -92,7 +83,7 @@ export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
     id: 1007,
     responsable: 'Ana Morales',
     celular: '+57 310 539 0611',
-    ...monthRange(7),
+    ...week(11),
     color: '#00c389',
     aplicaciones: [
       {
@@ -109,7 +100,7 @@ export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
     id: 1008,
     responsable: 'Ana Morales',
     celular: '+57 310 539 0611',
-    ...monthRange(21),
+    ...week(18),
     color: '#00c389',
     aplicaciones: [
       {
@@ -122,7 +113,7 @@ export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
     id: 1009,
     responsable: 'Ana Morales',
     celular: '+57 310 539 0611',
-    ...monthRange(4, 7, 1),
+    ...week(4, 1),
     color: '#59cbeb',
     aplicaciones: [
       {
@@ -135,7 +126,7 @@ export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
     id: 1010,
     responsable: 'Ana Morales',
     celular: '+57 310 539 0611',
-    ...monthRange(18, 7, 1),
+    ...week(18, 1),
     color: '#59cbeb',
     aplicaciones: [
       {
@@ -145,15 +136,41 @@ export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
     ]
   },
   {
-    id: 1005,
-    responsable: 'Jahiver Horacio Lopez',
-    celular: '+57 315 444 5566',
-    ...monthRange(26),
+    id: 1011,
+    responsable: 'Mariana Soto',
+    celular: '+57 300 111 2233',
+    ...week(11),
+    color: '#9063cd',
+    aplicaciones: [
+      {
+        codigoAplicacion: 'SRV-001',
+        nombreAplicacion: 'Reportería'
+      }
+    ]
+  },
+  {
+    id: 1012,
+    responsable: 'Paula Andrea Giraldo',
+    celular: '+57 301 222 3344',
+    ...week(18),
+    color: '#00c389',
+    aplicaciones: [
+      {
+        codigoAplicacion: 'SRV-003',
+        nombreAplicacion: 'Transaccional'
+      }
+    ]
+  },
+  {
+    id: 1013,
+    responsable: 'Carlos Eduardo Vargas',
+    celular: '+57 302 333 4455',
+    ...week(4, 1),
     color: '#ff7f41',
     aplicaciones: [
       {
-        codigoAplicacion: 'NU0113004',
-        nombreAplicacion: 'Gestión de Alertas'
+        codigoAplicacion: 'SRV-004',
+        nombreAplicacion: 'Pagos'
       }
     ]
   }

@@ -94,7 +94,11 @@
 
           <div class="leader-picked">
             <div class="leader-option leader-option--selected">
-              <span class="leader-option__avatar">
+              <span
+                class="leader-option__avatar"
+                [style.background]="avatarTone(leader.nombre).background"
+                [style.color]="avatarTone(leader.nombre).color"
+              >
                 {{ leader.initials }}
               </span>
               <span class="leader-option__info">
@@ -133,7 +137,11 @@
                   class="leader-option"
                   (click)="selectLeader(leader)"
                 >
-                  <span class="leader-option__avatar">
+                  <span
+                    class="leader-option__avatar"
+                    [style.background]="avatarTone(leader.nombre).background"
+                    [style.color]="avatarTone(leader.nombre).color"
+                  >
                     {{ leader.initials }}
                   </span>
                   <span class="leader-option__info">

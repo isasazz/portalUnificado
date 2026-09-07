@@ -4,6 +4,7 @@ import {
   HostListener,
   computed,
   inject,
+  input,
   signal
 } from '@angular/core';
 
@@ -33,16 +34,25 @@ export class PortalFilterBarComponent {
 
   readonly portalFilter = inject(PortalFilterService);
 
+  /** Dimensiones a ocultar (p. ej. `app` en Standby de otras áreas). */
+  readonly hiddenDimensions = input<PortalFilterDimension[]>([]);
+
   readonly openDimension =
     signal<PortalFilterDimension | null>(null);
 
-  readonly allChips: FilterChip[] = [
-    ...PORTAL_ORG_DIMENSIONS,
-    ...PORTAL_ENTITY_DIMENSIONS
-  ].map(key => ({
-    key,
-    label: PORTAL_FILTER_LABELS[key]
-  }));
+  readonly allChips = computed<FilterChip[]>(() => {
+    const hidden = new Set(this.hiddenDimensions());
+
+    return [
+      ...PORTAL_ORG_DIMENSIONS,
+      ...PORTAL_ENTITY_DIMENSIONS
+    ]
+      .filter(key => !hidden.has(key))
+      .map(key => ({
+        key,
+        label: PORTAL_FILTER_LABELS[key]
+      }));
+  });
 
   readonly activeSummary = computed(() => {
 

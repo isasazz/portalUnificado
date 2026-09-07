@@ -32,6 +32,9 @@ from '../../services/standby-delegation.service';
 import { SaveSuccessService }
 from '../../../../shared/services/save-success.service';
 
+import { avatarToneForName }
+from '../../../../shared/utils/avatar-tone.util';
+
 @Component({
   selector: 'app-standby-relevo-modal',
   standalone: true,
@@ -132,6 +135,10 @@ export class StandbyRelevoModalComponent {
     this.reset();
     this.closed.emit();
 
+  }
+
+  avatarTone(name: string) {
+    return avatarToneForName(name);
   }
 
   onMotivoChange(event: Event): void {

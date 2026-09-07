@@ -1,0 +1,21 @@
+---
+description: Avatares/bolitas de perfil solo con colores corporativos Bancolombia
+alwaysApply: true
+---
+
+# Avatares de perfil
+
+Las bolitas/círculos de iniciales de persona deben usar **solo** la paleta corporativa de `styles/abstracts/colors.scss`:
+
+- `#fdda24` amarillo macondo (+ texto `#2c2a29`)
+- `#9063cd` violeta orquídea (+ texto blanco)
+- `#00c389` verde andino (+ texto blanco)
+- `#ff7f41` naranja alba (+ texto blanco)
+- `#f586cd` rosa flamenco (+ texto `#2c2a29`)
+- `#59cbeb` azul caribe (+ texto `#2c2a29`)
+
+## Reglas
+
+- Usar siempre `avatarToneForName()` de `shared/utils/avatar-tone.util.ts`.
+- No inventar colores, grises (`#9ca3af`, etc.) ni link-blue (`#0099d8`) para avatares.
+- Fallbacks CSS de `.avatar` / `__avatar` también deben ser corporativos (p. ej. `$amarillo-macondo`).

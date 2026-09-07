@@ -32,7 +32,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import(
             './features/stanby/pages/standby-page/standby-page'
-          ).then(m => m.StandbyPageComponent)
+          ).then(m => m.StandbyPageComponent),
+        data: { scope: 'tech' }
+      },
+      {
+        path: 'standby/otras-areas',
+        loadComponent: () =>
+          import(
+            './features/stanby/pages/standby-page/standby-page'
+          ).then(m => m.StandbyPageComponent),
+        data: { scope: 'areas' }
       },
       {
         path: 'standby/consulta',

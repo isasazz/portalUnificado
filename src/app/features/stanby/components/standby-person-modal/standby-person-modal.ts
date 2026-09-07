@@ -50,6 +50,9 @@ export class StandbyPersonModalComponent {
 
   readonly visible = input(false);
 
+  /** Otras áreas: sin servicios TI / apps. */
+  readonly serviceMode = input(false);
+
   readonly closed = output<void>();
 
   readonly saved = output<StandbyPersonRecord>();
@@ -81,6 +84,7 @@ export class StandbyPersonModalComponent {
 
     const values = this.formSnapshot();
     const celular = values.celular?.trim() ?? '';
+    const needsTi = !this.serviceMode();
 
     return Boolean(
       values.funcionario.trim() &&
@@ -88,7 +92,7 @@ export class StandbyPersonModalComponent {
       celular.length > 4 &&
       values.empresa &&
       this.servicios().length > 0 &&
-      this.serviciosTi().length > 0
+      (!needsTi || this.serviciosTi().length > 0)
     );
 
   });

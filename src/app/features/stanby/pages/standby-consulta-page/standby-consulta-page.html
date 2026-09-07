@@ -66,7 +66,11 @@
           (click)="openPersonStandby(row.name)"
         >
           <div class="consulta-row__person">
-            <span class="consulta-row__avatar">
+            <span
+              class="consulta-row__avatar"
+              [style.background]="avatarTone(row.name).background"
+              [style.color]="avatarTone(row.name).color"
+            >
               {{ personInitials(row.name) }}
             </span>
             <strong>{{ row.name }}</strong>

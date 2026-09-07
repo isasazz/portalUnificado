@@ -27,6 +27,9 @@ export class StandbyCardComponent {
 
   readonly highlighted = input(false);
 
+  /** Otras áreas: oculta código de app y muestra el servicio. */
+  readonly serviceMode = input(false);
+
   readonly selected = output<number>();
 
   readonly view = output<number>();

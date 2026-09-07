@@ -2,8 +2,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   input,
-  output
+  output,
+  signal
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
@@ -13,7 +15,25 @@ from '../../models/standby-assignment.model';
 import { StandbyMonthViewComponent }
 from '../standby-month-view/standby-month-view';
 
+import { avatarToneForName }
+from '../../../../shared/utils/avatar-tone.util';
+
 type StandbyPeriod = 'past' | 'current' | 'next';
+
+export interface StandbyRowDetail {
+  fechaLabel: string;
+  nombre: string;
+  celular?: string;
+  appCodes: string[];
+  appNames: string[];
+  bvc: string;
+  ldc: string;
+  celula: string;
+  service: string;
+  footerLabel: string;
+}
+
+type DetailTab = 'info' | 'standby';
 
 @Component({
   selector: 'app-standby-view-modal',
@@ -39,7 +59,18 @@ export class StandbyViewModalComponent {
 
   readonly showPeopleList = input(true);
 
+  readonly rowDetail = input<StandbyRowDetail | null>(null);
+
+  /** Otras áreas: oculta bloque de aplicaciones. */
+  readonly serviceMode = input(false);
+
   readonly closed = output<void>();
+
+  readonly detailTab = signal<DetailTab>('info');
+
+  readonly hasRowDetail = computed(
+    () => this.rowDetail() !== null
+  );
 
   readonly isPersonView = computed(
     () => this.personName().trim().length > 0
@@ -55,6 +86,10 @@ export class StandbyViewModalComponent {
       .join('');
 
   });
+
+  readonly personAvatarTone = computed(() =>
+    avatarToneForName(this.personName())
+  );
 
   readonly upcomingAssignments = computed(() => {
 
@@ -80,28 +115,21 @@ export class StandbyViewModalComponent {
 
   });
 
-  readonly currentAssignment = computed(() =>
-    this.assignments().find(
-      assignment =>
-        this.standbyPeriod(assignment) === 'current'
-    ) ?? null
-  );
+  constructor() {
 
-  readonly nextAssignment = computed(() => {
+    effect(() => {
+      if (this.visible()) {
+        this.detailTab.set(this.hasRowDetail() ? 'info' : 'standby');
+      }
+    });
 
-    const today = this.startOfDay(new Date());
+  }
 
-    return this.assignments()
-      .filter(
-        assignment =>
-          this.startOfDay(assignment.fechaInicio) > today
-      )
-      .sort(
-        (a, b) =>
-          a.fechaInicio.getTime() - b.fechaInicio.getTime()
-      )[0] ?? null;
+  setDetailTab(tab: DetailTab): void {
 
-  });
+    this.detailTab.set(tab);
+
+  }
 
   close(): void {
 

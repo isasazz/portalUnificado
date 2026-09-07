@@ -61,6 +61,9 @@ import {
 import { STANDBY_APPLICATIONS }
 from '../../mocks/standby-applications.mock';
 
+import { toStandbyWeek }
+from '../../utils/standby-week.util';
+
 
 
 interface GroupedAcceptance {
@@ -129,7 +132,11 @@ export class StandbyModalComponent {
 
   readonly aplicaciones = input<StandbyApplication[]>([]);
 
+  /** Catálogo para + App / + Servicio. Por defecto apps TI. */
+  readonly catalog = input<StandbyApplication[]>(STANDBY_APPLICATIONS);
 
+  /** Otras áreas: sin apps, solo servicios. */
+  readonly serviceMode = input(false);
 
   readonly closed = output<void>();
 
@@ -291,15 +298,22 @@ export class StandbyModalComponent {
       return '';
     }
 
+    const labelOf = (app: StandbyApplication) =>
+      this.serviceMode()
+        ? (app.service || app.nombreAplicacion)
+        : app.codigoAplicacion;
+
     if (apps.length === 1) {
-      return apps[0].codigoAplicacion;
+      return labelOf(apps[0]);
     }
 
     if (apps.length <= 3) {
-      return apps.map(app => app.codigoAplicacion).join(', ');
+      return apps.map(labelOf).join(', ');
     }
 
-    return `${apps.length} aplicaciones`;
+    return this.serviceMode()
+      ? `${apps.length} servicios`
+      : `${apps.length} aplicaciones`;
 
   }
 
@@ -341,7 +355,7 @@ export class StandbyModalComponent {
       this.sessionApps.map(app => app.codigoAplicacion)
     );
 
-    return STANDBY_APPLICATIONS.filter(
+    return this.catalog().filter(
       app =>
         !inSession.has(app.codigoAplicacion) &&
         !this.scheduleService.isAppProgrammed(app.codigoAplicacion)
@@ -361,7 +375,9 @@ export class StandbyModalComponent {
     return list.filter(
       app =>
         app.codigoAplicacion.toLowerCase().includes(term) ||
-        app.nombreAplicacion.toLowerCase().includes(term)
+        app.nombreAplicacion.toLowerCase().includes(term) ||
+        (app.service ?? '').toLowerCase().includes(term) ||
+        app.celula.toLowerCase().includes(term)
     );
 
   }
@@ -1034,37 +1050,9 @@ export class StandbyModalComponent {
 
   }[] {
 
-
-
-    return this.selectedWeekStarts.map(
-
-      start => {
-
-
-
-        const end = new Date(start);
-
-
-
-        end.setDate(end.getDate() + 6);
-
-
-
-        return {
-
-          start,
-
-          end
-
-        };
-
-
-
-      }
-
+    return this.selectedWeekStarts.map(start =>
+      toStandbyWeek(start)
     );
-
-
 
   }
 

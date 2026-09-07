@@ -28,6 +28,9 @@ from '../../mocks/standby-user-phones.mock';
 import { StandbyAssignment }
 from '../../models/standby-assignment.model';
 
+import { avatarToneForName }
+from '../../../../shared/utils/avatar-tone.util';
+
 type StandbyPeriod = 'past' | 'current' | 'next';
 
 interface PersonRow {
@@ -210,6 +213,10 @@ export class StandbyConsultaPageComponent {
       .map(part => part[0]?.toUpperCase() ?? '')
       .join('');
 
+  }
+
+  avatarTone(name: string) {
+    return avatarToneForName(name);
   }
 
   private personStatusLabel(name: string): string {

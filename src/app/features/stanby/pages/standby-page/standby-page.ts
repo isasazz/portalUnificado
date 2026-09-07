@@ -12,6 +12,9 @@ import { FormsModule } from '@angular/forms';
 import { STANDBY_APPLICATIONS }
 from '../../mocks/standby-applications.mock';
 
+import { STANDBY_AREA_SERVICES }
+from '../../mocks/standby-area-services.mock';
+
 import { StandbyApplication }
 from '../../models/standby-application.model';
 
@@ -24,8 +27,10 @@ from '../../components/standby-card/standby-card';
 import { StandbyModalComponent }
 from '../../components/standby-modal/standby-modal';
 
-import { StandbyViewModalComponent }
-from '../../components/standby-view-modal/standby-view-modal';
+import {
+  StandbyRowDetail,
+  StandbyViewModalComponent
+} from '../../components/standby-view-modal/standby-view-modal';
 
 import { StandbyRelevoModalComponent }
 from '../../components/standby-relevo-modal/standby-relevo-modal';
@@ -57,7 +62,12 @@ import {
 import { StandbyPersonRecord }
 from '../../mocks/standby-person-catalog.mock';
 
+import { avatarToneForName }
+from '../../../../shared/utils/avatar-tone.util';
+
 type StandbyPanelView = 'apps' | 'program' | 'policies' | 'delegate';
+
+type StandbyScope = 'tech' | 'areas';
 
 @Component({
   selector: 'app-standby-page',
@@ -88,6 +98,9 @@ export class StandbyPageComponent implements OnInit {
 
   readonly panelView = signal<StandbyPanelView>('apps');
 
+  /** tech = TI con apps; areas = otras áreas solo servicios */
+  readonly scope = signal<StandbyScope>('tech');
+
   readonly policyMeta = STANDBY_POLICY_META;
 
   readonly policySections = STANDBY_POLICY_SECTIONS;
@@ -98,6 +111,22 @@ export class StandbyPageComponent implements OnInit {
 
   applications: StandbyApplication[] =
     [...STANDBY_APPLICATIONS];
+
+  get isAreasMode(): boolean {
+    return this.scope() === 'areas';
+  }
+
+  get filterHiddenDimensions(): ('app')[] {
+    return this.isAreasMode ? ['app'] : [];
+  }
+
+  get itemLabel(): string {
+    return this.isAreasMode ? 'servicio' : 'aplicación';
+  }
+
+  get itemsLabel(): string {
+    return this.isAreasMode ? 'servicios' : 'aplicaciones';
+  }
 
   showStandbyModal = false;
 
@@ -116,6 +145,12 @@ export class StandbyPageComponent implements OnInit {
   viewAppCodigo = '';
 
   viewAppNombre = '';
+
+  viewPersonName = '';
+
+  viewPersonPhone = '';
+
+  viewRowDetail: StandbyRowDetail | null = null;
 
   highlightedAppCodigo = '';
 
@@ -137,11 +172,32 @@ export class StandbyPageComponent implements OnInit {
 
   ngOnInit(): void {
 
+    this.route.data.subscribe(data => {
+      const nextScope: StandbyScope =
+        data['scope'] === 'areas' ? 'areas' : 'tech';
+
+      this.scope.set(nextScope);
+      this.applications = [
+        ...(nextScope === 'areas'
+          ? STANDBY_AREA_SERVICES
+          : STANDBY_APPLICATIONS)
+      ].map(app => ({ ...app, selected: false }));
+
+      this.panelView.set('apps');
+      this.clearSelection();
+      this.panelApplications = [];
+      this.showSidePanel = false;
+      this.showStandbyModal = false;
+      this.appSearch.set('');
+      this.portalFilter.clearAll();
+      this.cdr.markForCheck();
+    });
+
     this.route.queryParams.subscribe(params => {
 
       const appCode = params['app'];
 
-      if (!appCode) {
+      if (!appCode || this.isAreasMode) {
         return;
       }
 
@@ -169,6 +225,32 @@ export class StandbyPageComponent implements OnInit {
       this.cdr.markForCheck();
 
     });
+
+  }
+
+  private isAreaServiceCode(code: string): boolean {
+    return code.startsWith('SRV-');
+  }
+
+  private assignmentMatchesScope(
+    assignment: StandbyAssignment
+  ): boolean {
+
+    const codes = (assignment.aplicaciones ?? []).map(
+      app => app.codigoAplicacion
+    );
+
+    if (codes.length === 0) {
+      return false;
+    }
+
+    const isAreaAssignment = codes.every(code =>
+      this.isAreaServiceCode(code)
+    );
+
+    return this.isAreasMode
+      ? isAreaAssignment
+      : !codes.some(code => this.isAreaServiceCode(code));
 
   }
 
@@ -252,6 +334,7 @@ export class StandbyPageComponent implements OnInit {
     return (
       app.codigoAplicacion.toLowerCase().includes(term) ||
       app.nombreAplicacion.toLowerCase().includes(term) ||
+      (app.service ?? '').toLowerCase().includes(term) ||
       app.celula.toLowerCase().includes(term) ||
       app.responsable.toLowerCase().includes(term)
     );
@@ -369,6 +452,7 @@ export class StandbyPageComponent implements OnInit {
     const term = this.appSearch().trim().toLowerCase();
 
     return this.scheduleService.savedAssignments
+      .filter(assignment => this.assignmentMatchesScope(assignment))
       .filter(assignment => {
 
         const apps = (assignment.aplicaciones ?? [])
@@ -424,6 +508,11 @@ export class StandbyPageComponent implements OnInit {
           .filter(Boolean) as StandbyApplication[];
 
         const primary = apps[0];
+        const serviceLabel =
+          primary?.service ||
+          primary?.nombreAplicacion ||
+          (assignment.aplicaciones ?? [])[0]?.nombreAplicacion ||
+          '—';
 
         return {
           id: assignment.id,
@@ -441,7 +530,7 @@ export class StandbyPageComponent implements OnInit {
           bvc: primary?.bvc ?? '—',
           ldc: primary?.ldc ?? '—',
           celula: primary?.celula ?? '—',
-          service: primary?.service ?? '—',
+          service: serviceLabel,
           areaLabel: primary
             ? `${primary.bvc} · ${primary.ldc}`
             : '—',
@@ -527,6 +616,10 @@ export class StandbyPageComponent implements OnInit {
       .map(part => part[0]?.toUpperCase() ?? '')
       .join('');
 
+  }
+
+  avatarTone(name: string) {
+    return avatarToneForName(name);
   }
 
   addToStandbyPanel(): void {
@@ -651,6 +744,9 @@ export class StandbyPageComponent implements OnInit {
       return;
     }
 
+    this.viewPersonName = '';
+    this.viewPersonPhone = '';
+    this.viewRowDetail = null;
     this.viewAppCodigo = app.codigoAplicacion;
     this.viewAppNombre = app.nombreAplicacion;
 
@@ -658,6 +754,51 @@ export class StandbyPageComponent implements OnInit {
       this.scheduleService.getByAppCodigo(
         app.codigoAplicacion
       );
+
+    this.showViewModal = true;
+    this.cdr.markForCheck();
+
+  }
+
+  openStandbyRow(row: {
+    id: number;
+    nombre: string;
+    fechaLabel: string;
+    appCodes: string[];
+    appNames: string[];
+    bvc: string;
+    ldc: string;
+    celula: string;
+    service: string;
+    footerLabel: string;
+  }): void {
+
+    const phone =
+      this.scheduleService.getAssignmentsForPerson(
+        row.nombre
+      )[0]?.celular ?? '—';
+
+    this.viewAppCodigo = '';
+    this.viewAppNombre = '';
+    this.viewPersonName = row.nombre;
+    this.viewPersonPhone = phone;
+    this.viewRowDetail = {
+      fechaLabel: row.fechaLabel,
+      nombre: row.nombre,
+      celular: phone,
+      appCodes: row.appCodes,
+      appNames: row.appNames,
+      bvc: row.bvc,
+      ldc: row.ldc,
+      celula: row.celula,
+      service: row.service,
+      footerLabel: row.footerLabel
+    };
+
+    this.viewAssignments =
+      this.scheduleService
+        .getAssignmentsForPerson(row.nombre)
+        .filter(item => this.assignmentMatchesScope(item));
 
     this.showViewModal = true;
     this.cdr.markForCheck();
@@ -686,6 +827,9 @@ export class StandbyPageComponent implements OnInit {
     this.viewAssignments = [];
     this.viewAppCodigo = '';
     this.viewAppNombre = '';
+    this.viewPersonName = '';
+    this.viewPersonPhone = '';
+    this.viewRowDetail = null;
 
   }
 

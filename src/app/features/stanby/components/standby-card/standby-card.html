@@ -39,7 +39,9 @@
 
       } @else {
 
-        <span class="selected-pill">Seleccionada</span>
+        <span class="selected-pill">
+          {{ serviceMode() ? 'Seleccionado' : 'Seleccionada' }}
+        </span>
 
       }
 
@@ -48,12 +50,18 @@
   }
 
   <strong class="app-code">
-    {{ application().codigoAplicacion }}
+    @if (serviceMode()) {
+      {{ application().service || application().nombreAplicacion }}
+    } @else {
+      {{ application().codigoAplicacion }}
+    }
   </strong>
 
-  <h3 class="app-name">
-    {{ application().nombreAplicacion }}
-  </h3>
+  @if (!serviceMode()) {
+    <h3 class="app-name">
+      {{ application().nombreAplicacion }}
+    </h3>
+  }
 
   <p class="app-description">
     {{ application().descripcion }}
