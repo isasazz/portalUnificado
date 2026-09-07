@@ -691,7 +691,10 @@ export class StandbyPageComponent implements OnInit {
     this.saveSuccess.show({
       title: '¡Listo!',
       message: 'Tu standby quedó programado.',
-      buttonLabel: 'Continuar'
+      buttonLabel: 'Ver standby',
+      onConfirm: () => {
+        this.openLatestSavedStandby(payload.appCodigo);
+      }
     });
 
   }
@@ -704,11 +707,7 @@ export class StandbyPageComponent implements OnInit {
 
     this.highlightedAppCodigo = appCodigo;
 
-    const assignment = this.scheduleService.savedAssignments.find(item =>
-      (item.aplicaciones ?? []).some(
-        app => app.codigoAplicacion === appCodigo
-      )
-    );
+    const assignment = this.findLatestAssignment(appCodigo);
 
     setTimeout(() => {
       if (!assignment) {
@@ -728,6 +727,72 @@ export class StandbyPageComponent implements OnInit {
       this.highlightTimer = null;
       this.cdr.markForCheck();
     }, 5000);
+
+  }
+
+  private findLatestAssignment(appCodigo: string) {
+
+    if (!appCodigo) {
+      return undefined;
+    }
+
+    return [...this.scheduleService.savedAssignments]
+      .filter(item => this.assignmentMatchesScope(item))
+      .filter(item =>
+        (item.aplicaciones ?? []).some(
+          app => app.codigoAplicacion === appCodigo
+        )
+      )
+      .sort((a, b) => b.id - a.id)[0];
+
+  }
+
+  private openLatestSavedStandby(appCodigo: string): void {
+
+    const assignment = this.findLatestAssignment(appCodigo);
+
+    if (!assignment) {
+      return;
+    }
+
+    const row = this.standbyListRows.find(
+      item => item.id === assignment.id
+    );
+
+    if (row) {
+      this.openStandbyRow(row);
+      return;
+    }
+
+    // Fallback si el listado aún no resolvió la fila
+    this.viewAppCodigo = '';
+    this.viewAppNombre = '';
+    this.viewPersonName = assignment.responsable;
+    this.viewPersonPhone = assignment.celular ?? '—';
+    this.viewRowDetail = {
+      fechaLabel: this.formatDateRange(
+        assignment.fechaInicio,
+        assignment.fechaFin
+      ),
+      nombre: assignment.responsable,
+      celular: assignment.celular ?? '—',
+      appCodes: (assignment.aplicaciones ?? []).map(
+        app => app.codigoAplicacion
+      ),
+      appNames: (assignment.aplicaciones ?? []).map(
+        app => app.nombreAplicacion
+      ),
+      bvc: '—',
+      ldc: '—',
+      celula: '—',
+      service: (assignment.aplicaciones ?? [])[0]?.nombreAplicacion ?? '—',
+      footerLabel: 'Standby programado'
+    };
+    this.viewAssignments = this.scheduleService
+      .getAssignmentsForPerson(assignment.responsable)
+      .filter(item => this.assignmentMatchesScope(item));
+    this.showViewModal = true;
+    this.cdr.markForCheck();
 
   }
 
