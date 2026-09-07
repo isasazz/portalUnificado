@@ -138,6 +138,9 @@ export class StandbyModalComponent {
   /** Otras áreas: sin apps, solo servicios. */
   readonly serviceMode = input(false);
 
+  /** Edición de una programación existente. */
+  readonly editMode = input(false);
+
   readonly closed = output<void>();
 
 
@@ -414,6 +417,118 @@ export class StandbyModalComponent {
 
     this.activeAppIndex = this.sessionApps.length - 1;
     this.closeAddAppMenu();
+
+  }
+
+  removeApplication(codigoAplicacion: string, event?: Event): void {
+
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    if (this.sessionApps.length <= 1) {
+      // Permite quitar la única app: queda vacío hasta que agreguen otra
+      this.scheduleService.removeDraftsForApps([codigoAplicacion]);
+      this.productStates.delete(codigoAplicacion);
+      this.sessionApps = [];
+      this.activeAppIndex = 0;
+      this.programMode = 'single';
+      this.clearSelectedUser();
+      return;
+    }
+
+    const removedIndex = this.sessionApps.findIndex(
+      app => app.codigoAplicacion === codigoAplicacion
+    );
+
+    if (removedIndex < 0) {
+      return;
+    }
+
+    this.scheduleService.removeDraftsForApps([codigoAplicacion]);
+    this.productStates.delete(codigoAplicacion);
+    this.sessionApps = this.sessionApps.filter(
+      app => app.codigoAplicacion !== codigoAplicacion
+    );
+
+    if (this.activeAppIndex >= this.sessionApps.length) {
+      this.activeAppIndex = Math.max(0, this.sessionApps.length - 1);
+    } else if (removedIndex < this.activeAppIndex) {
+      this.activeAppIndex -= 1;
+    }
+
+    if (this.sessionApps.length <= 1) {
+      this.programMode = 'single';
+    }
+
+    this.restoreProductState(this.activeAppCodigo);
+
+  }
+
+  clearSelectedUser(): void {
+
+    const name = this.selectedUser;
+
+    this.selectedUser = undefined;
+    this.coResponsables = [];
+    this.addingCoResponsable = false;
+    this.addingToExistingWeek = null;
+    this.selectedWeekStarts = [];
+    this.calendar?.clearSelection();
+
+    if (name && this.sessionApps.length > 0) {
+      this.scheduleService.removeDraftPersonFromApps(
+        name,
+        this.sessionApps.map(app => app.codigoAplicacion)
+      );
+    }
+
+    this.persistActiveProductState();
+
+  }
+
+  removeCoResponsable(name: string): void {
+
+    this.coResponsables = this.coResponsables.filter(
+      item => item !== name
+    );
+    this.persistActiveProductState();
+
+  }
+
+  removeAcceptedPerson(
+    group: GroupedAcceptance,
+    name: string,
+    event?: Event
+  ): void {
+
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    const codes = group.aplicaciones.map(app => app.codigoAplicacion);
+    this.scheduleService.removeDraftPerson(name, group.start, codes);
+
+    if (this.selectedUser === name) {
+      this.clearSelectedUser();
+    }
+
+    this.removeCoResponsable(name);
+
+  }
+
+  removeAcceptedGroup(
+    group: GroupedAcceptance,
+    event?: Event
+  ): void {
+
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    const codes = group.aplicaciones.map(app => app.codigoAplicacion);
+    this.scheduleService.removeDraftGroup(group.start, codes);
+
+    if (group.responsables.includes(this.selectedUser ?? '')) {
+      this.clearSelectedUser();
+    }
 
   }
 
@@ -866,6 +981,7 @@ export class StandbyModalComponent {
 
     if (this.selectedUser === user) {
 
+      this.clearSelectedUser();
       return;
 
     }
@@ -1271,12 +1387,6 @@ export class StandbyModalComponent {
 
     this.scheduleService.save();
 
-
-
-    this.close();
-
-
-
     this.saved.emit({
 
       appCodigo: first?.codigoAplicacion ?? '',
@@ -1284,6 +1394,8 @@ export class StandbyModalComponent {
       appNombre: first?.nombreAplicacion ?? ''
 
     });
+
+    this.close();
 
 
 
@@ -1383,7 +1495,13 @@ export class StandbyModalComponent {
 
   private restoreProductState(codigo: string): void {
 
-
+    if (!codigo) {
+      this.selectedUser = undefined;
+      this.coResponsables = [];
+      this.selectedWeekStarts = [];
+      this.calendar?.clearSelection();
+      return;
+    }
 
     const state = this.productStates.get(codigo);
 
@@ -1456,6 +1574,30 @@ export class StandbyModalComponent {
     this.closeAddAppMenu();
 
     this.calendar?.clearSelection();
+
+    this.hydrateFromExistingDrafts();
+
+  }
+
+  /** Precarga responsable si ya hay semanas en borrador (modo edición). */
+  private hydrateFromExistingDrafts(): void {
+
+    const codes = new Set(
+      this.sessionApps.map(app => app.codigoAplicacion)
+    );
+
+    const drafts = this.scheduleService.draftAssignments.filter(
+      assignment =>
+        assignment.aplicaciones?.some(app =>
+          codes.has(app.codigoAplicacion)
+        )
+    );
+
+    if (drafts.length === 0) {
+      return;
+    }
+
+    this.selectedUser = drafts[0].responsable;
 
   }
 

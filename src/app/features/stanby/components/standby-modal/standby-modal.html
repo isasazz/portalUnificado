@@ -8,7 +8,9 @@
 
       <div class="modal-header__info">
 
-        <h2>Agregar Standby</h2>
+        <h2>
+          {{ editMode() ? 'Editar Standby' : 'Agregar Standby' }}
+        </h2>
 
         @if (sessionApps.length > 0) {
 
@@ -62,11 +64,28 @@
                   "
                   (click)="selectActiveApp(i)"
                 >
-                  @if (serviceMode()) {
-                    {{ app.service || app.nombreAplicacion }}
-                  } @else {
-                    {{ app.codigoAplicacion }}
-                  }
+                  <span class="product-tab__label">
+                    @if (serviceMode()) {
+                      {{ app.service || app.nombreAplicacion }}
+                    } @else {
+                      {{ app.codigoAplicacion }}
+                    }
+                  </span>
+                  <span
+                    class="product-tab__remove"
+                    role="button"
+                    tabindex="0"
+                    title="Quitar"
+                    [attr.aria-label]="
+                      serviceMode()
+                        ? 'Quitar servicio'
+                        : 'Quitar aplicación'
+                    "
+                    (click)="removeApplication(app.codigoAplicacion, $event)"
+                    (keydown.enter)="removeApplication(app.codigoAplicacion, $event)"
+                  >
+                    ×
+                  </span>
                 </button>
               }
             </div>
@@ -293,6 +312,13 @@
             Responsable seleccionado:
             {{ selectedUser }}
             · Selecciona un viernes (standby de viernes a jueves)
+            <button
+              type="button"
+              class="link-clear"
+              (click)="clearSelectedUser()"
+            >
+              Quitar responsable
+            </button>
 
           </div>
 
@@ -335,8 +361,21 @@
                 name of responsablesForSummaryDisplay;
                 track name
               ) {
-                <span class="person-chip">
+                <span class="person-chip person-chip--removable">
                   {{ name }}
+                  <button
+                    type="button"
+                    class="person-chip__remove"
+                    title="Quitar persona"
+                    aria-label="Quitar persona"
+                    (click)="
+                      name === selectedUser
+                        ? clearSelectedUser()
+                        : removeCoResponsable(name)
+                    "
+                  >
+                    ×
+                  </button>
                 </span>
               }
             </div>
@@ -426,7 +465,17 @@
 
               <li class="trace-item">
 
-                @if (hasMultipleProducts) {
+                <button
+                  type="button"
+                  class="trace-item__remove"
+                  title="Quitar esta selección"
+                  aria-label="Quitar esta selección"
+                  (click)="removeAcceptedGroup(group, $event)"
+                >
+                  ×
+                </button>
+
+                @if (group.aplicaciones.length > 0) {
                   <div class="trace-apps">
                     @for (
                       app of group.aplicaciones;
@@ -457,8 +506,17 @@
                     name of group.responsables;
                     track name
                   ) {
-                    <span class="person-chip">
+                    <span class="person-chip person-chip--removable">
                       {{ name }}
+                      <button
+                        type="button"
+                        class="person-chip__remove"
+                        title="Quitar persona"
+                        aria-label="Quitar persona"
+                        (click)="removeAcceptedPerson(group, name, $event)"
+                      >
+                        ×
+                      </button>
                     </span>
                   }
 

@@ -130,6 +130,9 @@ export class StandbyPageComponent implements OnInit {
 
   showStandbyModal = false;
 
+  /** Modal abierto en modo edición de una fila existente. */
+  editingStandby = false;
+
   showRelevoModal = false;
 
   showPersonModal = false;
@@ -580,6 +583,7 @@ export class StandbyPageComponent implements OnInit {
       ...this.selectedApplications
     ];
 
+    this.editingStandby = false;
     this.showSidePanel = false;
     this.showStandbyModal = true;
     this.cdr.markForCheck();
@@ -656,6 +660,7 @@ export class StandbyPageComponent implements OnInit {
 
   openStandbyModal(): void {
 
+    this.editingStandby = false;
     this.showStandbyModal = true;
 
   }
@@ -664,12 +669,27 @@ export class StandbyPageComponent implements OnInit {
 
     this.showStandbyModal = false;
 
+    // Solo restaurar/limpiar si aún hay edición pendiente o borradores
+    // (tras un save exitoso el servicio ya quedó limpio).
+    if (
+      this.scheduleService.isEditing ||
+      this.scheduleService.hasDraft
+    ) {
+      this.scheduleService.cancelPendingEdit();
+    }
+
+    this.editingStandby = false;
+    this.panelApplications = [];
+    this.cdr.markForCheck();
+
   }
 
   onStandbySaved(payload: {
     appCodigo: string;
     appNombre: string;
   }): void {
+
+    const wasEditing = this.editingStandby;
 
     this.applications.forEach(app => {
       app.selected = false;
@@ -678,6 +698,7 @@ export class StandbyPageComponent implements OnInit {
     this.panelApplications = [];
     this.showSidePanel = false;
     this.showStandbyModal = false;
+    this.editingStandby = false;
     this.applications = [...this.applications];
     this.activeView = 'programmed';
     this.panelView.set('apps');
@@ -690,7 +711,9 @@ export class StandbyPageComponent implements OnInit {
 
     this.saveSuccess.show({
       title: '¡Listo!',
-      message: 'Tu standby quedó programado.',
+      message: wasEditing
+        ? 'Tu standby quedó actualizado.'
+        : 'Tu standby quedó programado.',
       buttonLabel: 'Ver standby',
       onConfirm: () => {
         this.openLatestSavedStandby(payload.appCodigo);
@@ -880,9 +903,64 @@ export class StandbyPageComponent implements OnInit {
       return;
     }
 
+    this.editingStandby = false;
     this.panelApplications = [{ ...app }];
     this.showSidePanel = false;
     this.showStandbyModal = true;
+
+  }
+
+  openEditForRow(
+    row: { id: number; appCodes: string[] },
+    event?: Event
+  ): void {
+
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    if (this.delegationService.hasDelegatedOut()) {
+      return;
+    }
+
+    const assignment = this.scheduleService.beginEdit(row.id);
+
+    if (!assignment) {
+      return;
+    }
+
+    const codes = new Set(
+      (assignment.aplicaciones ?? []).map(
+        app => app.codigoAplicacion
+      )
+    );
+
+    let apps = this.applications
+      .filter(app => codes.has(app.codigoAplicacion))
+      .map(app => ({ ...app, selected: true }));
+
+    if (apps.length === 0) {
+      apps = (assignment.aplicaciones ?? []).map((app, index) => ({
+        id: -(index + 1),
+        codigoAplicacion: app.codigoAplicacion,
+        nombreAplicacion: app.nombreAplicacion,
+        descripcion: '',
+        bvc: '',
+        ldc: '',
+        celula: '',
+        service: app.nombreAplicacion,
+        evc: '',
+        linea: '',
+        responsable: assignment.responsable,
+        selected: true
+      }));
+    }
+
+    this.editingStandby = true;
+    this.panelApplications = apps;
+    this.showSidePanel = false;
+    this.showViewModal = false;
+    this.showStandbyModal = true;
+    this.cdr.markForCheck();
 
   }
 

@@ -229,7 +229,11 @@
 }
 
 .product-tab {
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 8px 6px 12px;
 
   border: 1px solid $border-color;
   border-radius: $radius-pill;
@@ -240,6 +244,30 @@
   color: $text-secondary;
 
   cursor: pointer;
+}
+
+.product-tab__label {
+  line-height: 1.2;
+}
+
+.product-tab__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  color: $text-secondary;
+  cursor: pointer;
+}
+
+.product-tab__remove:hover {
+  background: rgba(144, 99, 205, 0.15);
+  color: $violeta-orquidea;
 }
 
 .product-tab--active {
@@ -502,6 +530,7 @@
 .person-chip {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
 
   padding: 4px 10px;
 
@@ -512,6 +541,49 @@
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
   color: $text-primary;
+}
+
+.person-chip--removable {
+  padding-right: 4px;
+}
+
+.person-chip__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 18px;
+  height: 18px;
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+
+  font-size: 14px;
+  line-height: 1;
+  color: $text-secondary;
+  cursor: pointer;
+}
+
+.person-chip__remove:hover {
+  background: rgba(144, 99, 205, 0.15);
+  color: $violeta-orquidea;
+}
+
+.link-clear {
+  display: inline;
+  margin-left: $space-8;
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  font: inherit;
+  font-weight: $font-weight-semibold;
+  color: $violeta-orquidea;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .add-person-btn {
@@ -591,14 +663,44 @@
 }
 
 .trace-item {
+  position: relative;
   @include flex-column;
   gap: $space-8;
 
   padding: $space-12;
+  padding-right: $space-36;
 
   border: 1px solid $border-light;
   border-radius: $radius-sm;
   background: $background-body;
+}
+
+.trace-item__remove {
+  position: absolute;
+  top: $space-8;
+  right: $space-8;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+  padding: 0;
+
+  border: 1px solid $border-light;
+  border-radius: $radius-sm;
+  background: $surface;
+
+  font-size: 16px;
+  line-height: 1;
+  color: $text-secondary;
+  cursor: pointer;
+}
+
+.trace-item__remove:hover {
+  border-color: $violeta-orquidea;
+  color: $violeta-orquidea;
 }
 
 .trace-item__main {

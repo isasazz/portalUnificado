@@ -36,6 +36,13 @@ export class StandbyScheduleService {
     ...STANDBY_ASSIGNMENTS_MOCK
   ];
 
+  /** Snapshot para restaurar si se cierra el modal de edición sin guardar. */
+  private editRestore: StandbyAssignment[] = [];
+
+  get isEditing(): boolean {
+    return this.editRestore.length > 0;
+  }
+
   constructor() {
 
     STANDBY_ASSIGNMENTS_MOCK.forEach(assignment => {
@@ -49,6 +56,75 @@ export class StandbyScheduleService {
 
     });
 
+  }
+
+  /**
+   * Saca la asignación de guardados y la pone en borrador
+   * para reabrir el modal de programación con lo ya configurado.
+   */
+  beginEdit(assignmentId: number): StandbyAssignment | null {
+
+    const assignment = this.savedAssignments.find(
+      item => item.id === assignmentId
+    );
+
+    if (!assignment) {
+      return null;
+    }
+
+    // Descarta borradores previos de otra sesión
+    this.draftAssignments = [];
+    this.editRestore = [];
+
+    const clone: StandbyAssignment = {
+      ...assignment,
+      fechaInicio: new Date(assignment.fechaInicio),
+      fechaFin: new Date(assignment.fechaFin),
+      aplicaciones: [...(assignment.aplicaciones ?? [])]
+    };
+
+    this.editRestore = [clone];
+    this.savedAssignments = this.savedAssignments.filter(
+      item => item.id !== assignmentId
+    );
+    this.draftAssignments = [
+      {
+        ...clone,
+        fechaInicio: new Date(clone.fechaInicio),
+        fechaFin: new Date(clone.fechaFin),
+        aplicaciones: [...(clone.aplicaciones ?? [])]
+      }
+    ];
+
+    return clone;
+
+  }
+
+  /** Restaura la asignación si se cancela la edición. */
+  cancelPendingEdit(): void {
+
+    if (this.editRestore.length === 0) {
+      this.draftAssignments = [];
+      return;
+    }
+
+    this.savedAssignments = [
+      ...this.savedAssignments,
+      ...this.editRestore.map(item => ({
+        ...item,
+        fechaInicio: new Date(item.fechaInicio),
+        fechaFin: new Date(item.fechaFin),
+        aplicaciones: [...(item.aplicaciones ?? [])]
+      }))
+    ];
+
+    this.editRestore = [];
+    this.draftAssignments = [];
+
+  }
+
+  clearPendingEdit(): void {
+    this.editRestore = [];
   }
 
   acceptWeeks(
@@ -96,6 +172,100 @@ export class StandbyScheduleService {
     ];
 
     this.draftAssignments = [];
+    this.editRestore = [];
+
+  }
+
+  /** Quita del borrador a una persona en una semana / apps concretas. */
+  removeDraftPerson(
+    responsable: string,
+    start: Date,
+    appCodes: string[]
+  ): void {
+
+    const startKey = this.startOfDay(start);
+    const codeSet = new Set(appCodes);
+
+    this.draftAssignments = this.draftAssignments.filter(assignment => {
+      if (assignment.responsable !== responsable) {
+        return true;
+      }
+
+      if (this.startOfDay(assignment.fechaInicio) !== startKey) {
+        return true;
+      }
+
+      const codes = (assignment.aplicaciones ?? []).map(
+        app => app.codigoAplicacion
+      );
+
+      const sameApps =
+        codes.length === codeSet.size &&
+        codes.every(code => codeSet.has(code));
+
+      return !sameApps;
+    });
+
+  }
+
+  /** Quita del borrador toda una selección aceptada (semana + apps). */
+  removeDraftGroup(start: Date, appCodes: string[]): void {
+
+    const startKey = this.startOfDay(start);
+    const codeSet = new Set(appCodes);
+
+    this.draftAssignments = this.draftAssignments.filter(assignment => {
+      if (this.startOfDay(assignment.fechaInicio) !== startKey) {
+        return true;
+      }
+
+      const codes = (assignment.aplicaciones ?? []).map(
+        app => app.codigoAplicacion
+      );
+
+      const sameApps =
+        codes.length === codeSet.size &&
+        codes.every(code => codeSet.has(code));
+
+      return !sameApps;
+    });
+
+  }
+
+  /** Quita del borrador todo lo ligado a unas apps. */
+  removeDraftsForApps(appCodes: string[]): void {
+
+    const codeSet = new Set(appCodes);
+
+    this.draftAssignments = this.draftAssignments.filter(assignment => {
+      const codes = (assignment.aplicaciones ?? []).map(
+        app => app.codigoAplicacion
+      );
+
+      return !codes.some(code => codeSet.has(code));
+    });
+
+  }
+
+  /** Quita a una persona de todos los borradores ligados a esas apps. */
+  removeDraftPersonFromApps(
+    responsable: string,
+    appCodes: string[]
+  ): void {
+
+    const codeSet = new Set(appCodes);
+
+    this.draftAssignments = this.draftAssignments.filter(assignment => {
+      if (assignment.responsable !== responsable) {
+        return true;
+      }
+
+      const codes = (assignment.aplicaciones ?? []).map(
+        app => app.codigoAplicacion
+      );
+
+      return !codes.some(code => codeSet.has(code));
+    });
 
   }
 
