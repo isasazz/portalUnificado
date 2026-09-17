@@ -1,0 +1,344 @@
+@use 'abstracts/colors' as *;
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+
+.sp-doc {
+  overflow: hidden;
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  background: $surface;
+  box-shadow: $shadow-sm;
+}
+
+.sp-doc__hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+
+  min-height: 200px;
+  padding: $space-24 $space-32;
+
+  background:
+    linear-gradient(
+      105deg,
+      rgba(12, 16, 24, 0.92) 0%,
+      rgba(20, 28, 40, 0.55) 48%,
+      rgba(18, 22, 30, 0.35) 100%
+    ),
+    radial-gradient(
+      circle at 70% 40%,
+      #3a4a5c 0%,
+      #12161e 55%,
+      #0a0c10 100%
+    );
+}
+
+.sp-doc__hero-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(10, 12, 16, 0.72) 0%,
+    rgba(10, 12, 16, 0.35) 55%,
+    rgba(10, 12, 16, 0.15) 100%
+  );
+}
+
+.sp-doc__hero h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.02em;
+  color: $blanco;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.sp-doc__body {
+  @include flex-column;
+  gap: $space-16;
+  width: 100%;
+  max-width: none;
+  padding: $space-32 $space-24 $space-40;
+  margin: 0;
+}
+
+.sp-doc__lead,
+.sp-doc__contact,
+.sp-doc__payment {
+  margin: 0;
+  max-width: none;
+  text-align: left;
+  font-size: $font-size-sm;
+  line-height: 1.65;
+  color: $text-secondary;
+}
+
+.sp-doc__contact a {
+  color: $link-color;
+  font-weight: $font-weight-semibold;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sp-doc__payment {
+  padding-bottom: $space-8;
+  border-bottom: 1px solid $border-light;
+}
+
+.sp-doc__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-16;
+  margin-top: $space-8;
+}
+
+.sp-doc__action {
+  @include button-base;
+
+  min-height: 52px;
+  padding: 14px 18px;
+
+  border: none;
+  border-radius: 2px;
+  background: #4a4a4a;
+
+  font-size: 14px;
+  font-weight: $font-weight-semibold;
+  color: $blanco;
+}
+
+.sp-doc__action:hover {
+  background: #333;
+}
+
+.sp-doc__soon {
+  margin: 0;
+  padding: $space-12;
+  border-radius: $radius-sm;
+  background: rgba(253, 218, 36, 0.16);
+  font-size: $font-size-sm;
+  color: $text-primary;
+  text-align: center;
+}
+
+.sp-doc__accordion {
+  @include flex-column;
+  gap: 0;
+  margin-top: $space-16;
+  border-top: 1px solid $border-light;
+}
+
+.sp-acc {
+  border-bottom: 1px solid $border-light;
+}
+
+.sp-acc:nth-child(odd) .sp-acc__trigger {
+  background: #f3f3f3;
+}
+
+.sp-acc:nth-child(even) .sp-acc__trigger {
+  background: $surface;
+}
+
+.sp-acc--open .sp-acc__trigger {
+  background: #ebebeb;
+}
+
+.sp-acc__trigger {
+  @include button-base;
+
+  display: flex;
+  align-items: center;
+  gap: $space-12;
+
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 16px;
+
+  border: none;
+  border-radius: 0;
+
+  text-align: left;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.sp-acc__chevron {
+  flex-shrink: 0;
+  width: 1.1rem;
+  text-align: center;
+  color: $text-secondary;
+  transition: transform 0.18s ease;
+}
+
+.sp-acc__chevron--open {
+  transform: rotate(180deg);
+}
+
+.sp-acc__panel {
+  padding: $space-20 $space-16 $space-24;
+  background: #fafafa;
+}
+
+.sp-acc__grid {
+  display: grid;
+  gap: $space-20;
+}
+
+.sp-acc__content {
+  @include flex-column;
+  gap: $space-12;
+  min-width: 0;
+}
+
+.sp-acc__intro {
+  margin: 0;
+  font-size: $font-size-sm;
+  line-height: 1.6;
+  color: $text-primary;
+}
+
+.sp-acc__list {
+  margin: 0;
+  padding-left: $space-20;
+
+  font-size: $font-size-sm;
+  line-height: 1.55;
+  color: $text-secondary;
+}
+
+.sp-acc__list li + li {
+  margin-top: 10px;
+}
+
+.sp-acc__list strong {
+  color: $text-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.sp-acc__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-12;
+  margin-top: 4px;
+}
+
+.sp-acc__btn {
+  @include button-base;
+
+  min-height: 44px;
+  padding: 10px 16px;
+
+  border: none;
+  border-radius: 2px;
+  background: #4a4a4a;
+
+  font-size: 13px;
+  font-weight: $font-weight-semibold;
+  color: $blanco;
+}
+
+.sp-acc__btn:hover {
+  background: #333;
+}
+
+.sp-acc__table-wrap {
+  overflow-x: auto;
+  border: 1px solid $border-color;
+  border-radius: $radius-sm;
+  background: $surface;
+}
+
+.sp-acc__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $font-size-sm;
+}
+
+.sp-acc__table th,
+.sp-acc__table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid $border-light;
+  text-align: left;
+  vertical-align: top;
+}
+
+.sp-acc__table th {
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  background: #f7f7f7;
+}
+
+.sp-acc__table td:last-child {
+  white-space: nowrap;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.sp-acc__table tr:last-child td {
+  border-bottom: none;
+}
+
+.sp-acc__note {
+  margin: 0;
+  padding: $space-12 $space-16;
+
+  border-left: 3px solid $amarillo-macondo;
+  border-radius: 0 $radius-sm $radius-sm 0;
+  background: rgba(253, 218, 36, 0.12);
+
+  font-size: $font-size-sm;
+  line-height: 1.55;
+  color: $text-primary;
+}
+
+.sp-acc__note strong {
+  font-weight: $font-weight-semibold;
+}
+
+.sp-acc__media {
+  margin: 0;
+  overflow: hidden;
+  border-radius: $radius-md;
+  background: $background-body;
+}
+
+.sp-acc__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+@media (min-width: 860px) {
+  .sp-acc__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .sp-doc__body {
+    padding: $space-20;
+  }
+
+  .sp-doc__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .sp-doc__hero {
+    min-height: 160px;
+    padding: $space-20;
+  }
+
+  .sp-acc__actions {
+    flex-direction: column;
+  }
+
+  .sp-acc__btn {
+    width: 100%;
+  }
+}

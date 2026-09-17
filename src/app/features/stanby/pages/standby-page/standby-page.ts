@@ -41,6 +41,9 @@ from '../../components/standby-person-modal/standby-person-modal';
 import { StandbyReportExportComponent }
 from '../../components/standby-report-export/standby-report-export';
 
+import { StandbyPoliciesViewerComponent }
+from '../../components/standby-policies-viewer/standby-policies-viewer';
+
 import { StandbyScheduleService }
 from '../../services/standby-schedule.service';
 
@@ -89,6 +92,7 @@ type StandbyScope = 'tech' | 'areas';
     StandbyRelevoModalComponent,
     StandbyPersonModalComponent,
     StandbyReportExportComponent,
+    StandbyPoliciesViewerComponent,
     PortalFilterBarComponent
   ],
   templateUrl: './standby-page.html',
@@ -216,6 +220,11 @@ export class StandbyPageComponent implements OnInit {
     });
 
     this.route.queryParams.subscribe(params => {
+
+      if (params['tab'] === 'program') {
+        this.panelView.set('program');
+        this.cdr.markForCheck();
+      }
 
       const appCode = params['app'];
 

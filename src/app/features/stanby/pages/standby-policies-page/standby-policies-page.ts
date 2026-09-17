@@ -1,40 +1,29 @@
 import {
   ChangeDetectionStrategy,
-  Component
+  Component,
+  inject
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
-import {
-  STANDBY_POLICY_META,
-  STANDBY_POLICY_PRINCIPLES,
-  STANDBY_POLICY_SECTIONS
-} from '../../data/standby-policies.data';
+import { StandbyPoliciesViewerComponent }
+from '../../components/standby-policies-viewer/standby-policies-viewer';
 
 @Component({
   selector: 'app-standby-policies-page',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, StandbyPoliciesViewerComponent],
   templateUrl: './standby-policies-page.html',
   styleUrl: './standby-policies-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StandbyPoliciesPageComponent {
 
-  readonly meta = STANDBY_POLICY_META;
+  private readonly router = inject(Router);
 
-  readonly sections = STANDBY_POLICY_SECTIONS;
-
-  readonly principles = STANDBY_POLICY_PRINCIPLES;
-
-  scrollToSection(id: string): void {
-
-    document
-      .getElementById(id)
-      ?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-
+  goToProgram(): void {
+    void this.router.navigate(['/standby'], {
+      queryParams: { tab: 'program' }
+    });
   }
 
 }

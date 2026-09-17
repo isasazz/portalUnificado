@@ -368,6 +368,49 @@
   gap: $space-16;
 }
 
+.inline-panel--policies {
+  gap: $space-16;
+  width: 100%;
+  max-width: none;
+}
+
+.inline-panel--policies app-standby-policies-viewer,
+.inline-panel--policies .sp-doc {
+  display: block;
+  width: 100%;
+}
+
+.policies-embed {
+  overflow: hidden;
+
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+  background: $background-body;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.policies-embed__frame {
+  display: block;
+  width: 100%;
+  min-height: min(70vh, 780px);
+  height: 70vh;
+  border: 0;
+  background: $surface;
+}
+
+.policies-embed__note {
+  margin: 0;
+  font-size: $font-size-xs;
+  line-height: 1.45;
+  color: $text-secondary;
+}
+
+.policies-embed__note a {
+  color: $link-color;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .policy-block {
   padding: $space-20;
 

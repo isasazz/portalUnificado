@@ -680,7 +680,7 @@
                     [value]="filterLinea()"
                     (change)="updateAppFilter('linea', $any($event.target).value)"
                   >
-                    <option value="">Todas las LdC</option>
+                    <option value="">Todas las LC</option>
                     @for (ldc of ldcOptions(); track ldc) {
                       <option [value]="ldc">{{ ldc }}</option>
                     }
@@ -743,7 +743,7 @@
                 } @else {
 
                   <p class="form-section__hint">
-                    Selecciona una célula, una LdC o escribe en el buscador
+                    Selecciona una célula, una LC o escribe en el buscador
                     (también aplica el filtro global del portal).
                     para ver aplicaciones.
                   </p>
@@ -884,7 +884,7 @@
                   </div>
 
                   <div class="preview-item">
-                    <label>Célula / LdC</label>
+                    <label>Célula / LC</label>
                     <span>
                       @if (selectedApp(); as app) {
                         {{ app.celula }} · {{ app.ldc }}

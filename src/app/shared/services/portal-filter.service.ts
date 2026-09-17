@@ -9,9 +9,9 @@ import {
   PortalFilterable,
   PortalFilterDimension,
   PortalFilterState,
-  PORTAL_BVC_OPTIONS,
+  PORTAL_EVC_OPTIONS,
   PORTAL_CELULA_OPTIONS,
-  PORTAL_LDC_OPTIONS,
+  PORTAL_LC_OPTIONS,
   PORTAL_SERVICE_OPTIONS
 } from '../models/portal-filter.model';
 
@@ -47,14 +47,14 @@ export class PortalFilterService {
 
   readonly bvcOptions = computed(() =>
     this.mergeOptions(
-      [...PORTAL_BVC_OPTIONS],
+      [...PORTAL_EVC_OPTIONS],
       STANDBY_APPLICATIONS.map(app => app.bvc)
     )
   );
 
   readonly ldcOptions = computed(() =>
     this.mergeOptions(
-      [...PORTAL_LDC_OPTIONS],
+      [...PORTAL_LC_OPTIONS],
       STANDBY_APPLICATIONS.map(app => app.ldc)
     )
   );

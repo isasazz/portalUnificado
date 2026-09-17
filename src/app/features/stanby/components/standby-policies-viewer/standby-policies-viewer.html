@@ -1,0 +1,160 @@
+<article class="sp-doc">
+
+  <header class="sp-doc__hero">
+    <div class="sp-doc__hero-shade"></div>
+    <h2>Stand By</h2>
+  </header>
+
+  <div class="sp-doc__body">
+
+    <p class="sp-doc__lead">{{ intro.lead }}</p>
+
+    <p class="sp-doc__contact">
+      {{ intro.contactLabel }}
+      <a [href]="'mailto:' + intro.contactEmail">
+        {{ intro.contactEmail }}
+      </a>
+      ({{ intro.contactName }}).
+    </p>
+
+    <p class="sp-doc__payment">
+      {{ intro.paymentNote }}
+    </p>
+
+    <div class="sp-doc__actions">
+      <button
+        type="button"
+        class="sp-doc__action"
+        (click)="onPersonalClick()"
+      >
+        Personal del Stand By
+      </button>
+
+      <button
+        type="button"
+        class="sp-doc__action"
+        (click)="goToProgram()"
+      >
+        Programación del Stand By
+      </button>
+    </div>
+
+    @if (soonHint()) {
+      <p class="sp-doc__soon">{{ soonHint() }}</p>
+    }
+
+    <div class="sp-doc__accordion" role="list">
+      @for (item of items; track item.id) {
+        <div
+          class="sp-acc"
+          [class.sp-acc--open]="isOpen(item)"
+          role="listitem"
+        >
+          <button
+            type="button"
+            class="sp-acc__trigger"
+            [attr.aria-expanded]="isOpen(item)"
+            (click)="toggle(item)"
+          >
+            <span
+              class="sp-acc__chevron"
+              [class.sp-acc__chevron--open]="isOpen(item)"
+              aria-hidden="true"
+            >∨</span>
+            <span class="sp-acc__title">{{ item.title }}</span>
+          </button>
+
+          @if (isOpen(item)) {
+            <div class="sp-acc__panel">
+
+              <div
+                class="sp-acc__grid"
+                [class.sp-acc__grid--flip]="item.imageSide === 'right'"
+              >
+
+                @if (item.image) {
+                  <figure class="sp-acc__media">
+                    <img
+                      [src]="item.image"
+                      [alt]="item.title"
+                      loading="lazy"
+                    />
+                  </figure>
+                }
+
+                <div class="sp-acc__content">
+
+                  @if (item.intro) {
+                    <p
+                      class="sp-acc__intro"
+                      [innerHTML]="richText(item.intro)"
+                    ></p>
+                  }
+
+                  @if (item.bullets.length) {
+                    <ul class="sp-acc__list">
+                      @for (bullet of item.bullets; track bullet) {
+                        <li [innerHTML]="richText(bullet)"></li>
+                      }
+                    </ul>
+                  }
+
+                  @if (item.actions?.length) {
+                    <div class="sp-acc__actions">
+                      @for (action of item.actions; track action.id) {
+                        <button
+                          type="button"
+                          class="sp-acc__btn"
+                          (click)="onAction(action)"
+                        >
+                          {{ action.label }}
+                        </button>
+                      }
+                    </div>
+                  }
+
+                  @if (item.table; as table) {
+                    <div class="sp-acc__table-wrap">
+                      <table class="sp-acc__table">
+                        <thead>
+                          <tr>
+                            <th>{{ table.headers[0] }}</th>
+                            <th>{{ table.headers[1] }}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (row of table.rows; track row.cargo) {
+                            <tr>
+                              <td>{{ row.cargo }}</td>
+                              <td>{{ row.valor }}</td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                    @if (table.footnote) {
+                      <p class="sp-acc__note">{{ table.footnote }}</p>
+                    }
+                  }
+
+                  @if (item.notes?.length) {
+                    @for (note of item.notes; track note) {
+                      <aside
+                        class="sp-acc__note"
+                        [innerHTML]="richText(note)"
+                      ></aside>
+                    }
+                  }
+
+                </div>
+              </div>
+
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+
+</article>

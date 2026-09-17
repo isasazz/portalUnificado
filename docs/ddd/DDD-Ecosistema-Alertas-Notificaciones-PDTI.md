@@ -218,7 +218,7 @@ El mismo contexto cubre:
 
 #### Flujo principal — Programar standby
 
-1. **Read model:** consultar catálogo app/servicio (Helix) / filtros organizacionales (BVC, LdC, Célula).  
+1. **Read model:** consultar catálogo app/servicio (Helix) / filtros organizacionales (EVC, LC, Célula).
 2. **Comando:** `DefinirAlcanceStandby` (apps y/o servicios)  
    - Actor: Líder o Delegado  
    - **Evento:** `AlcanceStandbyDefinido`  

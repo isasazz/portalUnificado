@@ -45,16 +45,16 @@ export const PORTAL_FILTER_LABELS: Record<
   PortalFilterDimension,
   string
 > = {
-  bvc: 'BVC',
-  ldc: 'LdC',
+  bvc: 'EVC',
+  ldc: 'LC',
   celula: 'Célula',
   service: 'Service',
   app: 'App',
   user: 'User'
 };
 
-/** Catálogo mock de valores organizacionales. */
-export const PORTAL_BVC_OPTIONS = [
+/** Catálogo mock de valores organizacionales (EVC). */
+export const PORTAL_EVC_OPTIONS = [
   'Banca Personas',
   'Banca Empresas',
   'Tesorería',
@@ -62,13 +62,20 @@ export const PORTAL_BVC_OPTIONS = [
   'Operaciones'
 ] as const;
 
-export const PORTAL_LDC_OPTIONS = [
+/** @deprecated Usar PORTAL_EVC_OPTIONS */
+export const PORTAL_BVC_OPTIONS = PORTAL_EVC_OPTIONS;
+
+/** Catálogo mock de valores organizacionales (LC). */
+export const PORTAL_LC_OPTIONS = [
   'Aplicaciones',
   'Infraestructura',
   'Monitoreo',
   'Backoffice',
   'Cumplimiento'
 ] as const;
+
+/** @deprecated Usar PORTAL_LC_OPTIONS */
+export const PORTAL_LDC_OPTIONS = PORTAL_LC_OPTIONS;
 
 export const PORTAL_CELULA_OPTIONS = [
   'Célula Core',

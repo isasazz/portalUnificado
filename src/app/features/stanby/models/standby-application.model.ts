@@ -8,10 +8,10 @@ export interface StandbyApplication {
 
   descripcion: string;
 
-  /** Vertical de negocio (BVC). */
+  /** Vertical de negocio (EVC). */
   bvc: string;
 
-  /** Línea de conocimiento (LdC). */
+  /** Línea de conocimiento (LC). */
   ldc: string;
 
   /** Célula responsable. */
@@ -27,7 +27,7 @@ export interface StandbyApplication {
   evc: string;
 
   /**
-   * Alias legado de LdC (compatibilidad UI).
+   * Alias legado de LC (compatibilidad UI).
    * @deprecated Preferir `ldc`.
    */
   linea: string;

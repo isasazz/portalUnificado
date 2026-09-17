@@ -1,10 +1,31 @@
-export interface StandbyPolicySection {
+export interface StandbyPolicyAction {
   id: string;
-  number: string;
+  label: string;
+  /** program = ir al tab Programar; soon = aún no disponible */
+  kind: 'program' | 'soon';
+}
+
+export interface StandbyPolicyTableRow {
+  cargo: string;
+  valor: string;
+}
+
+export interface StandbyPolicyAccordionItem {
+  id: string;
   title: string;
-  summary: string;
+  intro?: string;
   bullets: string[];
-  highlight?: string;
+  notes?: string[];
+  image?: string;
+  /** Imagen a la izquierda (default) o derecha */
+  imageSide?: 'left' | 'right';
+  actions?: StandbyPolicyAction[];
+  table?: {
+    caption?: string;
+    headers: [string, string];
+    rows: StandbyPolicyTableRow[];
+    footnote?: string;
+  };
 }
 
 export interface StandbyPolicyMeta {
@@ -16,118 +37,203 @@ export interface StandbyPolicyMeta {
 }
 
 export const STANDBY_POLICY_META: StandbyPolicyMeta = {
-  title: 'Políticas de Standby',
+  title: 'Stand By',
   subtitle:
-    'Lineamientos corporativos para la programación, cobertura y escalamiento de standby en aplicaciones críticas.',
+    'Gobierno y definiciones de talento stand-by, integradas en el portal.',
   version: 'v2.1',
   lastUpdated: 'Agosto 2026',
-  owner: 'Operaciones · Continuidad de servicio'
+  owner: 'Administración de Capacidad'
 };
 
-export const STANDBY_POLICY_SECTIONS: StandbyPolicySection[] = [
+export const STANDBY_POLICIES_SHAREPOINT_URL =
+  'https://bancolombia.sharepoint.com/sites/co-vsti/SitePages/gobierno_definiciones_talento_stand-by.aspx';
+
+export const STANDBY_POLICIES_EMBED_URL =
+  `${STANDBY_POLICIES_SHAREPOINT_URL}?env=Embedded`;
+
+export const STANDBY_POLICIES_INTRO = {
+  lead:
+    'La figura del Stand By es un grupo de personas que apoyan los procesos de Continuidad del Negocio, con el fin de garantizar que se cuente con el soporte personal requerido ante eventualidades.',
+  contactLabel: 'Cualquier inquietud escribir a:',
+  contactEmail: 'admincap@bancolombia.com.co',
+  contactName: 'Administración de Capacidad',
+  paymentNote:
+    'El pago del servicio de Stand By se realizará durante los primeros quince días del mes siguiente al del servicio.'
+};
+
+export const STANDBY_POLICY_ACCORDION: StandbyPolicyAccordionItem[] = [
   {
-    id: 'alcance',
-    number: '01',
-    title: 'Alcance y objetivo',
-    summary:
-      'El standby garantiza respuesta oportuna ante incidentes en aplicaciones de misión crítica fuera del horario laboral habitual.',
+    id: 'requisitos-area',
+    title: 'Requisitos para que un área aplique modelo Stand By',
+    intro:
+      'El concepto de Stand By será aplicable en aquellas áreas que cumplan con estos requisitos:',
+    imageSide: 'left',
     bullets: [
-      'Aplica a aplicaciones registradas en el portal con contacto y responsable vigente.',
-      'Su objetivo es mantener continuidad operativa y tiempos de respuesta acordes al nivel de criticidad.',
-      'Toda programación debe quedar trazada en el módulo Standby del portal unificado.'
-    ],
-    highlight:
-      'Ninguna cobertura fuera del portal se considera válida para auditoría.'
-  },
-  {
-    id: 'cobertura',
-    number: '02',
-    title: 'Ventana de cobertura',
-    summary:
-      'Cada turno de standby cubre un periodo continuo de siete días calendario.',
-    bullets: [
-      'El inicio del turno es siempre un viernes.',
-      'El cierre del turno es el jueves siguiente (viernes → jueves).',
-      'Un mismo responsable puede programar varios turnos, siempre que no se crucen con otros ya aceptados.',
-      'Los días ocupados por otro responsable no están disponibles para selección.'
-    ],
-    highlight: 'Regla operativa: selecciona únicamente el viernes de inicio; el sistema completa la semana.'
-  },
-  {
-    id: 'responsables',
-    number: '03',
-    title: 'Responsables y elegibilidad',
-    summary:
-      'Solo personal autorizado y registrado como contacto de la aplicación puede ser asignado.',
-    bullets: [
-      'El responsable debe tener celular corporativo activo y correo de notificación válido.',
-      'Debe conocer runbooks, accesos y procedimientos de escalamiento de la aplicación.',
-      'Es responsable de permanecer localizable durante las 24 horas de cada día del turno.',
-      'Ante incapacidad, debe gestionar relevo con anticipación y actualizar la programación.'
+      'Prestar servicios de disponibilidad total (7 X 24 horas), siempre y cuando, el área no maneje turnos sucesivos de 24 horas.',
+      'Atender un servicio crítico y que afecte la **continuidad del negocio** para el Banco.',
+      'Responder por servicios que requieren soporte en **horarios no hábiles** porque se presenten fallas en la prestación de los mismos.',
+      'Atender servicios que, en caso de no ser restaurados oportunamente, causarían un impacto grave al Banco por su impacto en los clientes.'
     ]
   },
   {
-    id: 'programacion',
-    number: '04',
-    title: 'Programación en el portal',
-    summary:
-      'La programación se realiza desde Standby → Agregar, siguiendo el flujo guiado del calendario.',
+    id: 'condiciones-personal',
+    title: 'Condiciones para el personal programado en Stand by',
+    intro:
+      'El personal que presta Stand By debe cumplir estas condiciones operativas y de elegibilidad:',
+    imageSide: 'right',
     bullets: [
-      'Selecciona una o más aplicaciones disponibles y agrégalas al panel de programación.',
-      'Elige el responsable y los viernes de inicio deseados en el calendario.',
-      'Revisa el resumen (de viernes a jueves) y confirma con «Aceptar selección».',
-      'Finaliza con «Guardar» para publicar el standby programado.'
-    ]
-  },
-  {
-    id: 'escalamiento',
-    number: '05',
-    title: 'Escalamiento y tiempos de respuesta',
-    summary:
-      'Ante un incidente, el responsable de standby es el primer punto de contacto operativo.',
-    bullets: [
-      'Atender alertas en el tiempo definido por la criticidad de la aplicación (SLA interno).',
-      'Escalar al líder de servicio o EVC cuando el incidente supere su alcance técnico.',
-      'Documentar acciones en la herramienta de gestión de incidentes correspondiente.',
-      'Notificar continuidad si hay impacto a clientes o transacciones masivas.'
+      'El personal Stand By debe prestar soporte telefónico inmediato y, en caso de requerirse su desplazamiento a las instalaciones del Banco, debe acudir en un tiempo no mayor a **45 minutos**. Será responsabilidad de los jefes velar porque esta condición se cumpla.',
+      'Línea celular y modem asignado por el banco, rotativo por temas entre los empleados que atienden Stand By, en caso de ser necesario.',
+      'Token personal asignado por el banco, en caso de ser necesario.',
+      'Tener disponibilidad rotativa de acuerdo a una programación mensual definida por el Banco. El líder es quien garantiza la rotación de los empleados semanalmente, para armonizar el bienestar y la salud de los colaboradores.',
+      'El líder es responsable de garantizar que el empleado programado para atención del Stand By tenga las herramientas y conocimientos necesarios para el cargo.',
+      'Es responsabilidad de quien presta el servicio reportar alertas y tiempos de atención en la página definida por cada Gerencia de Gestión Stand By **una vez por semana**. Esto es un prerrequisito para el respectivo pago de las horas Stand By.',
+      'El Stand By aplica para cargos del mapa de cargos profesionales que requieran prestar el servicio en niveles **H, I y J**, exceptuando los cargos con denominación de líder. Aplica también para el mapa de cargos operativos en niveles **9, 8, 7 e inferiores**.',
+      'A las personas que ocupen cargos de Experto, Jefe de Sección, Líderes de Línea de conocimiento, Dueños de Producto, Líderes de Área de Conocimiento, Líderes de EVC, Líderes de Entorno y superiores **no le son aplicables** los beneficios descritos en esta política, los cuales son exclusivos para las personas que conforman los equipos de Stand By.'
     ],
-    highlight:
-      'En ausencia de respuesta en 15 minutos, aplica el escalamiento automático del runbook.'
+    notes: [
+      '**Excepción:** los Líderes de Línea de Conocimiento y Dueños de Producto pueden prestar servicio de Stand By de manera excepcional, cuando no tengan el equipo idóneo para poder prestar dicho servicio; en ese caso se les reconocerá el pago aquí descrito y se les asignarán las herramientas correspondientes.'
+    ]
   },
   {
-    id: 'cumplimiento',
-    number: '06',
-    title: 'Cumplimiento y auditoría',
-    summary:
-      'El cumplimiento de estas políticas es obligatorio para equipos de aplicaciones y EVC.',
+    id: 'definicion-turnos',
+    title: 'Definición de los turnos',
+    imageSide: 'left',
     bullets: [
-      'Turnos sin responsable confirmado serán rechazados en revisiones de continuidad.',
-      'Modificaciones posteriores deben reflejarse en el portal antes del inicio del turno.',
-      'Incumplimientos reiterados se reportan al comité de operaciones para seguimiento.',
-      'Esta versión reemplaza lineamientos informales previos sobre selección libre de fechas.'
+      'El turno de Stand By opera de **viernes a viernes** en horarios no hábiles.',
+      'Los días sábados, domingos y festivos se entienden disponibles, independientemente de la fecha.',
+      'Los turnos se programan mes anticipado por el líder (del **15 al 30** de cada mes) y se publica en la herramienta definida por cada Gerencia de Gestión.',
+      'No se debe asignar tareas adicionales a las demandadas durante el turno de Stand By.'
+    ],
+    notes: [
+      '**Nota:** las pruebas de Alta Disponibilidad y Recuperación de Desastres podrán utilizar la figura de Stand By durante la planeación, diseño y ejecución de las pruebas de activación, conforme a la programación de las contingencias.'
     ]
+  },
+  {
+    id: 'compensatorios',
+    title: 'Compensatorios',
+    imageSide: 'right',
+    bullets: [
+      'Para los **casos excepcionales o de fuerza mayor**, en que una misma persona preste Stand By en 2 semanas continuas al mes, se podrá acordar con su respectivo líder un (1) día compensatorio para su disfrute en un periodo no superior a 1 mes.',
+      'Para los casos en que el tiempo efectivo del turno de Stand By **supere las 4 horas continuas**, podrá acordarse con el líder el horario de ingreso al día siguiente. Los incidentes no resueltos deben tener continuidad y el líder debe evaluar si el tema puede ser entregado a otra persona del equipo o si el mismo Stand By lo debe resolver.'
+    ],
+    notes: [
+      '**Nota:** la decisión del día compensatorio debe ser producto de un común acuerdo entre el jefe y el colaborador, y debe estar sustentada en la actividad que representó el Stand By para el colaborador durante las 2 semanas.'
+    ]
+  },
+  {
+    id: 'procedimiento',
+    title: 'Procedimiento para programar y reportar',
+    intro:
+      'Cada líder de área es el responsable de realizar la programación en las fechas establecidas, a través de la **herramienta definida por cada Gerencia de Gestión.**',
+    imageSide: 'left',
+    bullets: [
+      'Los líderes son responsables de reportar **las novedades** (renuncias, traslados, etc.) y de confirmar las horas extras del personal operativo después de la hora 44.',
+      'Los reportes de pago del Stand By se enviarán mensualmente a la Sección de Nómina para su pago en la primera quincena del mes siguiente.'
+    ],
+    actions: [
+      { id: 'programar', label: 'Programación del Stand By', kind: 'program' },
+      { id: 'inscripcion', label: 'Inscripción al Stand By', kind: 'soon' },
+      {
+        id: 'modificar',
+        label: 'Modificar información del personal Stand By',
+        kind: 'soon'
+      }
+    ]
+  },
+  {
+    id: 'control',
+    title: 'Control',
+    imageSide: 'right',
+    bullets: [
+      'Es responsabilidad de los líderes verificar que las actividades y tiempo reportado por cada empleado durante el turno de Stand By corresponda con lo ejecutado.',
+      'Mensualmente las Gerencias de Gestión deberán generar un informe a cada Vicepresidencia con el número de horas pagadas por Stand By, las horas Stand By causadas, el número de personas que están reportando y las actividades que se atendieron.'
+    ]
+  },
+  {
+    id: 'bonificacion',
+    title: 'Bonificación',
+    intro:
+      'El Banco pagará una bonificación por mera liberalidad constitutiva de factor salarial a quien cumpla funciones de Stand By, en las siguientes condiciones:',
+    imageSide: 'left',
+    bullets: [],
+    notes: [
+      '** Valor fijo por Cargo. Estos montos se ajustarán en el IPC correspondiente al periodo enero-diciembre de cada año.'
+    ],
+    table: {
+      headers: ['CARGO', 'VALOR POR PAGAR **'],
+      rows: [
+        {
+          cargo:
+            'Categoría J o categorías superiores (Mapa de Cargos Profesionales) 45 %',
+          valor: '$ 542.996'
+        },
+        {
+          cargo: 'Categoría I (Mapa de Cargos Profesionales)',
+          valor: '$ 392.551'
+        },
+        {
+          cargo: 'Categoría H (Mapa de Cargos Profesionales)',
+          valor: '$ 307.814'
+        },
+        {
+          cargo: 'Nivel 9 (Mapa de Cargos Operativos)',
+          valor: '$ 307.814'
+        },
+        {
+          cargo: 'Nivel 8 (Mapa de Cargos Operativos)',
+          valor: '$ 292.246'
+        },
+        {
+          cargo: 'Nivel 7 o Inferiores (Mapa de Cargos Operativos)',
+          valor: '$ 159.092'
+        }
+      ],
+      footnote:
+        'Nota: Esta política está definida para la Vicepresidencia de Servicios Corporativos; cualquier extensión de la misma debe ser autorizada por la Vicepresidencia de Gestión Humana.'
+    }
   }
 ];
+
+/** @deprecated Preferir STANDBY_POLICY_ACCORDION */
+export interface StandbyPolicySection {
+  id: string;
+  number: string;
+  title: string;
+  summary: string;
+  bullets: string[];
+  highlight?: string;
+}
+
+/** @deprecated Preferir STANDBY_POLICY_ACCORDION */
+export const STANDBY_POLICY_SECTIONS: StandbyPolicySection[] =
+  STANDBY_POLICY_ACCORDION.map((item, index) => ({
+    id: item.id,
+    number: `${index + 1}`.padStart(2, '0'),
+    title: item.title,
+    summary: item.intro ?? item.bullets[0] ?? '',
+    bullets: item.bullets
+  }));
 
 export const STANDBY_POLICY_PRINCIPLES = [
   {
     icon: 'calendar',
-    label: '7 días',
-    detail: 'Cobertura continua por turno'
+    label: '7×24',
+    detail: 'Disponibilidad en horarios no hábiles'
   },
   {
     icon: 'week',
-    label: 'Vie → Jue',
-    detail: 'Inicio siempre en viernes'
+    label: 'Vie → Vie',
+    detail: 'Turno en horarios no hábiles'
   },
   {
     icon: 'shield',
     label: 'Trazabilidad',
-    detail: 'Todo queda en el portal'
+    detail: 'Programación y reporte en portal'
   },
   {
     icon: 'alert',
-    label: 'Escalamiento',
-    detail: 'Runbook y SLA interno'
+    label: 'Pago',
+    detail: 'Primeros 15 días del mes siguiente'
   }
 ];
