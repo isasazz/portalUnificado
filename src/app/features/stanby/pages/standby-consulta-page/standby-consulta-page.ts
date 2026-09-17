@@ -10,14 +10,23 @@ import { FormsModule } from '@angular/forms';
 import { StandbyViewModalComponent }
 from '../../components/standby-view-modal/standby-view-modal';
 
+import { StandbyReportExportComponent }
+from '../../components/standby-report-export/standby-report-export';
+
 import { PortalFilterBarComponent }
 from '../../../../shared/components/portal-filter-bar/portal-filter-bar';
 
 import { StandbyScheduleService }
 from '../../services/standby-schedule.service';
 
+import { StandbyReportService }
+from '../../services/standby-report.service';
+
 import { PortalFilterService }
 from '../../../../shared/services/portal-filter.service';
+
+import { StandbyReportFilter }
+from '../../models/standby-report-filter.model';
 
 import { STANDBY_APPLICATIONS }
 from '../../mocks/standby-applications.mock';
@@ -53,6 +62,7 @@ const PERIOD_COLORS: Record<StandbyPeriod, string> = {
   imports: [
     FormsModule,
     StandbyViewModalComponent,
+    StandbyReportExportComponent,
     PortalFilterBarComponent
   ],
   templateUrl: './standby-consulta-page.html',
@@ -63,6 +73,9 @@ export class StandbyConsultaPageComponent {
 
   private readonly scheduleService =
     inject(StandbyScheduleService);
+
+  private readonly reportService =
+    inject(StandbyReportService);
 
   private readonly portalFilter =
     inject(PortalFilterService);
@@ -298,6 +311,32 @@ export class StandbyConsultaPageComponent {
   private formatRange(start: Date, end: Date): string {
 
     return `${this.formatDate(start)} → ${this.formatDate(end)}`;
+
+  }
+
+  get hasSavedAssignments(): boolean {
+    return this.scheduleService.savedAssignments.length > 0;
+  }
+
+  downloadStandbyReport(
+    filter: StandbyReportFilter,
+    panel: StandbyReportExportComponent
+  ): void {
+
+    const assignments = this.reportService.filterByStartDate(
+      this.scheduleService.savedAssignments,
+      filter
+    );
+
+    if (assignments.length === 0) {
+      panel.showEmptyResult();
+      return;
+    }
+
+    this.reportService.downloadExcel(
+      assignments,
+      this.reportService.buildFileName(filter, 'consulta')
+    );
 
   }
 

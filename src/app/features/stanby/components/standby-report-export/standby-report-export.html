@@ -1,0 +1,100 @@
+<section class="report-export">
+
+  <div class="report-export__intro">
+    <h3>{{ title() }}</h3>
+    <p>{{ subtitle() }}</p>
+  </div>
+
+  <div class="report-export__modes" role="tablist" aria-label="Tipo de filtro">
+    <button
+      type="button"
+      role="tab"
+      class="report-export__mode"
+      [class.report-export__mode--active]="reportMode === 'month'"
+      (click)="setMode('month')"
+    >
+      Por mes
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="report-export__mode"
+      [class.report-export__mode--active]="reportMode === 'range'"
+      (click)="setMode('range')"
+    >
+      Por rango
+    </button>
+  </div>
+
+  <div class="report-export__filters">
+
+    @if (reportMode === 'month') {
+      <label class="report-field">
+        <span>Mes</span>
+        <select name="reportMonth" [(ngModel)]="month">
+          @for (item of months; track item.value) {
+            <option [ngValue]="item.value">{{ item.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="report-field">
+        <span>Año</span>
+        <input
+          type="number"
+          name="reportYear"
+          min="2000"
+          max="2100"
+          [(ngModel)]="year"
+        />
+      </label>
+    } @else {
+      <label class="report-field">
+        <span>Fecha desde</span>
+        <input
+          type="date"
+          name="reportFrom"
+          [(ngModel)]="fromDate"
+        />
+      </label>
+
+      <label class="report-field">
+        <span>Fecha hasta</span>
+        <input
+          type="date"
+          name="reportTo"
+          [(ngModel)]="toDate"
+        />
+      </label>
+    }
+
+    <button
+      type="button"
+      class="report-export__btn"
+      [disabled]="disabled()"
+      title="Exportar Excel"
+      (click)="export()"
+    >
+      <svg
+        class="report-export__btn-icon"
+        viewBox="0 0 20 20"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M10 2.5a.75.75 0 0 1 .75.75v8.19l2.72-2.72a.75.75 0 1 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 0 1 1.06-1.06l2.72 2.72V3.25A.75.75 0 0 1 10 2.5Z"
+        />
+        <path
+          d="M3.5 13.25a.75.75 0 0 1 .75.75v1.5c0 .69.56 1.25 1.25 1.25h9c.69 0 1.25-.56 1.25-1.25v-1.5a.75.75 0 0 1 1.5 0v1.5A2.75 2.75 0 0 1 14.5 18h-9A2.75 2.75 0 0 1 2.75 15.5v-1.5a.75.75 0 0 1 .75-.75Z"
+        />
+      </svg>
+      Exportar Excel
+    </button>
+
+  </div>
+
+  @if (emptyHint()) {
+    <p class="report-export__hint">{{ emptyHint() }}</p>
+  }
+
+</section>

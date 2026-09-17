@@ -3,14 +3,22 @@
   <header class="consulta-header">
 
     <div>
-      <h1>Consulta por persona</h1>
+      <h1>Consulta Standby</h1>
       <p>
-        Revisa la lista de responsables y filtra por nombre.
-        Haz clic en una fila para ver el standby en detalle.
+        Revisa responsables, filtra por nombre y exporta reportería
+        por mes o por rango de fechas (según fecha de inicio).
       </p>
     </div>
 
   </header>
+
+  <app-standby-report-export
+    #consultaReport
+    title="Reportería de Standby"
+    subtitle="Descarga standby por mes o por rango. Solo se incluyen turnos cuya fecha de inicio cae en el periodo elegido."
+    [disabled]="!hasSavedAssignments"
+    (exportRequested)="downloadStandbyReport($event, consultaReport)"
+  />
 
   <section class="consulta-panel">
 

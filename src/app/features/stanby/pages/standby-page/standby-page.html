@@ -204,29 +204,15 @@
           >
             + Agregar persona
           </button>
-          <button
-            type="button"
-            class="btn-report"
-            [disabled]="standbyListRows.length === 0"
-            title="Descargar Excel para contabilidad"
-            (click)="downloadStandbyReport()"
-          >
-            <svg
-              class="btn-report__icon"
-              viewBox="0 0 20 20"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                d="M10 2.5a.75.75 0 0 1 .75.75v8.19l2.72-2.72a.75.75 0 1 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 0 1 1.06-1.06l2.72 2.72V3.25A.75.75 0 0 1 10 2.5Z"
-              />
-              <path
-                d="M3.5 13.25a.75.75 0 0 1 .75.75v1.5c0 .69.56 1.25 1.25 1.25h9c.69 0 1.25-.56 1.25-1.25v-1.5a.75.75 0 0 1 1.5 0v1.5A2.75 2.75 0 0 1 14.5 18h-9A2.75 2.75 0 0 1 2.75 15.5v-1.5a.75.75 0 0 1 .75-.75Z"
-              />
-            </svg>
-            Descargar reporte
-          </button>
         </div>
+
+        <app-standby-report-export
+          #standbyReport
+          title="Descarga de reportes"
+          subtitle="Por mes o por rango de fechas. Solo entran standbys cuya fecha de inicio cae en el periodo."
+          [disabled]="!hasSavedAssignments"
+          (exportRequested)="downloadStandbyReport($event, standbyReport)"
+        />
 
         <div class="standby-board">
 

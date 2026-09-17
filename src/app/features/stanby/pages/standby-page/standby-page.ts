@@ -38,6 +38,9 @@ from '../../components/standby-relevo-modal/standby-relevo-modal';
 import { StandbyPersonModalComponent }
 from '../../components/standby-person-modal/standby-person-modal';
 
+import { StandbyReportExportComponent }
+from '../../components/standby-report-export/standby-report-export';
+
 import { StandbyScheduleService }
 from '../../services/standby-schedule.service';
 
@@ -65,6 +68,9 @@ import {
 import { StandbyPersonRecord }
 from '../../mocks/standby-person-catalog.mock';
 
+import { StandbyReportFilter }
+from '../../models/standby-report-filter.model';
+
 import { avatarToneForName }
 from '../../../../shared/utils/avatar-tone.util';
 
@@ -82,6 +88,7 @@ type StandbyScope = 'tech' | 'areas';
     StandbyViewModalComponent,
     StandbyRelevoModalComponent,
     StandbyPersonModalComponent,
+    StandbyReportExportComponent,
     PortalFilterBarComponent
   ],
   templateUrl: './standby-page.html',
@@ -118,6 +125,12 @@ export class StandbyPageComponent implements OnInit {
 
   get isAreasMode(): boolean {
     return this.scope() === 'areas';
+  }
+
+  get hasSavedAssignments(): boolean {
+    return this.scheduleService.savedAssignments.some(item =>
+      this.assignmentMatchesScope(item)
+    );
   }
 
   get filterHiddenDimensions(): ('app')[] {
@@ -1129,22 +1142,30 @@ export class StandbyPageComponent implements OnInit {
 
   }
 
-  downloadStandbyReport(): void {
+  downloadStandbyReport(
+    filter: StandbyReportFilter,
+    panel: StandbyReportExportComponent
+  ): void {
 
-    const assignments = this.scheduleService.savedAssignments.filter(
+    const scoped = this.scheduleService.savedAssignments.filter(
       item => this.assignmentMatchesScope(item)
     );
 
+    const assignments = this.reportService.filterByStartDate(
+      scoped,
+      filter
+    );
+
     if (assignments.length === 0) {
+      panel.showEmptyResult();
       return;
     }
 
-    const stamp = new Date().toISOString().slice(0, 10);
     const scope = this.isAreasMode ? 'otras_areas' : 'tecnologia';
 
     this.reportService.downloadExcel(
       assignments,
-      `Datos_stand_by_${scope}_${stamp}.xlsx`
+      this.reportService.buildFileName(filter, scope)
     );
 
   }

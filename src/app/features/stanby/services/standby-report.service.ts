@@ -4,6 +4,9 @@ import * as XLSX from 'xlsx';
 import { StandbyAssignment }
 from '../models/standby-assignment.model';
 
+import { StandbyReportFilter }
+from '../models/standby-report-filter.model';
+
 import {
   findReportPerson,
   StandbyReportPerson
@@ -13,6 +16,33 @@ import {
   providedIn: 'root'
 })
 export class StandbyReportService {
+
+  /**
+   * Filtra por fecha de inicio del standby (regla de negocio).
+   * Un turno 29-jun→06-jul no entra en el reporte de julio.
+   */
+  filterByStartDate(
+    assignments: StandbyAssignment[],
+    filter: StandbyReportFilter
+  ): StandbyAssignment[] {
+
+    return assignments.filter(assignment => {
+      const start = this.startOfDay(assignment.fechaInicio);
+
+      if (filter.mode === 'month') {
+        return (
+          assignment.fechaInicio.getFullYear() === filter.year &&
+          assignment.fechaInicio.getMonth() === filter.month
+        );
+      }
+
+      const from = this.startOfDay(filter.from);
+      const to = this.startOfDay(filter.to);
+
+      return start >= from && start <= to;
+    });
+
+  }
 
   downloadExcel(
     assignments: StandbyAssignment[],
@@ -39,6 +69,21 @@ export class StandbyReportService {
     );
 
     XLSX.writeFile(workbook, fileName);
+  }
+
+  buildFileName(
+    filter: StandbyReportFilter,
+    scope = 'standby'
+  ): string {
+
+    if (filter.mode === 'month') {
+      const mm = `${filter.month + 1}`.padStart(2, '0');
+      return `Datos_stand_by_${scope}_${filter.year}-${mm}.xlsx`;
+    }
+
+    const from = this.toIsoDate(filter.from);
+    const to = this.toIsoDate(filter.to);
+    return `Datos_stand_by_${scope}_${from}_${to}.xlsx`;
   }
 
   private buildProductosServicios(
@@ -128,6 +173,21 @@ export class StandbyReportService {
     const month = date.getMonth();
     const mm = `${month + 1}`.padStart(2, '0');
     return `${year}/${mm} - ${months[month]}`;
+  }
+
+  private startOfDay(date: Date): number {
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    ).getTime();
+  }
+
+  private toIsoDate(date: Date): string {
+    const y = date.getFullYear();
+    const m = `${date.getMonth() + 1}`.padStart(2, '0');
+    const d = `${date.getDate()}`.padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 
 }
