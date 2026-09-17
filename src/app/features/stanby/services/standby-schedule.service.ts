@@ -207,7 +207,7 @@ export class StandbyScheduleService {
 
   }
 
-  save(): void {
+  save(): number[] {
 
     const seen = new Set<string>();
 
@@ -231,6 +231,10 @@ export class StandbyScheduleService {
       return true;
     });
 
+    const savedIds = this.draftAssignments.map(
+      assignment => assignment.id
+    );
+
     this.savedAssignments = [
       ...this.savedAssignments,
       ...this.draftAssignments
@@ -238,6 +242,8 @@ export class StandbyScheduleService {
 
     this.draftAssignments = [];
     this.editRestore = [];
+
+    return savedIds;
 
   }
 

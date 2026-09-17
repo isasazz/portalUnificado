@@ -303,26 +303,15 @@ export class StandbyMonthViewComponent {
 
   private focusOnAssignments(): void {
 
-    const assignments = this.assignments();
-
-    if (
-      this.didFocusAssignments ||
-      assignments.length === 0
-    ) {
+    if (this.didFocusAssignments) {
       return;
     }
 
-    const sorted = [...assignments].sort(
-      (a, b) =>
-        a.fechaInicio.getTime() -
-        b.fechaInicio.getTime()
-    );
-
-    const first = sorted[0];
+    const now = new Date();
 
     this.currentDate = new Date(
-      first.fechaInicio.getFullYear(),
-      first.fechaInicio.getMonth(),
+      now.getFullYear(),
+      now.getMonth(),
       1
     );
 

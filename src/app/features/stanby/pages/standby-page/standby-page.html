@@ -247,8 +247,12 @@
                 class="standby-row"
                 [attr.id]="'standby-row-' + row.id"
                 [class.standby-row--flash]="
-                  highlightedAppCodigo &&
-                  row.appCodes.includes(highlightedAppCodigo)
+                  row.assignmentIds.some(
+                    id => highlightedAssignmentIds.includes(id)
+                  ) ||
+                  (highlightedAssignmentIds.length === 0 &&
+                    !!highlightedAppCodigo &&
+                    row.appCodes.includes(highlightedAppCodigo))
                 "
                 role="button"
                 tabindex="0"
@@ -272,12 +276,17 @@
               </div>
 
               @if (!isAreasMode) {
-                <div class="standby-row__apps">
-                  @for (code of row.appCodes; track code) {
-                    <span>{{ code }}</span>
-                  }
-                  @if (row.appNames[0]) {
-                    <small>{{ row.appNames[0] }}</small>
+                <div
+                  class="standby-row__apps"
+                  [title]="appsRowTitle(row)"
+                >
+                  <span class="standby-row__apps-line">
+                    {{ row.appCodes.join(' · ') }}
+                  </span>
+                  @if (row.appNames.length) {
+                    <small class="standby-row__apps-line">
+                      {{ row.appNames.join(' · ') }}
+                    </small>
                   }
                 </div>
               }

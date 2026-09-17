@@ -161,6 +161,8 @@ export class StandbyPageComponent implements OnInit {
 
   highlightedAppCodigo = '';
 
+  highlightedAssignmentIds: number[] = [];
+
   private highlightTimer: ReturnType<typeof setTimeout> | null = null;
 
   activeView: 'available' | 'programmed' = 'programmed';
@@ -458,7 +460,7 @@ export class StandbyPageComponent implements OnInit {
 
     const term = this.appSearch().trim().toLowerCase();
 
-    return this.scheduleService.savedAssignments
+    const filtered = this.scheduleService.savedAssignments
       .filter(assignment => this.assignmentMatchesScope(assignment))
       .filter(assignment => {
 
@@ -498,42 +500,65 @@ export class StandbyPageComponent implements OnInit {
 
         return haystack.includes(term);
 
-      })
-      .sort(
-        (a, b) =>
-          b.fechaInicio.getTime() - a.fechaInicio.getTime()
-      )
-      .map(assignment => {
+      });
 
-        const apps = (assignment.aplicaciones ?? [])
-          .map(app =>
-            this.applications.find(
-              item =>
-                item.codigoAplicacion === app.codigoAplicacion
-            )
+    type GroupRow = {
+      id: number;
+      assignmentIds: number[];
+      fechaInicio: Date;
+      fechaFin: Date;
+      nombre: string;
+      appCodes: string[];
+      appNames: string[];
+      bvc: string;
+      ldc: string;
+      celula: string;
+      service: string;
+      areaLabel: string;
+      footerLabel: string;
+      observacion: string;
+      color: string;
+    };
+
+    const groups = new Map<string, GroupRow>();
+
+    for (const assignment of filtered) {
+      const key = assignment.responsable;
+
+      const catalogApps = (assignment.aplicaciones ?? [])
+        .map(app =>
+          this.applications.find(
+            item =>
+              item.codigoAplicacion === app.codigoAplicacion
           )
-          .filter(Boolean) as StandbyApplication[];
+        )
+        .filter(Boolean) as StandbyApplication[];
 
-        const primary = apps[0];
+      const codes = (assignment.aplicaciones ?? []).map(
+        app => app.codigoAplicacion
+      );
+      const names = (assignment.aplicaciones ?? []).map(
+        app => app.nombreAplicacion
+      );
+
+      const existing = groups.get(key);
+
+      if (!existing) {
+        const primary = catalogApps[0];
         const serviceLabel =
           primary?.service ||
           primary?.nombreAplicacion ||
-          (assignment.aplicaciones ?? [])[0]?.nombreAplicacion ||
+          names[0] ||
           '—';
 
-        return {
+        groups.set(key, {
           id: assignment.id,
-          fechaLabel: this.formatDateRange(
-            assignment.fechaInicio,
-            assignment.fechaFin
-          ),
+          assignmentIds: [assignment.id],
+          fechaInicio: assignment.fechaInicio,
+          fechaFin: assignment.fechaFin,
           nombre: assignment.responsable,
-          appCodes: (assignment.aplicaciones ?? []).map(
-            app => app.codigoAplicacion
-          ),
-          appNames: (assignment.aplicaciones ?? []).map(
-            app => app.nombreAplicacion
-          ),
+          appCodes: [...codes],
+          appNames: [...names],
           bvc: primary?.bvc ?? '—',
           ldc: primary?.ldc ?? '—',
           celula: primary?.celula ?? '—',
@@ -546,9 +571,70 @@ export class StandbyPageComponent implements OnInit {
             : 'Standby programado',
           observacion: assignment.observacion ?? '',
           color: assignment.color
-        };
+        });
+        continue;
+      }
 
-      });
+      existing.assignmentIds.push(assignment.id);
+
+      for (let i = 0; i < codes.length; i++) {
+        if (!existing.appCodes.includes(codes[i])) {
+          existing.appCodes.push(codes[i]);
+          existing.appNames.push(names[i] ?? codes[i]);
+        }
+      }
+
+      // La fecha visible es la del turno más reciente
+      if (assignment.fechaInicio.getTime() > existing.fechaInicio.getTime()) {
+        existing.fechaInicio = assignment.fechaInicio;
+        existing.fechaFin = assignment.fechaFin;
+        existing.id = assignment.id;
+        if (assignment.observacion) {
+          existing.observacion = assignment.observacion;
+        }
+      } else if (!existing.observacion && assignment.observacion) {
+        existing.observacion = assignment.observacion;
+      }
+    }
+
+    return [...groups.values()]
+      .sort((a, b) => {
+        const aFlash = a.assignmentIds.some(id =>
+          this.highlightedAssignmentIds.includes(id)
+        )
+          ? 1
+          : 0;
+        const bFlash = b.assignmentIds.some(id =>
+          this.highlightedAssignmentIds.includes(id)
+        )
+          ? 1
+          : 0;
+
+        if (aFlash !== bFlash) {
+          return bFlash - aFlash;
+        }
+
+        return b.fechaInicio.getTime() - a.fechaInicio.getTime();
+      })
+      .map(group => ({
+        id: group.id,
+        assignmentIds: group.assignmentIds,
+        fechaLabel: this.formatDateRange(
+          group.fechaInicio,
+          group.fechaFin
+        ),
+        nombre: group.nombre,
+        appCodes: group.appCodes,
+        appNames: group.appNames,
+        bvc: group.bvc,
+        ldc: group.ldc,
+        celula: group.celula,
+        service: group.service,
+        areaLabel: group.areaLabel,
+        footerLabel: group.footerLabel,
+        observacion: group.observacion,
+        color: group.color
+      }));
 
   }
   startAddStandby(): void {
@@ -627,6 +713,20 @@ export class StandbyPageComponent implements OnInit {
 
   }
 
+  appsRowTitle(row: {
+    appCodes: string[];
+    appNames: string[];
+  }): string {
+
+    return row.appCodes
+      .map((code, index) => {
+        const name = row.appNames[index];
+        return name ? `${code} · ${name}` : code;
+      })
+      .join('\n');
+
+  }
+
   avatarTone(name: string) {
     return avatarToneForName(name);
   }
@@ -692,6 +792,7 @@ export class StandbyPageComponent implements OnInit {
   onStandbySaved(payload: {
     appCodigo: string;
     appNombre: string;
+    assignmentIds: number[];
   }): void {
 
     const wasEditing = this.editingStandby;
@@ -708,9 +809,10 @@ export class StandbyPageComponent implements OnInit {
     this.activeView = 'programmed';
     this.panelView.set('apps');
 
-    if (payload.appCodigo) {
-      this.focusSavedStandby(payload.appCodigo);
-    }
+    this.focusSavedStandbys(
+      payload.assignmentIds,
+      payload.appCodigo
+    );
 
     this.cdr.markForCheck();
 
@@ -719,42 +821,65 @@ export class StandbyPageComponent implements OnInit {
       message: wasEditing
         ? 'Tu standby quedó actualizado.'
         : 'Tu standby quedó programado.',
-      buttonLabel: 'Ver standby',
-      onConfirm: () => {
-        this.openLatestSavedStandby(payload.appCodigo);
-      }
+      buttonLabel: 'Continuar'
     });
 
   }
 
-  private focusSavedStandby(appCodigo: string): void {
+  private focusSavedStandbys(
+    assignmentIds: number[],
+    fallbackAppCodigo = ''
+  ): void {
 
     if (this.highlightTimer) {
       clearTimeout(this.highlightTimer);
     }
 
-    this.highlightedAppCodigo = appCodigo;
+    const ids = [...new Set(assignmentIds.filter(Boolean))];
 
-    const assignment = this.findLatestAssignment(appCodigo);
+    this.highlightedAssignmentIds = ids;
+    this.highlightedAppCodigo =
+      fallbackAppCodigo ||
+      this.scheduleService.savedAssignments.find(
+        item => ids.includes(item.id)
+      )?.aplicaciones?.[0]?.codigoAplicacion ||
+      '';
 
     setTimeout(() => {
-      if (!assignment) {
+      const targetRow =
+        this.standbyListRows.find(row =>
+          row.assignmentIds.some(id => ids.includes(id))
+        ) ??
+        this.standbyListRows.find(
+          row =>
+            this.highlightedAppCodigo &&
+            row.appCodes.includes(this.highlightedAppCodigo)
+        );
+
+      if (!targetRow) {
         return;
       }
 
       document
-        .getElementById(`standby-row-${assignment.id}`)
+        .getElementById(`standby-row-${targetRow.id}`)
         ?.scrollIntoView({
           behavior: 'smooth',
           block: 'center'
         });
-    }, 100);
+    }, 150);
 
     this.highlightTimer = setTimeout(() => {
+      this.highlightedAssignmentIds = [];
       this.highlightedAppCodigo = '';
       this.highlightTimer = null;
       this.cdr.markForCheck();
     }, 5000);
+
+  }
+
+  private focusSavedStandby(appCodigo: string): void {
+
+    this.focusSavedStandbys([], appCodigo);
 
   }
 
@@ -784,7 +909,7 @@ export class StandbyPageComponent implements OnInit {
     }
 
     const row = this.standbyListRows.find(
-      item => item.id === assignment.id
+      item => item.assignmentIds.includes(assignment.id)
     );
 
     if (row) {

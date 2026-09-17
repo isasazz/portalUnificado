@@ -978,25 +978,21 @@
 
 .standby-row__apps {
   @include flex-column;
-  gap: 6px;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
 }
 
-.standby-row__apps span {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
+.standby-row__apps-line {
+  display: block;
   max-width: 100%;
-
-  padding: 2px 8px;
-
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
 
-  border-radius: $radius-sm;
-  background: $background-body;
+.standby-row__apps span.standby-row__apps-line {
   color: $text-primary;
-
   font-size: 11px;
   font-weight: $font-weight-semibold;
 }
@@ -1476,11 +1472,6 @@
 
   .standby-row--flash {
     box-shadow: 0 0 0 3px rgba(253, 218, 36, 0.35);
-  }
-
-  .standby-row__apps span {
-    background: $background-body;
-    color: $text-primary;
   }
 
   .standby-dock {

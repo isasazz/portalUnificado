@@ -151,6 +151,7 @@ export class StandbyModalComponent {
   readonly saved = output<{
     appCodigo: string;
     appNombre: string;
+    assignmentIds: number[];
   }>();
 
 
@@ -1392,15 +1393,15 @@ export class StandbyModalComponent {
 
     const first = apps[0];
 
-
-
-    this.scheduleService.save();
+    const assignmentIds = this.scheduleService.save();
 
     this.saved.emit({
 
       appCodigo: first?.codigoAplicacion ?? '',
 
-      appNombre: first?.nombreAplicacion ?? ''
+      appNombre: first?.nombreAplicacion ?? '',
+
+      assignmentIds
 
     });
 
