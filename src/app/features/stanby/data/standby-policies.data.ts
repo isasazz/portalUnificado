@@ -10,11 +10,26 @@ export interface StandbyPolicyTableRow {
   valor: string;
 }
 
+/** Texto de viñeta; `note` opcional va anidada bajo ese ítem. */
+export type StandbyPolicyBullet =
+  | string
+  | { text: string; note?: string };
+
+export function policyBulletText(bullet: StandbyPolicyBullet): string {
+  return typeof bullet === 'string' ? bullet : bullet.text;
+}
+
+export function policyBulletNote(
+  bullet: StandbyPolicyBullet
+): string | undefined {
+  return typeof bullet === 'string' ? undefined : bullet.note;
+}
+
 export interface StandbyPolicyAccordionItem {
   id: string;
   title: string;
   intro?: string;
-  bullets: string[];
+  bullets: StandbyPolicyBullet[];
   notes?: string[];
   image?: string;
   /** Imagen a la izquierda (default) o derecha */
@@ -53,12 +68,12 @@ export const STANDBY_POLICIES_EMBED_URL =
 
 export const STANDBY_POLICIES_INTRO = {
   lead:
-    'La figura del Stand By es un grupo de personas que apoyan los procesos de Continuidad del Negocio, con el fin de garantizar que se cuente con el soporte personal requerido ante eventualidades.',
-  contactLabel: 'Cualquier inquietud escribir a:',
+    'La figura de Stand By (participación de un grupo de personas que soportan procesos asociados a la Continuidad del Negocio de la Organización) se creó con el fin de tener un soporte personal disponible en caso de presentarse alguna eventualidad.',
+  contactLabel: 'Para validar novedades remitir su solicitud al correo',
   contactEmail: 'admincap@bancolombia.com.co',
   contactName: 'Administración de Capacidad',
   paymentNote:
-    'El pago del servicio de Stand By se realizará durante los primeros quince días del mes siguiente al del servicio.'
+    '💲 El pago del Stand By se realizará durante la primera quincena del mes siguiente a la prestación del servicio 💰'
 };
 
 export const STANDBY_POLICY_ACCORDION: StandbyPolicyAccordionItem[] = [
@@ -114,11 +129,13 @@ export const STANDBY_POLICY_ACCORDION: StandbyPolicyAccordionItem[] = [
     title: 'Compensatorios',
     imageSide: 'right',
     bullets: [
-      'Para los **casos excepcionales o de fuerza mayor**, en que una misma persona preste Stand By en 2 semanas continuas al mes, se podrá acordar con su respectivo líder un (1) día compensatorio para su disfrute en un periodo no superior a 1 mes.',
+      {
+        text:
+          'Para los **casos excepcionales o de fuerza mayor**, en que una misma persona preste Stand By en 2 semanas continuas al mes, se podrá acordar con su respectivo líder un (1) día compensatorio para su disfrute en un periodo no superior a 1 mes.',
+        note:
+          '**Nota:** la decisión del día compensatorio debe ser producto de un común acuerdo entre el jefe y el colaborador, y debe estar sustentada en la actividad que representó el Stand By para el colaborador durante las 2 semanas.'
+      },
       'Para los casos en que el tiempo efectivo del turno de Stand By **supere las 4 horas continuas**, podrá acordarse con el líder el horario de ingreso al día siguiente. Los incidentes no resueltos deben tener continuidad y el líder debe evaluar si el tema puede ser entregado a otra persona del equipo o si el mismo Stand By lo debe resolver.'
-    ],
-    notes: [
-      '**Nota:** la decisión del día compensatorio debe ser producto de un común acuerdo entre el jefe y el colaborador, y debe estar sustentada en la actividad que representó el Stand By para el colaborador durante las 2 semanas.'
     ]
   },
   {
@@ -128,8 +145,8 @@ export const STANDBY_POLICY_ACCORDION: StandbyPolicyAccordionItem[] = [
       'Cada líder de área es el responsable de realizar la programación en las fechas establecidas, a través de la **herramienta definida por cada Gerencia de Gestión.**',
     imageSide: 'left',
     bullets: [
-      'Los líderes son responsables de reportar **las novedades** (renuncias, traslados, etc.) y de confirmar las horas extras del personal operativo después de la hora 44.',
-      'Los reportes de pago del Stand By se enviarán mensualmente a la Sección de Nómina para su pago en la primera quincena del mes siguiente.'
+      'Es responsabilidad de los líderes reportar a cada Gerencia de Gestión, las novedades de las personas a su cargo previas al pago como son: retiros del Banco y traslados de áreas, así mismo, deberán confirmar el número de horas extras a pagar para los empleados que pertenecen al mapa de cargos operativos, a partir de la hora 44.',
+      'El reporte del pago del Stand By, será enviado desde cada Gerencia de Gestión a la Sección Nómina, con periodicidad mensual, para su pago en la primer quincena siguiente.'
     ],
     actions: [
       { id: 'programar', label: 'Programación del Stand By', kind: 'program' },
@@ -211,8 +228,10 @@ export const STANDBY_POLICY_SECTIONS: StandbyPolicySection[] =
     id: item.id,
     number: `${index + 1}`.padStart(2, '0'),
     title: item.title,
-    summary: item.intro ?? item.bullets[0] ?? '',
-    bullets: item.bullets
+    summary:
+      item.intro ??
+      (item.bullets[0] ? policyBulletText(item.bullets[0]) : ''),
+    bullets: item.bullets.map(policyBulletText)
   }));
 
 export const STANDBY_POLICY_PRINCIPLES = [

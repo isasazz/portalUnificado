@@ -11,10 +11,8 @@
 
     <p class="sp-doc__contact">
       {{ intro.contactLabel }}
-      <a [href]="'mailto:' + intro.contactEmail">
-        {{ intro.contactEmail }}
-      </a>
-      ({{ intro.contactName }}).
+      {{ intro.contactName }}
+      (<a [href]="'mailto:' + intro.contactEmail">{{ intro.contactEmail }}</a>)
     </p>
 
     <p class="sp-doc__payment">
@@ -93,8 +91,16 @@
 
                   @if (item.bullets.length) {
                     <ul class="sp-acc__list">
-                      @for (bullet of item.bullets; track bullet) {
-                        <li [innerHTML]="richText(bullet)"></li>
+                      @for (bullet of item.bullets; track $index) {
+                        <li>
+                          <span [innerHTML]="richText(bulletText(bullet))"></span>
+                          @if (bulletNote(bullet); as note) {
+                            <aside
+                              class="sp-acc__note sp-acc__note--nested"
+                              [innerHTML]="richText(note)"
+                            ></aside>
+                          }
+                        </li>
                       }
                     </ul>
                   }

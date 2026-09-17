@@ -9,7 +9,10 @@ import {
   STANDBY_POLICIES_INTRO,
   STANDBY_POLICY_ACCORDION,
   StandbyPolicyAccordionItem,
-  StandbyPolicyAction
+  StandbyPolicyAction,
+  StandbyPolicyBullet,
+  policyBulletNote,
+  policyBulletText
 } from '../../data/standby-policies.data';
 
 @Component({
@@ -73,6 +76,14 @@ export class StandbyPoliciesViewerComponent {
         /\*\*(.+?)\*\*/g,
         '<strong>$1</strong>'
       );
+  }
+
+  bulletText(bullet: StandbyPolicyBullet): string {
+    return policyBulletText(bullet);
+  }
+
+  bulletNote(bullet: StandbyPolicyBullet): string | undefined {
+    return policyBulletNote(bullet);
   }
 
 }
