@@ -80,7 +80,8 @@ export class StandbyScheduleService {
       ...assignment,
       fechaInicio: new Date(assignment.fechaInicio),
       fechaFin: new Date(assignment.fechaFin),
-      aplicaciones: [...(assignment.aplicaciones ?? [])]
+      aplicaciones: [...(assignment.aplicaciones ?? [])],
+      observacion: assignment.observacion
     };
 
     this.editRestore = [clone];
@@ -130,16 +131,57 @@ export class StandbyScheduleService {
   acceptWeeks(
     responsable: string,
     weeks: { start: Date; end: Date }[],
-    aplicaciones: StandbyAssociatedApp[] = []
+    aplicaciones: StandbyAssociatedApp[] = [],
+    observacion = ''
   ): void {
 
     const celular =
       STANDBY_USER_PHONES[responsable] ??
       '+57 300 000 0000';
 
+    const note = observacion.trim();
+    const appCodes = aplicaciones
+      .map(app => app.codigoAplicacion)
+      .sort()
+      .join('|');
+
     weeks.forEach(week => {
 
       const { start, end } = toStandbyWeek(week.start);
+      const startKey = this.startOfDay(start);
+
+      const existingIndex = this.draftAssignments.findIndex(
+        assignment => {
+          if (assignment.responsable !== responsable) {
+            return false;
+          }
+
+          if (this.startOfDay(assignment.fechaInicio) !== startKey) {
+            return false;
+          }
+
+          const codes = (assignment.aplicaciones ?? [])
+            .map(app => app.codigoAplicacion)
+            .sort()
+            .join('|');
+
+          return codes === appCodes;
+        }
+      );
+
+      if (existingIndex >= 0) {
+        const current = this.draftAssignments[existingIndex];
+        this.draftAssignments = this.draftAssignments.map(
+          (assignment, index) =>
+            index === existingIndex
+              ? {
+                  ...assignment,
+                  observacion: note || current.observacion
+                }
+              : assignment
+        );
+        return;
+      }
 
       const weekColor = this.resolveWeekColor(
         responsable,
@@ -156,7 +198,8 @@ export class StandbyScheduleService {
           fechaInicio: start,
           fechaFin: end,
           color: weekColor,
-          aplicaciones: [...aplicaciones]
+          aplicaciones: [...aplicaciones],
+          observacion: note || undefined
         }
       ];
 
@@ -165,6 +208,28 @@ export class StandbyScheduleService {
   }
 
   save(): void {
+
+    const seen = new Set<string>();
+
+    this.draftAssignments = this.draftAssignments.filter(assignment => {
+      const appsKey = (assignment.aplicaciones ?? [])
+        .map(app => app.codigoAplicacion)
+        .sort()
+        .join('|');
+
+      const key = [
+        assignment.responsable,
+        this.startOfDay(assignment.fechaInicio),
+        appsKey
+      ].join('::');
+
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    });
 
     this.savedAssignments = [
       ...this.savedAssignments,

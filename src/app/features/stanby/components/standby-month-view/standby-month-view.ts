@@ -252,6 +252,35 @@ export class StandbyMonthViewComponent {
 
   }
 
+  /** En vista outline (detalle persona), color por estado del turno. */
+  outlineDayColor(
+    assignment?: StandbyAssignment
+  ): string | null {
+
+    if (!assignment) {
+      return null;
+    }
+
+    if (!this.outlineMode()) {
+      return assignment.color;
+    }
+
+    const today = this.startOfDay(new Date());
+    const end = this.startOfDay(assignment.fechaFin);
+    const start = this.startOfDay(assignment.fechaInicio);
+
+    if (end < today) {
+      return '#9ca3af';
+    }
+
+    if (start <= today && end >= today) {
+      return '#00c389';
+    }
+
+    return '#59cbeb';
+
+  }
+
   get monthLabel(): string {
 
     return this.currentDate.toLocaleDateString(

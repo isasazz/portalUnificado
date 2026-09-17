@@ -19,6 +19,7 @@ export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
     celular: '+57 310 539 0611',
     ...week(12),
     color: '#9063cd',
+    observacion: 'Cobertura mes operativo Núcleo Único',
     aplicaciones: [
       {
         codigoAplicacion: 'NU0113001',
@@ -32,6 +33,7 @@ export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
     celular: '+57 310 987 6543',
     ...week(19),
     color: '#f586cd',
+    observacion: 'Turno programado para contabilidad',
     aplicaciones: [
       {
         codigoAplicacion: 'NU0113001',

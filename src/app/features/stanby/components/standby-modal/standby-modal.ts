@@ -82,6 +82,9 @@ interface GroupedAcceptance {
 
   responsables: string[];
 
+  /** Observación de la selección (misma para el grupo). */
+  observacion: string;
+
 }
 
 interface ProductSelectionState {
@@ -216,7 +219,8 @@ export class StandbyModalComponent {
 
   userSearch = '';
 
-
+  /** Nota libre al aceptar la selección (reporte contabilidad). */
+  observacion = '';
 
   showAcceptAlert = false;
 
@@ -661,7 +665,8 @@ export class StandbyModalComponent {
             appsKey,
             start: assignment.fechaInicio,
             end: assignment.fechaFin,
-            responsables: []
+            responsables: [],
+            observacion: ''
           };
 
           map.set(key, group);
@@ -675,6 +680,11 @@ export class StandbyModalComponent {
           group.responsables.push(
             assignment.responsable
           );
+        }
+
+        const note = assignment.observacion?.trim();
+        if (note && !group.observacion) {
+          group.observacion = note;
         }
 
       }
@@ -1070,6 +1080,9 @@ export class StandbyModalComponent {
 
     this.addingToExistingWeek = group;
 
+    this.observacion =
+      group.observacion || this.observacion;
+
     this.selectedWeekStarts = [
 
       new Date(group.start)
@@ -1268,28 +1281,6 @@ export class StandbyModalComponent {
 
 
 
-    const responsables = this.responsablesForSummary.filter(
-
-      name =>
-
-        !this.addingToExistingWeek?.responsables.includes(
-
-          name
-
-        )
-
-    );
-
-
-
-    if (!responsables.length) {
-
-      return;
-
-    }
-
-
-
     const sourceApps =
       this.addingToExistingWeek?.aplicaciones?.length
         ? this.addingToExistingWeek.aplicaciones
@@ -1301,8 +1292,6 @@ export class StandbyModalComponent {
 
     }
 
-
-
     const apps: StandbyAssociatedApp[] = sourceApps.map(app => ({
 
       codigoAplicacion: app.codigoAplicacion,
@@ -1311,7 +1300,21 @@ export class StandbyModalComponent {
 
     }));
 
+    const responsables = this.responsablesForSummary.filter(
+      name =>
+        !this.addingToExistingWeek?.responsables.includes(name)
+    );
 
+    if (!responsables.length) {
+
+      return;
+
+    }
+
+    const note =
+      this.observacion.trim() ||
+      this.addingToExistingWeek?.observacion ||
+      '';
 
     for (const responsable of responsables) {
 
@@ -1321,7 +1324,9 @@ export class StandbyModalComponent {
 
         this.standbyWeeks,
 
-        apps
+        apps,
+
+        note
 
       );
 
@@ -1333,7 +1338,11 @@ export class StandbyModalComponent {
 
     this.selectedWeekStarts = [];
 
+    this.selectedUser = undefined;
+
     this.coResponsables = [];
+
+    this.observacion = '';
 
     this.addingCoResponsable = false;
 
@@ -1569,6 +1578,8 @@ export class StandbyModalComponent {
 
     this.userSearch = '';
 
+    this.observacion = '';
+
     this.showAcceptConfirmAlert = false;
 
     this.closeAddAppMenu();
@@ -1598,6 +1609,7 @@ export class StandbyModalComponent {
     }
 
     this.selectedUser = drafts[0].responsable;
+    this.observacion = drafts[0].observacion ?? '';
 
   }
 

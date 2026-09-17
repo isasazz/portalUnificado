@@ -495,6 +495,37 @@
   color: $text-secondary;
 }
 
+.observation-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: $space-12;
+}
+
+.observation-field > span {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.observation-field textarea {
+  width: 100%;
+  min-height: 72px;
+  resize: vertical;
+  padding: $space-8 $space-12;
+  border: 1px solid $border-color;
+  border-radius: $radius-sm;
+  background: $surface;
+  color: $text-primary;
+  font: inherit;
+  line-height: 1.4;
+}
+
+.observation-field textarea:focus {
+  outline: none;
+  border-color: $violeta-orquidea;
+}
+
 .week-list {
   margin: $space-12 0 0;
   padding: 0;
@@ -704,9 +735,23 @@
 }
 
 .trace-item__main {
+  display: grid;
+  grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+  align-items: start;
+  column-gap: $space-16;
+  row-gap: 4px;
+
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
   color: $text-primary;
+}
+
+.trace-item__observation {
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  text-align: left;
+  line-height: 1.35;
+  word-break: break-word;
 }
 
 .trace-weeks {

@@ -412,6 +412,15 @@
 
           </ul>
 
+          <label class="observation-field">
+            <span>Observación</span>
+            <textarea
+              rows="3"
+              name="observacion"
+              [(ngModel)]="observacion"
+            ></textarea>
+          </label>
+
           @if (hasPendingStandbyDraft && !addingCoResponsable) {
             <p class="standby-flow-hint">
               Puedes seguir agregando personas a este standby con +.
@@ -495,10 +504,18 @@
                 }
 
                 <div class="trace-item__main">
-                  De
-                  {{ group.start | date:'dd/MM/yyyy' }}
-                  a
-                  {{ group.end | date:'dd/MM/yyyy' }}
+                  <span>
+                    De
+                    {{ group.start | date:'dd/MM/yyyy' }}
+                    a
+                    {{ group.end | date:'dd/MM/yyyy' }}
+                  </span>
+
+                  @if (group.observacion) {
+                    <span class="trace-item__observation">
+                      {{ group.observacion }}
+                    </span>
+                  }
                 </div>
 
                 <div class="trace-responsables">

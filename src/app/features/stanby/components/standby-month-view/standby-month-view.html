@@ -168,7 +168,7 @@
             [class.is-range-start]="day.isRangeStart"
             [class.is-range-end]="day.isRangeEnd"
             [style.--assignment-color]="
-              day.assignment?.color ?? null
+              outlineDayColor(day.assignment)
             "
             [style.background]="
               !outlineMode() && day.assignment

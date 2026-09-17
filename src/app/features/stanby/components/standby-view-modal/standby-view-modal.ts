@@ -31,6 +31,7 @@ export interface StandbyRowDetail {
   celula: string;
   service: string;
   footerLabel: string;
+  observacion?: string;
 }
 
 type DetailTab = 'info' | 'standby';

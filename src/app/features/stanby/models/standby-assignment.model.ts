@@ -11,4 +11,6 @@ export interface StandbyAssignment {
   fechaFin: Date;
   color: string;
   aplicaciones?: StandbyAssociatedApp[];
+  /** Nota libre al programar (reporte contabilidad). */
+  observacion?: string;
 }

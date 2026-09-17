@@ -41,6 +41,9 @@ from '../../components/standby-person-modal/standby-person-modal';
 import { StandbyScheduleService }
 from '../../services/standby-schedule.service';
 
+import { StandbyReportService }
+from '../../services/standby-report.service';
+
 import { StandbyDelegationService }
 from '../../services/standby-delegation.service';
 
@@ -89,6 +92,7 @@ export class StandbyPageComponent implements OnInit {
 
   private readonly route = inject(ActivatedRoute);
   private readonly scheduleService = inject(StandbyScheduleService);
+  private readonly reportService = inject(StandbyReportService);
   readonly delegationService = inject(StandbyDelegationService);
   private readonly saveSuccess = inject(SaveSuccessService);
   readonly portalFilter = inject(PortalFilterService);
@@ -540,6 +544,7 @@ export class StandbyPageComponent implements OnInit {
           footerLabel: primary
             ? `${primary.celula} · ${primary.ldc}`
             : 'Standby programado',
+          observacion: assignment.observacion ?? '',
           color: assignment.color
         };
 
@@ -859,6 +864,7 @@ export class StandbyPageComponent implements OnInit {
     celula: string;
     service: string;
     footerLabel: string;
+    observacion?: string;
   }): void {
 
     const phone =
@@ -880,7 +886,8 @@ export class StandbyPageComponent implements OnInit {
       ldc: row.ldc,
       celula: row.celula,
       service: row.service,
-      footerLabel: row.footerLabel
+      footerLabel: row.footerLabel,
+      observacion: row.observacion
     };
 
     this.viewAssignments =
@@ -994,6 +1001,26 @@ export class StandbyPageComponent implements OnInit {
 
     this.showPersonModal = true;
     this.cdr.markForCheck();
+
+  }
+
+  downloadStandbyReport(): void {
+
+    const assignments = this.scheduleService.savedAssignments.filter(
+      item => this.assignmentMatchesScope(item)
+    );
+
+    if (assignments.length === 0) {
+      return;
+    }
+
+    const stamp = new Date().toISOString().slice(0, 10);
+    const scope = this.isAreasMode ? 'otras_areas' : 'tecnologia';
+
+    this.reportService.downloadExcel(
+      assignments,
+      `Datos_stand_by_${scope}_${stamp}.xlsx`
+    );
 
   }
 
