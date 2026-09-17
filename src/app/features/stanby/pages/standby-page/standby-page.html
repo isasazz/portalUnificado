@@ -438,6 +438,85 @@
 
           }
 
+          <section class="delegate-history" aria-labelledby="delegate-history-title">
+
+            <header class="delegate-history__header">
+              <h3 id="delegate-history-title">Historial de delegaciones</h3>
+              <p>
+                Registro de relevos enviados y recibidos.
+              </p>
+            </header>
+
+            @if (delegationService.history().length === 0) {
+
+              <p class="delegate-history__empty">
+                Aún no hay delegaciones registradas.
+              </p>
+
+            } @else {
+
+              <div class="delegate-history__table-wrap">
+                <table class="delegate-history__table">
+                  <thead>
+                    <tr>
+                      <th>Dirección</th>
+                      <th>De</th>
+                      <th>Para</th>
+                      <th>Motivo</th>
+                      <th>Periodo</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (
+                      item of delegationService.history();
+                      track item.id
+                    ) {
+                      <tr>
+                        <td>
+                          <span
+                            class="delegate-history__dir"
+                            [class.delegate-history__dir--out]="
+                              item.fromLeader === delegationService.ownerLeader
+                            "
+                            [class.delegate-history__dir--in]="
+                              item.toLeader === delegationService.ownerLeader &&
+                              item.fromLeader !== delegationService.ownerLeader
+                            "
+                          >
+                            {{ delegationService.directionLabel(item) }}
+                          </span>
+                        </td>
+                        <td>{{ item.fromLeader }}</td>
+                        <td>{{ item.toLeader }}</td>
+                        <td>{{ delegationService.reasonLabel(item.motivo) }}</td>
+                        <td>
+                          {{ formatDelegationDate(item.fechaInicio) }}
+                          –
+                          {{ formatDelegationDate(item.fechaFin) }}
+                        </td>
+                        <td>
+                          <span
+                            class="delegate-history__status"
+                            [attr.data-status]="delegationService.statusOf(item)"
+                          >
+                            {{
+                              delegationService.statusLabel(
+                                delegationService.statusOf(item)
+                              )
+                            }}
+                          </span>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+            }
+
+          </section>
+
         </div>
 
       }

@@ -5,6 +5,12 @@ export type StandbyDelegationReason =
   | 'proyecto'
   | 'otro';
 
+export type StandbyDelegationStatus =
+  | 'activa'
+  | 'pendiente'
+  | 'finalizada'
+  | 'revocada';
+
 export interface StandbyDelegation {
   id: number;
   fromLeader: string;
@@ -14,6 +20,8 @@ export interface StandbyDelegation {
   fechaInicio: Date;
   fechaFin: Date;
   createdAt: Date;
+  /** Si se recuperó la programación antes de tiempo. */
+  revokedAt?: Date | null;
 }
 
 export interface StandbyLeaderPeer {

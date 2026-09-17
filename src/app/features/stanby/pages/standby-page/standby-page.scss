@@ -500,6 +500,112 @@
   line-height: 1.5;
 }
 
+.delegate-history {
+  @include flex-column;
+  gap: $space-16;
+  margin-top: $space-24;
+  width: 100%;
+}
+
+.delegate-history__header h3 {
+  margin: 0;
+  font-size: $font-size-h4;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.delegate-history__header p {
+  margin: $space-4 0 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.delegate-history__empty {
+  margin: 0;
+  padding: $space-16 $space-20;
+
+  border: 1px dashed $border-color;
+  border-radius: $radius-md;
+  background: $background-body;
+
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.delegate-history__table-wrap {
+  overflow-x: auto;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+  background: $surface;
+}
+
+.delegate-history__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $font-size-sm;
+}
+
+.delegate-history__table th,
+.delegate-history__table td {
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid $border-light;
+}
+
+.delegate-history__table th {
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  background: #f7f7f7;
+  white-space: nowrap;
+}
+
+.delegate-history__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.delegate-history__dir {
+  display: inline-block;
+  font-weight: $font-weight-semibold;
+}
+
+.delegate-history__dir--out {
+  color: $violeta-orquidea;
+}
+
+.delegate-history__dir--in {
+  color: $verde-andino;
+}
+
+.delegate-history__status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: $radius-sm;
+  font-size: 12px;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+}
+
+.delegate-history__status[data-status='activa'] {
+  background: rgba(0, 195, 137, 0.14);
+  color: $verde-andino;
+}
+
+.delegate-history__status[data-status='pendiente'] {
+  background: rgba(89, 203, 235, 0.18);
+  color: #1a7a96;
+}
+
+.delegate-history__status[data-status='finalizada'] {
+  background: rgba(44, 42, 41, 0.08);
+  color: $text-secondary;
+}
+
+.delegate-history__status[data-status='revocada'] {
+  background: rgba(255, 127, 65, 0.16);
+  color: $naranja-alba;
+}
+
 .section-title {
   margin: 0;
 

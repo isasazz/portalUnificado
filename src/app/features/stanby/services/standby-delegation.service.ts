@@ -9,7 +9,8 @@ from '../../perfil/mocks/current-user.mock';
 
 import {
   StandbyDelegation,
-  StandbyDelegationReason
+  StandbyDelegationReason,
+  StandbyDelegationStatus
 } from '../models/standby-delegation.model';
 
 const STORAGE_KEY = 'portal-standby-delegations';
@@ -40,6 +41,21 @@ export class StandbyDelegationService {
       item.toLeader === this.ownerLeader &&
       this.isActiveToday(item)
     ) ?? null
+  );
+
+  /** Historial del usuario actual (enviadas y recibidas), más reciente primero. */
+  readonly history = computed(() =>
+    this.delegationsSource()
+      .filter(
+        item =>
+          item.fromLeader === this.ownerLeader ||
+          item.toLeader === this.ownerLeader
+      )
+      .slice()
+      .sort(
+        (a, b) =>
+          b.createdAt.getTime() - a.createdAt.getTime()
+      )
   );
 
   /** Titular sigue siendo líder; otro programa por ti. */
@@ -84,17 +100,24 @@ export class StandbyDelegationService {
       nota: payload.nota.trim(),
       fechaInicio: payload.fechaInicio,
       fechaFin: payload.fechaFin,
-      createdAt: new Date()
+      createdAt: new Date(),
+      revokedAt: null
     };
 
-    const withoutOutgoing =
-      this.delegationsSource().filter(
-        item => item.fromLeader !== this.ownerLeader
-      );
+    const now = new Date();
 
-    this.delegationsSource.set([
+    this.delegationsSource.update(list => [
       created,
-      ...withoutOutgoing
+      ...list.map(item => {
+        if (
+          item.fromLeader === this.ownerLeader &&
+          this.isActiveToday(item)
+        ) {
+          return { ...item, revokedAt: now };
+        }
+
+        return item;
+      })
     ]);
 
     this.persist();
@@ -105,14 +128,19 @@ export class StandbyDelegationService {
 
   revokeOutgoing(): void {
 
+    const now = new Date();
+
     this.delegationsSource.update(list =>
-      list.filter(
-        item =>
-          !(
-            item.fromLeader === this.ownerLeader &&
-            this.isActiveToday(item)
-          )
-      )
+      list.map(item => {
+        if (
+          item.fromLeader === this.ownerLeader &&
+          this.isActiveToday(item)
+        ) {
+          return { ...item, revokedAt: now };
+        }
+
+        return item;
+      })
     );
 
     this.persist();
@@ -135,9 +163,60 @@ export class StandbyDelegationService {
 
   }
 
+  statusOf(
+    delegation: StandbyDelegation
+  ): StandbyDelegationStatus {
+
+    if (delegation.revokedAt) {
+      return 'revocada';
+    }
+
+    const today = this.startOfDay(new Date());
+    const from = this.startOfDay(delegation.fechaInicio);
+    const to = this.startOfDay(delegation.fechaFin);
+
+    if (today < from) {
+      return 'pendiente';
+    }
+
+    if (today > to) {
+      return 'finalizada';
+    }
+
+    return 'activa';
+
+  }
+
+  statusLabel(status: StandbyDelegationStatus): string {
+
+    const labels: Record<StandbyDelegationStatus, string> = {
+      activa: 'Activa',
+      pendiente: 'Pendiente',
+      finalizada: 'Finalizada',
+      revocada: 'Revocada'
+    };
+
+    return labels[status];
+
+  }
+
+  directionLabel(delegation: StandbyDelegation): string {
+
+    if (delegation.fromLeader === this.ownerLeader) {
+      return 'Enviada';
+    }
+
+    return 'Recibida';
+
+  }
+
   private isActiveToday(
     delegation: StandbyDelegation
   ): boolean {
+
+    if (delegation.revokedAt) {
+      return false;
+    }
 
     const today = this.startOfDay(new Date());
     const from = this.startOfDay(delegation.fechaInicio);
@@ -167,10 +246,14 @@ export class StandbyDelegationService {
       }
 
       const parsed = JSON.parse(raw) as Array<
-        Omit<StandbyDelegation, 'fechaInicio' | 'fechaFin' | 'createdAt'> & {
+        Omit<
+          StandbyDelegation,
+          'fechaInicio' | 'fechaFin' | 'createdAt' | 'revokedAt'
+        > & {
           fechaInicio: string;
           fechaFin: string;
           createdAt: string;
+          revokedAt?: string | null;
         }
       >;
 
@@ -178,7 +261,10 @@ export class StandbyDelegationService {
         ...item,
         fechaInicio: new Date(item.fechaInicio),
         fechaFin: new Date(item.fechaFin),
-        createdAt: new Date(item.createdAt)
+        createdAt: new Date(item.createdAt),
+        revokedAt: item.revokedAt
+          ? new Date(item.revokedAt)
+          : null
       }));
 
     } catch {
