@@ -98,20 +98,29 @@
 .sp-doc__action {
   @include button-base;
 
-  min-height: 52px;
-  padding: 14px 18px;
+  min-height: 48px;
+  width: 100%;
+  background: $surface;
+}
 
-  border: none;
-  border-radius: 2px;
-  background: #4a4a4a;
+.sp-doc__action--violet {
+  border: 1.5px solid $violeta-orquidea;
+  color: $violeta-orquidea;
+}
 
-  font-size: 14px;
-  font-weight: $font-weight-semibold;
+.sp-doc__action--violet:hover {
+  background: $violeta-orquidea;
   color: $blanco;
 }
 
-.sp-doc__action:hover {
-  background: #333;
+.sp-doc__action--green {
+  border: 1.5px solid $verde-andino;
+  color: $verde-andino;
+}
+
+.sp-doc__action--green:hover {
+  background: $verde-andino;
+  color: $blanco;
 }
 
 .sp-doc__soon {
@@ -231,19 +240,37 @@
   @include button-base;
 
   min-height: 44px;
-  padding: 10px 16px;
+  background: $surface;
+}
 
-  border: none;
-  border-radius: 2px;
-  background: #4a4a4a;
+.sp-acc__btn--blue {
+  border: 1.5px solid $azul-caribe;
+  color: $azul-caribe;
+}
 
-  font-size: 13px;
-  font-weight: $font-weight-semibold;
+.sp-acc__btn--blue:hover {
+  background: $azul-caribe;
   color: $blanco;
 }
 
-.sp-acc__btn:hover {
-  background: #333;
+.sp-acc__btn--orange {
+  border: 1.5px solid $naranja-alba;
+  color: $naranja-alba;
+}
+
+.sp-acc__btn--orange:hover {
+  background: $naranja-alba;
+  color: $blanco;
+}
+
+.sp-acc__btn--pink {
+  border: 1.5px solid $rosa-flamenco;
+  color: $rosa-flamenco;
+}
+
+.sp-acc__btn--pink:hover {
+  background: $rosa-flamenco;
+  color: $blanco;
 }
 
 .sp-acc__table-wrap {
