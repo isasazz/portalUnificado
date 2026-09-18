@@ -330,6 +330,17 @@
   box-shadow: none;
 }
 
+.users-section--edit-only {
+  .co-responsable-callout {
+    margin-bottom: 0;
+  }
+}
+
+.person-chip--edit-current {
+  align-self: flex-start;
+  margin-top: $space-4;
+}
+
 .co-responsable-callout {
   @include flex-column;
   gap: $space-8;
@@ -600,6 +611,30 @@
   line-height: 1;
   color: $text-secondary;
   cursor: pointer;
+}
+
+.person-chip__edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 18px;
+  padding: 0 6px;
+
+  border: 1px solid $border-light;
+  border-radius: $radius-sm;
+  background: $surface;
+
+  font-size: 10px;
+  font-weight: $font-weight-semibold;
+  line-height: 1;
+  color: $text-secondary;
+  cursor: pointer;
+}
+
+.person-chip__edit:hover {
+  border-color: $link-color;
+  color: $link-color;
 }
 
 .person-chip__remove:hover {

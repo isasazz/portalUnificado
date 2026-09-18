@@ -210,7 +210,7 @@ export class StandbyCalendarComponent {
   private getOccupantsForWeek(date: Date): string[] {
 
     const weekStart = this.getWeekStart(date);
-    const end = this.addDays(weekStart, 6);
+    const end = this.addDays(weekStart, 7);
 
     return this.occupiedRanges()
       .filter(range =>
@@ -283,7 +283,7 @@ export class StandbyCalendarComponent {
     }
 
     return this.selectedWeekStarts.some(start => {
-      const end = this.addDays(start, 6);
+      const end = this.addDays(start, 7);
 
       return this.isDateInRange(
         day.date,
@@ -326,7 +326,7 @@ export class StandbyCalendarComponent {
 
   }
 
-  /** Viernes que inicia la semana vie–jue que contiene la fecha. */
+  /** Viernes que inicia el turno vie→vie que contiene la fecha. */
   private getWeekStart(date: Date): Date {
 
     const friday = new Date(date);
@@ -344,7 +344,7 @@ export class StandbyCalendarComponent {
   ): Date | null {
 
     const friday = this.getWeekStart(date);
-    const end = this.addDays(friday, 6);
+    const end = this.addDays(friday, 7);
 
     if (!this.isDateInRange(date, friday, end)) {
       return null;
@@ -359,7 +359,7 @@ export class StandbyCalendarComponent {
   private weekHasOccupied(date: Date): boolean {
 
     const weekStart = this.getWeekStart(date);
-    const end = this.addDays(weekStart, 6);
+    const end = this.addDays(weekStart, 7);
 
     return this.occupiedRanges().some(range =>
       this.rangesOverlap(
@@ -384,7 +384,8 @@ export class StandbyCalendarComponent {
     const b0 = this.startOfDay(bStart);
     const b1 = this.startOfDay(bEnd);
 
-    return a0 <= b1 && b0 <= a1;
+    // Fin exclusivo (viernes 12 a. m. del cierre).
+    return a0 < b1 && b0 < a1;
 
   }
 
@@ -398,7 +399,8 @@ export class StandbyCalendarComponent {
     const from = this.startOfDay(start);
     const to = this.startOfDay(end);
 
-    return day >= from && day <= to;
+    // [inicio, fin): el viernes de cierre inicia el siguiente turno.
+    return day >= from && day < to;
 
   }
 
@@ -506,6 +508,7 @@ export class StandbyCalendarComponent {
       return null;
     }
 
+    // Último día cubierto del turno (antes del viernes 12 a. m. de cierre).
     return this.addDays(lastStart, 6);
 
   }

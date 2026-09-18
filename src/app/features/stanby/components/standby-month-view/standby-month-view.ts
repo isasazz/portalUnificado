@@ -269,11 +269,11 @@ export class StandbyMonthViewComponent {
     const end = this.startOfDay(assignment.fechaFin);
     const start = this.startOfDay(assignment.fechaInicio);
 
-    if (end < today) {
+    if (end <= today) {
       return '#9ca3af';
     }
 
-    if (start <= today && end >= today) {
+    if (start <= today && today < end) {
       return '#00c389';
     }
 
@@ -380,7 +380,7 @@ export class StandbyMonthViewComponent {
         isRangeEnd: assignment
           ? this.isSameDate(
               date,
-              assignment.fechaFin
+              this.dayBefore(assignment.fechaFin)
             )
           : false
       });
@@ -407,7 +407,7 @@ export class StandbyMonthViewComponent {
 
           this.startOfDay(assignment.fechaInicio) &&
 
-        dayTime <=
+        dayTime <
 
           this.startOfDay(assignment.fechaFin)
 
@@ -430,6 +430,18 @@ export class StandbyMonthViewComponent {
       date.getMonth(),
       date.getDate()
     ).getTime();
+
+  }
+
+  private dayBefore(date: Date): Date {
+
+    const previous = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+    previous.setDate(previous.getDate() - 1);
+    return previous;
 
   }
 

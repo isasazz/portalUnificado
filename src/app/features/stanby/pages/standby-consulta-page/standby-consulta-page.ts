@@ -245,7 +245,7 @@ export class StandbyConsultaPageComponent {
     const current = assignments.find(assignment => {
       const start = this.startOfDay(assignment.fechaInicio);
       const end = this.startOfDay(assignment.fechaFin);
-      return start <= today && end >= today;
+      return start <= today && today < end;
     });
 
     if (current) {
@@ -290,7 +290,7 @@ export class StandbyConsultaPageComponent {
     const hasCurrent = assignments.some(assignment => {
       const start = this.startOfDay(assignment.fechaInicio);
       const end = this.startOfDay(assignment.fechaFin);
-      return start <= today && end >= today;
+      return start <= today && today < end;
     });
 
     if (hasCurrent) {
@@ -358,11 +358,11 @@ export class StandbyConsultaPageComponent {
     const start = this.startOfDay(assignment.fechaInicio);
     const end = this.startOfDay(assignment.fechaFin);
 
-    if (end < today) {
+    if (end <= today) {
       return 'past';
     }
 
-    if (start <= today && end >= today) {
+    if (start <= today && today < end) {
       return 'current';
     }
 

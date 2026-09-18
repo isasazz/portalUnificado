@@ -242,9 +242,6 @@ export class StandbyModalComponent {
 
   showAcceptConfirmAlert = false;
 
-  /** Pregunta si la nueva persona va en los mismos días u en otros. */
-  showAddPersonDaysAlert = false;
-
   showSaveAlert = false;
 
 
@@ -261,6 +258,12 @@ export class StandbyModalComponent {
   private pendingOverrideWeekStarts: Date[] = [];
 
   private pendingOverridePerson: string | null = null;
+
+  /**
+   * 'form': suma a co-responsables sin quitar a la persona actual.
+   * 'schedule': acepta en el calendario (días ocupados / trazabilidad).
+   */
+  private pendingAddMode: 'form' | 'schedule' | null = null;
 
   users = [
 
@@ -539,12 +542,8 @@ export class StandbyModalComponent {
 
   clearSelectedUser(): void {
 
+    // En edición de una persona no se deja el formulario sin responsable.
     if (this.editingAcceptedSelection) {
-      const [next, ...rest] = this.coResponsables;
-      this.selectedUser = next;
-      this.coResponsables = rest;
-      this.addingCoResponsable = false;
-      this.persistActiveProductState();
       return;
     }
 
@@ -613,11 +612,12 @@ export class StandbyModalComponent {
   }
 
   /**
-   * Reabre una selección para editar personas y apps con libertad
-   * (agregar / quitar) y volver a aceptar.
+   * Reabre el stand by de una sola persona para editarlo
+   * (fechas, apps u observación). El resto del turno no se toca.
    */
-  editAcceptedGroup(
+  editAcceptedPerson(
     group: GroupedAcceptance,
+    name: string,
     event?: Event
   ): void {
 
@@ -625,8 +625,15 @@ export class StandbyModalComponent {
     event?.stopPropagation();
 
     const codes = group.aplicaciones.map(app => app.codigoAplicacion);
+    const extracted = this.scheduleService.extractPersonForEdit(
+      name,
+      group.start,
+      codes
+    );
 
-    this.scheduleService.extractGroupForEdit(group.start, codes);
+    if (!extracted) {
+      return;
+    }
 
     this.selectedAppCodigos = [...codes];
 
@@ -645,13 +652,12 @@ export class StandbyModalComponent {
       }
     }
 
-    const [primary, ...rest] = group.responsables;
-    this.selectedUser = primary;
-    this.coResponsables = [...rest];
+    this.selectedUser = name;
+    this.coResponsables = [];
     this.addingCoResponsable = false;
     this.addingToExistingWeek = null;
     this.editingAcceptedSelection = true;
-    this.observacion = group.observacion || '';
+    this.observacion = extracted.observacion || group.observacion || '';
     this.selectedWeekStarts = [new Date(group.start)];
 
     this.calendar?.setSelection(this.selectedWeekStarts);
@@ -996,9 +1002,16 @@ export class StandbyModalComponent {
   get showAddPersonOnCalendar(): boolean {
 
     return (
-      (this.canAddCoResponsable || this.editingAcceptedSelection) &&
+      this.canAddCoResponsable &&
       !this.addingCoResponsable
     );
+
+  }
+
+  /** Listado de contactos: en edición solo al añadir otra persona. */
+  get showUsersList(): boolean {
+
+    return !this.editingAcceptedSelection || this.addingCoResponsable;
 
   }
 
@@ -1103,8 +1116,7 @@ export class StandbyModalComponent {
 
     if (
       this.addingCoResponsable &&
-      this.selectedWeekStarts.length > 0 &&
-      !this.editingAcceptedSelection
+      this.selectedWeekStarts.length > 0
     ) {
 
       if (this.responsablesForSummary.includes(user)) {
@@ -1112,9 +1124,15 @@ export class StandbyModalComponent {
         return;
       }
 
-      const others = this.responsablesForSummary.filter(
+      const others = this.responsablesForSummaryDisplay.filter(
         name => name !== user
       );
+
+      // Sumar a la selección actual (mismos días), sin quitar a nadie.
+      if (!this.addingToExistingWeek) {
+        this.askAddPersonToForm(user, others);
+        return;
+      }
 
       this.askAddPersonToWeeks(
         user,
@@ -1125,32 +1143,9 @@ export class StandbyModalComponent {
 
     }
 
-    // En edición libre: clic alterna persona (agregar / quitar).
+    // En edición sin modo «añadir»: no se cambia de persona desde el listado.
     if (this.editingAcceptedSelection) {
-
-      if (this.selectedUser === user) {
-        const [next, ...rest] = this.coResponsables;
-        this.selectedUser = next;
-        this.coResponsables = rest;
-        this.persistActiveProductState();
-        return;
-      }
-
-      if (this.coResponsables.includes(user)) {
-        this.removeCoResponsable(user);
-        return;
-      }
-
-      if (!this.selectedUser) {
-        this.selectedUser = user;
-      } else {
-        this.coResponsables = [...this.coResponsables, user];
-      }
-
-      this.addingCoResponsable = false;
-      this.persistActiveProductState();
       return;
-
     }
 
     if (this.selectedUser === user) {
@@ -1176,57 +1171,11 @@ export class StandbyModalComponent {
 
   startAddCoResponsable(): void {
 
-    if (this.editingAcceptedSelection) {
-      this.focusUsersForCoResponsable();
-      return;
-    }
-
     if (!this.canAddCoResponsable) {
       return;
     }
 
-    this.showAddPersonDaysAlert = true;
-    this.showAcceptConfirmAlert = false;
-    this.showConflictAlert = false;
-    this.showOverrideConfirmAlert = false;
-    this.showAcceptAlert = false;
-    this.cdr.markForCheck();
-
-  }
-
-  confirmAddPersonSameDays(): void {
-
-    this.showAddPersonDaysAlert = false;
     this.beginAddCoResponsableSameDays();
-    this.cdr.markForCheck();
-
-  }
-
-  confirmAddPersonOtherDays(): void {
-
-    this.showAddPersonDaysAlert = false;
-
-    // Deja fija la selección actual y arranca otra persona en otros días.
-    if (this.canAccept) {
-      this.persistAcceptedSelection({ silent: true });
-    }
-
-    this.selectedUser = undefined;
-    this.coResponsables = [];
-    this.addingCoResponsable = false;
-    this.addingToExistingWeek = null;
-    this.selectedWeekStarts = [];
-    this.observacion = '';
-    this.calendar?.clearSelection();
-    this.persistActiveProductState();
-    this.focusUsersForCoResponsable();
-    this.cdr.markForCheck();
-
-  }
-
-  closeAddPersonDaysAlert(): void {
-
-    this.showAddPersonDaysAlert = false;
     this.cdr.markForCheck();
 
   }
@@ -1241,6 +1190,7 @@ export class StandbyModalComponent {
     this.addingToExistingWeek = null;
     this.calendar?.setSelection(this.selectedWeekStarts);
     this.persistActiveProductState();
+    this.cdr.detectChanges();
     this.focusUsersForCoResponsable();
 
   }
@@ -1382,8 +1332,42 @@ export class StandbyModalComponent {
   }
 
   /**
+   * Confirmación para sumar persona a la selección actual
+   * (mismos días, sin quitar a quien ya estaba).
+   */
+  private askAddPersonToForm(
+    person: string,
+    others: string[]
+  ): void {
+
+    this.pendingOverridePerson = person;
+    this.pendingOverrideWeekStarts = this.selectedWeekStarts.map(
+      d => new Date(d)
+    );
+    this.pendingAddMode = 'form';
+
+    if (others.length === 0) {
+      this.overrideConfirmMessage =
+        `¿Segura que quieres añadir a ${person} a este turno de stand by?`;
+    } else {
+      this.overrideConfirmMessage =
+        `¿Segura que quieres añadir a ${person} a este turno? ` +
+        `Ya está(n) ${others.join(', ')}. ` +
+        `No se quita a nadie: se suma a los mismos días.`;
+    }
+
+    this.showOverrideConfirmAlert = true;
+    this.showConflictAlert = false;
+    this.showAcceptAlert = false;
+    this.showAcceptConfirmAlert = false;
+    this.showSaveAlert = false;
+    this.cdr.markForCheck();
+
+  }
+
+  /**
    * Pide confirmación y, si acepta, suma la persona a esas semanas
-   * sin quitar a quienes ya están (sirve tras Guardar también).
+   * en el calendario (días ocupados / selección ya aceptada).
    */
   private askAddPersonToWeeks(
     person: string,
@@ -1395,13 +1379,14 @@ export class StandbyModalComponent {
     this.pendingOverrideWeekStarts = weekStarts.map(
       d => new Date(d)
     );
+    this.pendingAddMode = 'schedule';
 
     if (others.length === 0) {
       this.overrideConfirmMessage =
-        `¿Seguro que quieres añadir a ${person} en estos días?`;
+        `¿Segura que quieres añadir a ${person} en estos días?`;
     } else {
       this.overrideConfirmMessage =
-        `¿Seguro que quieres añadir a ${person} en estos días? ` +
+        `¿Segura que quieres añadir a ${person} en estos días? ` +
         `Ya están programados para ${others.join(', ')}. ` +
         `No se quita a nadie: se suma esta persona al mismo turno de stand by.`;
     }
@@ -1420,6 +1405,7 @@ export class StandbyModalComponent {
     const weekStarts = this.pendingOverrideWeekStarts;
     const responsable = this.pendingOverridePerson;
     const existingGroup = this.addingToExistingWeek;
+    const addMode = this.pendingAddMode;
     const note =
       this.observacion.trim() ||
       existingGroup?.observacion ||
@@ -1428,10 +1414,34 @@ export class StandbyModalComponent {
     this.showOverrideConfirmAlert = false;
     this.pendingOverrideWeekStarts = [];
     this.pendingOverridePerson = null;
+    this.pendingAddMode = null;
     this.addingCoResponsable = false;
+
+    if (!responsable) {
+      this.addingToExistingWeek = null;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    // Misma selección del formulario: suma sin quitar a la persona actual.
+    if (addMode === 'form') {
+      if (!this.responsablesForSummary.includes(responsable)) {
+        if (!this.selectedUser) {
+          this.selectedUser = responsable;
+        } else {
+          this.coResponsables = [...this.coResponsables, responsable];
+        }
+      }
+
+      this.addingToExistingWeek = null;
+      this.persistActiveProductState();
+      this.cdr.markForCheck();
+      return;
+    }
+
     this.addingToExistingWeek = null;
 
-    if (!responsable || weekStarts.length === 0) {
+    if (weekStarts.length === 0) {
       this.cdr.markForCheck();
       return;
     }
@@ -1458,12 +1468,13 @@ export class StandbyModalComponent {
       note
     );
 
-    this.selectedUser = undefined;
-    this.coResponsables = [];
-    this.selectedWeekStarts = [];
-    this.calendar?.clearSelection();
-    this.persistActiveProductState();
+    // No limpia la selección actual si aún hay personas en el formulario.
+    if (this.responsablesForSummary.length === 0) {
+      this.selectedWeekStarts = [];
+      this.calendar?.clearSelection();
+    }
 
+    this.persistActiveProductState();
     this.showAcceptAlert = true;
     this.cdr.markForCheck();
 
@@ -1474,7 +1485,8 @@ export class StandbyModalComponent {
     this.showOverrideConfirmAlert = false;
     this.pendingOverrideWeekStarts = [];
     this.pendingOverridePerson = null;
-    this.addingCoResponsable = false;
+    this.pendingAddMode = null;
+    // Sigue en modo «añadir persona» para elegir a otra.
     this.cdr.markForCheck();
 
   }
@@ -1930,10 +1942,53 @@ export class StandbyModalComponent {
   }
 
   /**
-   * En edición: deja visibles las selecciones aceptadas (borrador)
-   * sin preseleccionar responsable, para poder sumar otra persona.
+   * En edición de persona: carga solo esa asignación al formulario.
+   * En alta: deja visibles borradores pendientes sin fijar responsable.
    */
   private hydrateFromExistingDrafts(): void {
+
+    if (this.editMode()) {
+      const pending = this.scheduleService.pendingPersonEdit;
+
+      if (pending) {
+        const codes = (pending.aplicaciones ?? []).map(
+          app => app.codigoAplicacion
+        );
+
+        this.selectedAppCodigos =
+          codes.length > 0
+            ? [...codes]
+            : this.selectedAppCodigos;
+
+        if (codes.length > 1) {
+          const allInSession = codes.every(code =>
+            this.sessionApps.some(app => app.codigoAplicacion === code)
+          );
+          this.programMode = allInSession ? 'all' : 'single';
+        } else {
+          this.programMode = 'single';
+          const index = this.sessionApps.findIndex(
+            app => app.codigoAplicacion === codes[0]
+          );
+          if (index >= 0) {
+            this.activeAppIndex = index;
+          }
+        }
+
+        this.selectedUser = pending.responsable;
+        this.coResponsables = [];
+        this.addingCoResponsable = false;
+        this.addingToExistingWeek = null;
+        this.editingAcceptedSelection = true;
+        this.observacion = pending.observacion || '';
+        this.selectedWeekStarts = [
+          new Date(pending.fechaInicio)
+        ];
+        this.calendar?.setSelection(this.selectedWeekStarts);
+        this.persistActiveProductState();
+        return;
+      }
+    }
 
     const codes = new Set(
       this.sessionApps.map(app => app.codigoAplicacion)

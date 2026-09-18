@@ -1,5 +1,6 @@
 /**
- * Utilidades de periodo standby: siempre viernes → jueves (7 días).
+ * Utilidades de periodo stand by:
+ * viernes 12:00 a. m. → viernes siguiente 12:00 a. m. (7 días).
  */
 
 export function startOfDay(date: Date): Date {
@@ -14,11 +15,7 @@ export function isFriday(date: Date): boolean {
   return date.getDay() === 5;
 }
 
-export function isThursday(date: Date): boolean {
-  return date.getDay() === 4;
-}
-
-/** Viernes que inicia la semana vie–jue que contiene la fecha. */
+/** Viernes que inicia el turno que contiene la fecha. */
 export function fridayOfStandbyWeek(date: Date): Date {
   const friday = startOfDay(date);
 
@@ -29,11 +26,23 @@ export function fridayOfStandbyWeek(date: Date): Date {
   return friday;
 }
 
-/** Jueves de cierre (6 días después del viernes de inicio). */
-export function thursdayOfStandbyWeek(fridayStart: Date): Date {
+/**
+ * Viernes de cierre a las 12:00 a. m.
+ * (7 días después del viernes de inicio).
+ */
+export function nextFridayOfStandbyWeek(
+  fridayStart: Date
+): Date {
   const end = startOfDay(fridayStart);
-  end.setDate(end.getDate() + 6);
+  end.setDate(end.getDate() + 7);
   return end;
+}
+
+/** @deprecated Usar nextFridayOfStandbyWeek */
+export function thursdayOfStandbyWeek(
+  fridayStart: Date
+): Date {
+  return nextFridayOfStandbyWeek(fridayStart);
 }
 
 export function toStandbyWeek(date: Date): {
@@ -43,7 +52,7 @@ export function toStandbyWeek(date: Date): {
   const start = fridayOfStandbyWeek(date);
   return {
     start,
-    end: thursdayOfStandbyWeek(start)
+    end: nextFridayOfStandbyWeek(start)
   };
 }
 
@@ -55,7 +64,7 @@ export function isValidStandbyWeek(
 
   return (
     isFriday(start) &&
-    isThursday(end) &&
+    isFriday(end) &&
     startOfDay(start).getTime() ===
       normalized.start.getTime() &&
     startOfDay(end).getTime() === normalized.end.getTime()
@@ -63,7 +72,7 @@ export function isValidStandbyWeek(
 }
 
 /**
- * Semana vie–jue del mes (year/month) cuyo viernes es el más cercano
+ * Turno vie→vie del mes (year/month) cuyo viernes es el más cercano
  * a `preferredDay` (día del mes, 1–31).
  */
 export function standbyWeekNearDay(

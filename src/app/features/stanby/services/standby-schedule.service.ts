@@ -59,30 +59,16 @@ export class StandbyScheduleService {
   }
 
   /**
-   * Abre contexto de edición sin sacar lo guardado.
-   * Lo existente permanece (trazabilidad); lo nuevo va a borrador.
+   * Abre contexto de edición de una sola persona (por id).
+   * Saca solo esa asignación; el resto no se toca.
    */
   beginEdit(assignmentId: number): StandbyAssignment | null {
 
-    const assignment = this.savedAssignments.find(
-      item => item.id === assignmentId
-    );
-
-    if (!assignment) {
-      return null;
-    }
-
-    // Solo limpia borradores de una sesión anterior; no toca guardados.
+    // Limpia borradores de otra sesión; no toca guardados ajenos.
     this.draftAssignments = [];
     this.editRestore = [];
 
-    return {
-      ...assignment,
-      fechaInicio: new Date(assignment.fechaInicio),
-      fechaFin: new Date(assignment.fechaFin),
-      aplicaciones: [...(assignment.aplicaciones ?? [])],
-      observacion: assignment.observacion
-    };
+    return this.extractAssignmentForEdit(assignmentId);
 
   }
 
@@ -353,58 +339,91 @@ export class StandbyScheduleService {
   }
 
   /**
-   * Saca un grupo (guardado o borrador) al formulario de edición.
-   * Si se cancela, se puede restaurar con restoreGroupEdit().
+   * Saca solo a una persona de un turno (guardado o borrador)
+   * para editarla. El resto del grupo no se toca.
    */
-  extractGroupForEdit(
+  extractPersonForEdit(
+    responsable: string,
     start: Date,
     appCodes: string[]
-  ): StandbyAssignment[] {
+  ): StandbyAssignment | null {
 
     this.restoreGroupEdit();
 
     const startKey = this.startOfDay(start);
-    const extracted: {
-      assignment: StandbyAssignment;
-      wasSaved: boolean;
-    }[] = [];
 
-    const fromSaved = this.savedAssignments.filter(item =>
-      this.matchesWeekApps(item, startKey, appCodes)
-    );
+    const matchesPerson = (item: StandbyAssignment): boolean =>
+      item.responsable === responsable &&
+      this.matchesWeekApps(item, startKey, appCodes);
 
-    this.savedAssignments = this.savedAssignments.filter(
-      item => !this.matchesWeekApps(item, startKey, appCodes)
-    );
+    const fromSaved = this.savedAssignments.find(matchesPerson);
+    const fromDraft = this.draftAssignments.find(matchesPerson);
 
-    for (const item of fromSaved) {
-      extracted.push({
-        assignment: this.cloneAssignment(item),
-        wasSaved: true
-      });
+    if (!fromSaved && !fromDraft) {
+      return null;
     }
 
-    const fromDraft = this.draftAssignments.filter(item =>
-      this.matchesWeekApps(item, startKey, appCodes)
-    );
+    if (fromSaved) {
+      this.savedAssignments = this.savedAssignments.filter(
+        item => !matchesPerson(item)
+      );
+      this.groupEditBackup = [{
+        assignment: this.cloneAssignment(fromSaved),
+        wasSaved: true
+      }];
+      return this.cloneAssignment(fromSaved);
+    }
 
     this.draftAssignments = this.draftAssignments.filter(
-      item => !this.matchesWeekApps(item, startKey, appCodes)
+      item => !matchesPerson(item)
+    );
+    this.groupEditBackup = [{
+      assignment: this.cloneAssignment(fromDraft!),
+      wasSaved: false
+    }];
+    return this.cloneAssignment(fromDraft!);
+
+  }
+
+  /**
+   * Saca una asignación por id (edición desde el listado).
+   */
+  extractAssignmentForEdit(
+    assignmentId: number
+  ): StandbyAssignment | null {
+
+    this.restoreGroupEdit();
+
+    const fromSaved = this.savedAssignments.find(
+      item => item.id === assignmentId
+    );
+    const fromDraft = this.draftAssignments.find(
+      item => item.id === assignmentId
     );
 
-    for (const item of fromDraft) {
-      extracted.push({
-        assignment: this.cloneAssignment(item),
-        wasSaved: false
-      });
+    if (!fromSaved && !fromDraft) {
+      return null;
     }
 
-    this.groupEditBackup = extracted.map(item => ({
-      assignment: this.cloneAssignment(item.assignment),
-      wasSaved: item.wasSaved
-    }));
+    if (fromSaved) {
+      this.savedAssignments = this.savedAssignments.filter(
+        item => item.id !== assignmentId
+      );
+      this.groupEditBackup = [{
+        assignment: this.cloneAssignment(fromSaved),
+        wasSaved: true
+      }];
+      return this.cloneAssignment(fromSaved);
+    }
 
-    return extracted.map(item => this.cloneAssignment(item.assignment));
+    this.draftAssignments = this.draftAssignments.filter(
+      item => item.id !== assignmentId
+    );
+    this.groupEditBackup = [{
+      assignment: this.cloneAssignment(fromDraft!),
+      wasSaved: false
+    }];
+    return this.cloneAssignment(fromDraft!);
 
   }
 
@@ -427,6 +446,13 @@ export class StandbyScheduleService {
 
     this.groupEditBackup = [];
 
+  }
+
+  /** Asignación en edición de una persona (si hay). */
+  get pendingPersonEdit(): StandbyAssignment | null {
+    return this.groupEditBackup[0]
+      ? this.cloneAssignment(this.groupEditBackup[0].assignment)
+      : null;
   }
 
   /** Confirma la edición: descarta el respaldo (ya no se restaura). */

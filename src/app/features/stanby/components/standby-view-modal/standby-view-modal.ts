@@ -98,7 +98,7 @@ export class StandbyViewModalComponent {
 
     return this.assignments().filter(
       assignment =>
-        this.startOfDay(assignment.fechaFin) >= today
+        this.startOfDay(assignment.fechaFin) > today
     );
 
   });
@@ -110,7 +110,7 @@ export class StandbyViewModalComponent {
     return this.assignments()
       .filter(
         assignment =>
-          this.startOfDay(assignment.fechaFin) < today
+          this.startOfDay(assignment.fechaFin) <= today
       )
       .reverse();
 
@@ -146,11 +146,11 @@ export class StandbyViewModalComponent {
     const start = this.startOfDay(assignment.fechaInicio);
     const end = this.startOfDay(assignment.fechaFin);
 
-    if (end < today) {
+    if (end <= today) {
       return 'past';
     }
 
-    if (start <= today && end >= today) {
+    if (start <= today && today < end) {
       return 'current';
     }
 

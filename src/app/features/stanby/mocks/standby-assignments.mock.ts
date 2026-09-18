@@ -11,7 +11,7 @@ function week(
   return standbyWeekNearDay(preferredDay, monthOffset);
 }
 
-/** Asignaciones mock: siempre viernes → jueves. */
+/** Asignaciones mock: siempre viernes 12 a. m. → viernes siguiente 12 a. m. */
 export const STANDBY_ASSIGNMENTS_MOCK: StandbyAssignment[] = [
   {
     id: 1001,

@@ -192,11 +192,14 @@
         #usersSection
         class="users-section"
         [class.users-section--pick]="addingCoResponsable"
+        [class.users-section--edit-only]="
+          editingAcceptedSelection && !addingCoResponsable
+        "
       >
 
         <h3>Responsables</h3>
 
-        @if (editingAcceptedSelection && standbyWeeks.length > 0) {
+        @if (editingAcceptedSelection && !addingCoResponsable) {
 
           <div
             class="co-responsable-callout"
@@ -204,14 +207,21 @@
             aria-live="polite"
           >
 
-            <strong>Editando selección</strong>
+            <strong>Editando stand by</strong>
 
             <p>
-              Puedes agregar o quitar personas y aplicaciones.
-              Marca o desmarca productos arriba, y usa la lista
-              o las fichas × para las personas. Luego pulsa
-              «Aceptar selección».
+              Estás editando solo a
+              <strong>{{ selectedUser }}</strong>.
+              Cambia fechas, apps u observación.
+              Si necesitas sumar a alguien más, usa
+              «+ Añadir otra persona».
             </p>
+
+            @if (selectedUser) {
+              <span class="person-chip person-chip--edit-current">
+                {{ selectedUser }}
+              </span>
+            }
 
             @if (standbyWeeks.length === 1) {
               <span class="co-responsable-callout__dates">
@@ -219,11 +229,24 @@
                 →
                 {{ standbyWeeks[0].end | date:'dd/MM/yyyy' }}
               </span>
-            } @else {
-              <span class="co-responsable-callout__dates">
-                {{ standbyWeeks.length }} periodos seleccionados
-              </span>
             }
+
+          </div>
+
+        } @else if (editingAcceptedSelection && addingCoResponsable && standbyWeeks.length > 0) {
+
+          <div
+            class="co-responsable-callout"
+            role="status"
+            aria-live="polite"
+          >
+
+            <strong>Añadir otra persona</strong>
+
+            <p>
+              Elige a quién sumar al mismo turno de
+              {{ selectedUser }}. No se quita a nadie.
+            </p>
 
           </div>
 
@@ -259,47 +282,50 @@
 
         }
 
-        <input
-          #userSearchInput
-          class="user-search"
-          type="text"
-          placeholder="Buscar contacto..."
-          [(ngModel)]="userSearch"
-          name="userSearch"
-        />
+        @if (showUsersList) {
 
-        <div class="users-list">
+          <input
+            #userSearchInput
+            class="user-search"
+            type="text"
+            placeholder="Buscar contacto..."
+            [(ngModel)]="userSearch"
+            name="userSearch"
+          />
 
-          @for (
-            user of filteredUsers;
-            track user
-          ) {
+          <div class="users-list">
 
-            <div
-              class="user-card"
-              [class.selected]="
-                selectedUser === user ||
-                coResponsables.includes(user)
-              "
-              [class.user-card--disabled]="
-                addingCoResponsable &&
-                !editingAcceptedSelection &&
-                responsablesForSummary.includes(user)
-              "
-              (click)="selectUser(user)"
-            >
-              {{ user }}
-            </div>
+            @for (
+              user of filteredUsers;
+              track user
+            ) {
 
-          }
+              <div
+                class="user-card"
+                [class.selected]="
+                  selectedUser === user ||
+                  coResponsables.includes(user)
+                "
+                [class.user-card--disabled]="
+                  addingCoResponsable &&
+                  responsablesForSummary.includes(user)
+                "
+                (click)="selectUser(user)"
+              >
+                {{ user }}
+              </div>
 
-          @if (filteredUsers.length === 0) {
-            <p class="users-empty">
-              No se encontraron contactos.
-            </p>
-          }
+            }
 
-        </div>
+            @if (filteredUsers.length === 0) {
+              <p class="users-empty">
+                No se encontraron contactos.
+              </p>
+            }
+
+          </div>
+
+        }
 
       </div>
 
@@ -340,8 +366,8 @@
               <strong>{{ appsForProgrammingLabel }}</strong>
               ·
             }
-            Editando: agrega o quita personas y apps,
-            ajusta fechas si hace falta y acepta de nuevo.
+            Editando solo a {{ selectedUser }}.
+            Ajusta fechas o apps y guarda los cambios.
 
           </div>
 
@@ -355,7 +381,7 @@
             }
             Responsable seleccionado:
             {{ selectedUser }}
-            · Selecciona un viernes (stand by de viernes a jueves)
+            · Selecciona un viernes (stand by de viernes 12 a. m. a viernes 12 a. m.)
             <button
               type="button"
               class="link-clear"
@@ -401,7 +427,7 @@
           </label>
 
           <small>
-            Cada turno de stand by dura 7 días: de viernes a jueves
+            Cada turno de stand by va de viernes 12:00 a. m. a viernes 12:00 a. m.
           </small>
 
           @if (responsablesForSummaryDisplay.length > 0) {
@@ -472,9 +498,9 @@
 
           @if (editingAcceptedSelection) {
             <p class="standby-flow-hint">
-              Estás editando esta selección: agrega o quita personas
-              y aplicaciones, ajusta fechas si hace falta y pulsa
-              «Aceptar selección» para aplicar los cambios.
+              Editando el stand by de {{ selectedUser }}.
+              Para sumar a alguien más al mismo turno, usa
+              «+ Añadir otra persona».
             </p>
           } @else if (hasPendingStandbyDraft && !addingCoResponsable) {
             <p class="standby-flow-hint">
@@ -506,7 +532,7 @@
               [disabled]="!canAccept"
               (click)="acceptSelection()"
             >
-              Aceptar selección
+              {{ editingAcceptedSelection ? 'Guardar cambios' : 'Aceptar selección' }}
             </button>
           </div>
 
@@ -530,16 +556,6 @@
               <li class="trace-item">
 
                 <div class="trace-item__actions">
-                  <button
-                    type="button"
-                    class="trace-item__edit"
-                    title="Editar esta selección"
-                    aria-label="Editar esta selección"
-                    (click)="editAcceptedGroup(group, $event)"
-                  >
-                    Editar
-                  </button>
-
                   @if (group.responsables.length > 0) {
                     <button
                       type="button"
@@ -599,11 +615,20 @@
                       "
                       [title]="
                         group.persistedResponsables.includes(name)
-                          ? 'Guardado — puedes quitarlo'
+                          ? 'Guardado'
                           : 'Pendiente de guardar'
                       "
                     >
                       {{ name }}
+                      <button
+                        type="button"
+                        class="person-chip__edit"
+                        title="Editar stand by de esta persona"
+                        aria-label="Editar stand by de {{ name }}"
+                        (click)="editAcceptedPerson(group, name, $event)"
+                      >
+                        Editar
+                      </button>
                       <button
                         type="button"
                         class="person-chip__remove"
@@ -670,18 +695,6 @@
 />
 
 <app-standby-alert
-  [visible]="showAddPersonDaysAlert"
-  [confirmMode]="true"
-  title="¿Mismos días u otros?"
-  message="¿La nueva persona debe quedar en los mismos días ya seleccionados, o quieres programarla en otros días?"
-  confirmLabel="Mismos días"
-  cancelLabel="Otros días"
-  (confirmed)="confirmAddPersonSameDays()"
-  (cancelled)="confirmAddPersonOtherDays()"
-  (closed)="closeAddPersonDaysAlert()"
-/>
-
-<app-standby-alert
   [visible]="showAcceptAlert"
   title="Selección aceptada"
   [message]="acceptAlertMessage"
@@ -700,7 +713,7 @@
   [confirmMode]="true"
   title="¿Añadir persona a estos días?"
   [message]="overrideConfirmMessage"
-  confirmLabel="Sí, añadir a esta persona"
+  confirmLabel="Sí, añadir"
   cancelLabel="Cancelar"
   (confirmed)="confirmOverrideOccupied()"
   (cancelled)="cancelOverrideOccupied()"
