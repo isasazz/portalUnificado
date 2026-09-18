@@ -15,10 +15,14 @@ import {
 
 const STORAGE_KEY = 'portal-standby-delegations';
 
+const MAX_DELEGATES = 3;
+
 @Injectable({
   providedIn: 'root'
 })
 export class StandbyDelegationService {
+
+  readonly maxDelegates = MAX_DELEGATES;
 
   /** Líder titular: no se elimina; solo delega programación. */
   readonly ownerLeader = CURRENT_USER.nombre;
@@ -32,14 +36,14 @@ export class StandbyDelegationService {
   readonly activeOutgoing = computed(() =>
     this.delegationsSource().find(item =>
       item.fromLeader === this.ownerLeader &&
-      this.isActiveToday(item)
+      this.isActiveNow(item)
     ) ?? null
   );
 
   readonly activeIncoming = computed(() =>
     this.delegationsSource().find(item =>
-      item.toLeader === this.ownerLeader &&
-      this.isActiveToday(item)
+      item.toLeaders.includes(this.ownerLeader) &&
+      this.isActiveNow(item)
     ) ?? null
   );
 
@@ -49,13 +53,23 @@ export class StandbyDelegationService {
       .filter(
         item =>
           item.fromLeader === this.ownerLeader ||
-          item.toLeader === this.ownerLeader
+          item.toLeaders.includes(this.ownerLeader)
       )
       .slice()
       .sort(
         (a, b) =>
           b.createdAt.getTime() - a.createdAt.getTime()
       )
+  );
+
+  /** Activas, pendientes y finalizadas (no revocadas). */
+  readonly historyCurrent = computed(() =>
+    this.history().filter(item => this.statusOf(item) !== 'revocada')
+  );
+
+  /** Solo revocadas / cerradas (historial de eliminadas). */
+  readonly historyDeleted = computed(() =>
+    this.history().filter(item => this.statusOf(item) === 'revocada')
   );
 
   /** Titular sigue siendo líder; otro programa por ti. */
@@ -77,25 +91,51 @@ export class StandbyDelegationService {
     }
 
     if (outgoing) {
-      return `${outgoing.toLeader} programa por ti`;
+      return `Delegaste a ${this.leadersLabel(outgoing)}; sigues pudiendo programar`;
     }
 
     return 'Programación a tu cargo';
 
   });
 
+  leadersLabel(delegation: StandbyDelegation): string {
+
+    const names = delegation.toLeaders;
+
+    if (names.length === 0) {
+      return '';
+    }
+
+    if (names.length === 1) {
+      return names[0];
+    }
+
+    if (names.length === 2) {
+      return `${names[0]} y ${names[1]}`;
+    }
+
+    return `${names.slice(0, -1).join(', ')} y ${names.at(-1)}`;
+
+  }
+
   delegate(payload: {
-    toLeader: string;
+    toLeaders: string[];
     motivo: StandbyDelegationReason;
     nota: string;
     fechaInicio: Date;
     fechaFin: Date;
   }): StandbyDelegation {
 
+    const toLeaders = this.normalizeLeaders(payload.toLeaders);
+
+    if (toLeaders.length === 0) {
+      throw new Error('Debes indicar al menos un líder delegado.');
+    }
+
     const created: StandbyDelegation = {
       id: Date.now(),
       fromLeader: this.ownerLeader,
-      toLeader: payload.toLeader,
+      toLeaders,
       motivo: payload.motivo,
       nota: payload.nota.trim(),
       fechaInicio: payload.fechaInicio,
@@ -111,7 +151,7 @@ export class StandbyDelegationService {
       ...list.map(item => {
         if (
           item.fromLeader === this.ownerLeader &&
-          this.isActiveToday(item)
+          this.isActiveNow(item)
         ) {
           return { ...item, revokedAt: now };
         }
@@ -126,6 +166,99 @@ export class StandbyDelegationService {
 
   }
 
+  updateDelegation(
+    id: number,
+    payload: {
+      toLeaders: string[];
+      motivo: StandbyDelegationReason;
+      nota: string;
+      fechaInicio: Date;
+      fechaFin: Date;
+    }
+  ): StandbyDelegation | null {
+
+    const toLeaders = this.normalizeLeaders(payload.toLeaders);
+
+    if (toLeaders.length === 0) {
+      return null;
+    }
+
+    const current = this.delegationsSource().find(
+      item =>
+        item.id === id &&
+        item.fromLeader === this.ownerLeader
+    );
+
+    if (!current) {
+      return null;
+    }
+
+    const now = new Date();
+
+    const created: StandbyDelegation = {
+      id: Date.now(),
+      fromLeader: this.ownerLeader,
+      toLeaders,
+      motivo: payload.motivo,
+      nota: payload.nota.trim(),
+      fechaInicio: payload.fechaInicio,
+      fechaFin: payload.fechaFin,
+      createdAt: now,
+      revokedAt: null
+    };
+
+    // Conserva el registro anterior en historial (revocado) y suma el nuevo.
+    this.delegationsSource.update(list => [
+      created,
+      ...list.map(item =>
+        item.id === id
+          ? { ...item, revokedAt: item.revokedAt ?? now }
+          : item
+      )
+    ]);
+
+    this.persist();
+
+    return created;
+
+  }
+
+  getById(id: number): StandbyDelegation | null {
+
+    return this.delegationsSource().find(item => item.id === id) ?? null;
+
+  }
+
+  /**
+   * Cierra una delegación enviada sin borrarla del historial
+   * (queda como revocada).
+   */
+  deleteDelegation(id: number): void {
+
+    const current = this.delegationsSource().find(item => item.id === id);
+
+    if (!current || current.fromLeader !== this.ownerLeader) {
+      return;
+    }
+
+    if (current.revokedAt) {
+      return;
+    }
+
+    const now = new Date();
+
+    this.delegationsSource.update(list =>
+      list.map(item =>
+        item.id === id
+          ? { ...item, revokedAt: now }
+          : item
+      )
+    );
+
+    this.persist();
+
+  }
+
   revokeOutgoing(): void {
 
     const now = new Date();
@@ -134,7 +267,7 @@ export class StandbyDelegationService {
       list.map(item => {
         if (
           item.fromLeader === this.ownerLeader &&
-          this.isActiveToday(item)
+          this.isActiveNow(item)
         ) {
           return { ...item, revokedAt: now };
         }
@@ -171,15 +304,15 @@ export class StandbyDelegationService {
       return 'revocada';
     }
 
-    const today = this.startOfDay(new Date());
-    const from = this.startOfDay(delegation.fechaInicio);
-    const to = this.startOfDay(delegation.fechaFin);
+    const now = Date.now();
+    const from = delegation.fechaInicio.getTime();
+    const to = delegation.fechaFin.getTime();
 
-    if (today < from) {
+    if (now < from) {
       return 'pendiente';
     }
 
-    if (today > to) {
+    if (now > to) {
       return 'finalizada';
     }
 
@@ -210,7 +343,29 @@ export class StandbyDelegationService {
 
   }
 
-  private isActiveToday(
+  private normalizeLeaders(names: string[]): string[] {
+
+    const unique: string[] = [];
+
+    for (const name of names) {
+      const trimmed = name.trim();
+
+      if (!trimmed || unique.includes(trimmed)) {
+        continue;
+      }
+
+      unique.push(trimmed);
+
+      if (unique.length >= MAX_DELEGATES) {
+        break;
+      }
+    }
+
+    return unique;
+
+  }
+
+  private isActiveNow(
     delegation: StandbyDelegation
   ): boolean {
 
@@ -218,21 +373,12 @@ export class StandbyDelegationService {
       return false;
     }
 
-    const today = this.startOfDay(new Date());
-    const from = this.startOfDay(delegation.fechaInicio);
-    const to = this.startOfDay(delegation.fechaFin);
+    const now = Date.now();
 
-    return today >= from && today <= to;
-
-  }
-
-  private startOfDay(date: Date): number {
-
-    return new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate()
-    ).getTime();
+    return (
+      now >= delegation.fechaInicio.getTime() &&
+      now <= delegation.fechaFin.getTime()
+    );
 
   }
 
@@ -248,8 +394,10 @@ export class StandbyDelegationService {
       const parsed = JSON.parse(raw) as Array<
         Omit<
           StandbyDelegation,
-          'fechaInicio' | 'fechaFin' | 'createdAt' | 'revokedAt'
+          'fechaInicio' | 'fechaFin' | 'createdAt' | 'revokedAt' | 'toLeaders'
         > & {
+          toLeaders?: string[];
+          toLeader?: string;
           fechaInicio: string;
           fechaFin: string;
           createdAt: string;
@@ -257,15 +405,29 @@ export class StandbyDelegationService {
         }
       >;
 
-      return parsed.map(item => ({
-        ...item,
-        fechaInicio: new Date(item.fechaInicio),
-        fechaFin: new Date(item.fechaFin),
-        createdAt: new Date(item.createdAt),
-        revokedAt: item.revokedAt
-          ? new Date(item.revokedAt)
-          : null
-      }));
+      return parsed.map(item => {
+        const toLeaders = this.normalizeLeaders(
+          item.toLeaders?.length
+            ? item.toLeaders
+            : item.toLeader
+              ? [item.toLeader]
+              : []
+        );
+
+        return {
+          id: item.id,
+          fromLeader: item.fromLeader,
+          toLeaders,
+          motivo: item.motivo,
+          nota: item.nota,
+          fechaInicio: new Date(item.fechaInicio),
+          fechaFin: new Date(item.fechaFin),
+          createdAt: new Date(item.createdAt),
+          revokedAt: item.revokedAt
+            ? new Date(item.revokedAt)
+            : null
+        };
+      });
 
     } catch {
       return [];

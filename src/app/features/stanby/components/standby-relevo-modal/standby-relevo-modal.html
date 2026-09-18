@@ -8,17 +8,20 @@
   <div
     class="relevo-modal"
     role="dialog"
-    aria-labelledby="relevo-title"
+    [attr.aria-labelledby]="'relevo-title'"
     (click)="$event.stopPropagation()"
   >
 
     <header class="relevo-modal__header">
 
       <div>
-        <h2 id="relevo-title">Delegar programación</h2>
+        <h2 id="relevo-title">
+          {{ isEditMode() ? 'Editar delegación' : 'Delegar programación' }}
+        </h2>
         <p class="relevo-modal__subtitle">
-          Transfiere temporalmente la programación de standby a otro
-          líder. {{ owner.nombre }} permanece como líder titular.
+          Transfiere temporalmente la programación de standby a hasta
+          {{ maxDelegates }} líderes.
+          {{ owner.nombre }} permanece como líder titular.
         </p>
       </div>
 
@@ -88,35 +91,46 @@
       }
 
       <div class="field">
-        <label for="relevo-buscar">Usuario que recibe</label>
+        <label for="relevo-buscar">
+          Usuarios que reciben
+          <span class="field-count">
+            ({{ selectedLeaders().length }}/{{ maxDelegates }})
+          </span>
+        </label>
 
-        @if (selectedLeader(); as leader) {
+        @if (selectedLeaders().length > 0) {
 
-          <div class="leader-picked">
-            <div class="leader-option leader-option--selected">
-              <span
-                class="leader-option__avatar"
-                [style.background]="avatarTone(leader.nombre).background"
-                [style.color]="avatarTone(leader.nombre).color"
-              >
-                {{ leader.initials }}
-              </span>
-              <span class="leader-option__info">
-                <strong>{{ leader.nombre }}</strong>
-                <small>{{ leader.evc }} · {{ leader.linea }}</small>
-              </span>
-            </div>
+          <div class="leader-picked-list">
+            @for (leader of selectedLeaders(); track leader.id) {
+              <div class="leader-picked">
+                <div class="leader-option leader-option--selected">
+                  <span
+                    class="leader-option__avatar"
+                    [style.background]="avatarTone(leader.nombre).background"
+                    [style.color]="avatarTone(leader.nombre).color"
+                  >
+                    {{ leader.initials }}
+                  </span>
+                  <span class="leader-option__info">
+                    <strong>{{ leader.nombre }}</strong>
+                    <small>{{ leader.evc }} · {{ leader.linea }}</small>
+                  </span>
+                </div>
 
-            <button
-              type="button"
-              class="leader-change"
-              (click)="clearLeaderSelection()"
-            >
-              Cambiar líder
-            </button>
+                <button
+                  type="button"
+                  class="leader-change"
+                  (click)="removeLeader(leader.id)"
+                >
+                  Quitar
+                </button>
+              </div>
+            }
           </div>
 
-        } @else {
+        }
+
+        @if (canAddMoreLeaders()) {
 
           <input
             id="relevo-buscar"
@@ -159,32 +173,57 @@
 
             </div>
 
-          } @else {
+          } @else if (selectedLeaders().length === 0) {
             <p class="leader-hint">
               Escribe en el buscador para ver líderes disponibles.
+              Puedes agregar hasta {{ maxDelegates }}.
+            </p>
+          } @else {
+            <p class="leader-hint">
+              Puedes agregar hasta
+              {{ maxDelegates - selectedLeaders().length }}
+              líder(es) más.
             </p>
           }
 
+        } @else {
+          <p class="leader-hint">
+            Máximo {{ maxDelegates }} personas. Quita alguna para cambiar.
+          </p>
         }
       </div>
 
-      <div class="form-grid">
+      <div class="form-grid form-grid--datetime">
 
-        <div class="field">
-          <label for="relevo-desde">Desde</label>
+        <div class="field field--datetime">
+          <span class="field-group-label">Desde</span>
+          <label class="field-sublabel" for="relevo-desde">Fecha</label>
           <input
             id="relevo-desde"
             type="date"
             formControlName="fechaInicio"
           />
+          <label class="field-sublabel" for="relevo-hora-desde">Hora</label>
+          <input
+            id="relevo-hora-desde"
+            type="time"
+            formControlName="horaInicio"
+          />
         </div>
 
-        <div class="field">
-          <label for="relevo-hasta">Hasta</label>
+        <div class="field field--datetime">
+          <span class="field-group-label">Hasta</span>
+          <label class="field-sublabel" for="relevo-hasta">Fecha</label>
           <input
             id="relevo-hasta"
             type="date"
             formControlName="fechaFin"
+          />
+          <label class="field-sublabel" for="relevo-hora-hasta">Hora</label>
+          <input
+            id="relevo-hora-hasta"
+            type="time"
+            formControlName="horaFin"
           />
         </div>
 
@@ -230,7 +269,7 @@
         [disabled]="!canSave"
         (click)="save()"
       >
-        Confirmar relevo
+        {{ isEditMode() ? 'Guardar cambios' : 'Confirmar relevo' }}
       </button>
 
     </footer>

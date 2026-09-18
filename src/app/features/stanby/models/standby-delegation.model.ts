@@ -14,7 +14,8 @@ export type StandbyDelegationStatus =
 export interface StandbyDelegation {
   id: number;
   fromLeader: string;
-  toLeader: string;
+  /** Hasta 3 líderes que reciben la programación. */
+  toLeaders: string[];
   motivo: StandbyDelegationReason;
   nota: string;
   fechaInicio: Date;

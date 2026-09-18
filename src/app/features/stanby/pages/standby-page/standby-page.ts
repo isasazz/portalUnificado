@@ -53,6 +53,9 @@ from '../../services/standby-report.service';
 import { StandbyDelegationService }
 from '../../services/standby-delegation.service';
 
+import { StandbyDelegation }
+from '../../models/standby-delegation.model';
+
 import { SaveSuccessService }
 from '../../../../shared/services/save-success.service';
 
@@ -155,6 +158,11 @@ export class StandbyPageComponent implements OnInit {
   editingStandby = false;
 
   showRelevoModal = false;
+
+  editingDelegation: StandbyDelegation | null = null;
+
+  /** Tab del historial de delegaciones: vigentes vs eliminadas. */
+  delegationHistoryTab: 'current' | 'deleted' = 'current';
 
   showPersonModal = false;
 
@@ -381,10 +389,6 @@ export class StandbyPageComponent implements OnInit {
 
   toggleCard(id: number): void {
 
-    if (this.delegationService.hasDelegatedOut()) {
-      return;
-    }
-
     // Multi-selección: cada clic solo alterna esa app; no desmarca las demás.
     this.applications = this.applications.map(application => {
       if (application.id !== id) {
@@ -407,10 +411,6 @@ export class StandbyPageComponent implements OnInit {
   }
 
   toggleSelectAll(checked: boolean): void {
-
-    if (this.delegationService.hasDelegatedOut()) {
-      return;
-    }
 
     const selectableIds = new Set(
       this.selectableApplications.map(app => app.id)
@@ -661,10 +661,6 @@ export class StandbyPageComponent implements OnInit {
   }
   startAddStandby(): void {
 
-    if (this.delegationService.hasDelegatedOut()) {
-      return;
-    }
-
     this.clearSelection();
     this.panelView.set('program');
     this.activeView = 'available';
@@ -685,10 +681,7 @@ export class StandbyPageComponent implements OnInit {
 
   continueSelection(): void {
 
-    if (
-      this.delegationService.hasDelegatedOut() ||
-      !this.hasSelection
-    ) {
+    if (!this.hasSelection) {
       return;
     }
 
@@ -754,10 +747,6 @@ export class StandbyPageComponent implements OnInit {
   }
 
   addToStandbyPanel(): void {
-
-    if (this.delegationService.hasDelegatedOut()) {
-      return;
-    }
 
     this.showSidePanel = true;
     this.syncPanelWithSelection();
@@ -1072,10 +1061,6 @@ export class StandbyPageComponent implements OnInit {
     event?.preventDefault();
     event?.stopPropagation();
 
-    if (this.delegationService.hasDelegatedOut()) {
-      return;
-    }
-
     const assignment = this.scheduleService.beginEdit(row.id);
 
     if (!assignment) {
@@ -1132,6 +1117,23 @@ export class StandbyPageComponent implements OnInit {
 
   openRelevoModal(): void {
 
+    this.editingDelegation = null;
+    this.showRelevoModal = true;
+    this.cdr.markForCheck();
+
+  }
+
+  openEditRelevo(delegation?: StandbyDelegation | null): void {
+
+    const target =
+      delegation ??
+      this.delegationService.activeOutgoing();
+
+    if (!target || target.fromLeader !== this.delegationService.ownerLeader) {
+      return;
+    }
+
+    this.editingDelegation = { ...target };
     this.showRelevoModal = true;
     this.cdr.markForCheck();
 
@@ -1140,6 +1142,7 @@ export class StandbyPageComponent implements OnInit {
   closeRelevoModal(): void {
 
     this.showRelevoModal = false;
+    this.editingDelegation = null;
     this.cdr.markForCheck();
 
   }
@@ -1211,12 +1214,51 @@ export class StandbyPageComponent implements OnInit {
 
   }
 
+  deleteDelegation(item: StandbyDelegation): void {
+
+    if (item.fromLeader !== this.delegationService.ownerLeader) {
+      return;
+    }
+
+    if (item.revokedAt) {
+      return;
+    }
+
+    this.delegationService.deleteDelegation(item.id);
+    this.delegationHistoryTab = 'deleted';
+    this.cdr.markForCheck();
+
+    this.saveSuccess.show({
+      title: 'Delegación cerrada',
+      message:
+        'Quedó en el historial de eliminadas. Conservas tus permisos de líder.'
+    });
+
+  }
+
+  setDelegationHistoryTab(tab: 'current' | 'deleted'): void {
+
+    this.delegationHistoryTab = tab;
+    this.cdr.markForCheck();
+
+  }
+
+  get delegationHistoryRows(): StandbyDelegation[] {
+
+    return this.delegationHistoryTab === 'deleted'
+      ? this.delegationService.historyDeleted()
+      : this.delegationService.historyCurrent();
+
+  }
+
   formatDelegationDate(date: Date): string {
 
-    return date.toLocaleDateString('es-CO', {
+    return date.toLocaleString('es-CO', {
       day: '2-digit',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
 
   }

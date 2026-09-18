@@ -16,8 +16,8 @@
 }
 
 .relevo-modal {
-  width: min(560px, 100%);
-  max-height: min(90vh, 720px);
+  width: min(640px, 100%);
+  max-height: min(92vh, 800px);
 
   display: flex;
   flex-direction: column;
@@ -89,6 +89,52 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: $space-16;
+}
+
+.form-grid--datetime {
+  align-items: start;
+}
+
+.field--datetime {
+  padding: $space-12;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+  background: $background-body;
+}
+
+.field-group-label {
+  @include text-label;
+  margin-bottom: 2px;
+  color: $text-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.field-sublabel {
+  margin-top: $space-4 !important;
+  font-size: $font-size-xs !important;
+  font-weight: $font-weight-medium !important;
+  color: $text-secondary !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+.field input[type='time'],
+.field input[type='date'] {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.field-count {
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+}
+
+.leader-picked-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+  margin-bottom: $space-12;
 }
 
 .leader-search {

@@ -38,7 +38,7 @@ export const CONTACTOS_MOCK: Contacto[] = [
     celular: '+57 315 444 7788',
     nombre: 'Bibiana Montoya',
     correo: 'bmontoya@bancolombia.com.co',
-    horario: 'L-V 8-18',
+    horario: '24/7',
     bvc: 'Banca Personas',
     ldc: 'Aplicaciones',
     celula: 'Célula Digital',

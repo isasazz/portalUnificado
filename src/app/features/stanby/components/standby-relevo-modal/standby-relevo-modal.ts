@@ -22,6 +22,7 @@ import {
 } from '../../mocks/standby-leaders.mock';
 
 import {
+  StandbyDelegation,
   StandbyDelegationReason,
   StandbyLeaderPeer
 } from '../../models/standby-delegation.model';
@@ -54,6 +55,9 @@ export class StandbyRelevoModalComponent {
 
   readonly visible = input(false);
 
+  /** Si viene, el modal abre en modo edición. */
+  readonly editingDelegation = input<StandbyDelegation | null>(null);
+
   readonly closed = output<void>();
 
   readonly delegated = output<void>();
@@ -62,20 +66,28 @@ export class StandbyRelevoModalComponent {
 
   readonly reasons = STANDBY_DELEGATION_REASONS;
 
+  readonly maxDelegates = this.delegationService.maxDelegates;
+
   readonly allLeaders = STANDBY_LEADER_PEERS.filter(
     leader => leader.nombre !== CURRENT_USER.nombre
   );
 
   readonly leaderSearch = signal('');
 
-  readonly selectedLeader = signal<StandbyLeaderPeer | null>(null);
+  readonly selectedLeaders = signal<StandbyLeaderPeer[]>([]);
 
   readonly motivoIsOther = signal(false);
+
+  readonly isEditMode = computed(
+    () => this.editingDelegation() !== null
+  );
 
   readonly form = this.fb.nonNullable.group({
     motivo: ['', Validators.required],
     fechaInicio: ['', Validators.required],
+    horaInicio: ['08:00', Validators.required],
     fechaFin: ['', Validators.required],
+    horaFin: ['18:00', Validators.required],
     nota: ['']
   });
 
@@ -83,18 +95,29 @@ export class StandbyRelevoModalComponent {
     () => this.leaderSearch().trim().length > 0
   );
 
+  readonly canAddMoreLeaders = computed(
+    () => this.selectedLeaders().length < this.maxDelegates
+  );
+
   readonly filteredLeaders = computed(() => {
 
     const term = this.leaderSearch().trim().toLowerCase();
 
-    if (!term) {
+    if (!term || !this.canAddMoreLeaders()) {
       return [];
     }
 
+    const selectedIds = new Set(
+      this.selectedLeaders().map(leader => leader.id)
+    );
+
     return this.allLeaders.filter(leader =>
-      leader.nombre.toLowerCase().includes(term) ||
-      leader.evc.toLowerCase().includes(term) ||
-      leader.linea.toLowerCase().includes(term)
+      !selectedIds.has(leader.id) &&
+      (
+        leader.nombre.toLowerCase().includes(term) ||
+        leader.evc.toLowerCase().includes(term) ||
+        leader.linea.toLowerCase().includes(term)
+      )
     );
 
   });
@@ -103,7 +126,15 @@ export class StandbyRelevoModalComponent {
 
     effect(() => {
 
-      if (this.visible()) {
+      if (!this.visible()) {
+        return;
+      }
+
+      const editing = this.editingDelegation();
+
+      if (editing) {
+        this.loadDelegation(editing);
+      } else {
         this.reset();
       }
 
@@ -114,19 +145,34 @@ export class StandbyRelevoModalComponent {
   get canSave(): boolean {
 
     const values = this.form.getRawValue();
-    const leader = this.selectedLeader();
+    const leaders = this.selectedLeaders();
     const noteOk =
       !this.motivoIsOther() ||
       values.nota.trim().length >= 10;
 
-    return Boolean(
-      values.motivo &&
-      leader &&
-      values.fechaInicio &&
-      values.fechaFin &&
-      values.fechaFin >= values.fechaInicio &&
-      noteOk
+    if (
+      !values.motivo ||
+      leaders.length === 0 ||
+      leaders.length > this.maxDelegates ||
+      !values.fechaInicio ||
+      !values.horaInicio ||
+      !values.fechaFin ||
+      !values.horaFin ||
+      !noteOk
+    ) {
+      return false;
+    }
+
+    const start = this.combineDateTime(
+      values.fechaInicio,
+      values.horaInicio
     );
+    const end = this.combineDateTime(
+      values.fechaFin,
+      values.horaFin
+    );
+
+    return end.getTime() > start.getTime();
 
   }
 
@@ -159,15 +205,26 @@ export class StandbyRelevoModalComponent {
 
   selectLeader(leader: StandbyLeaderPeer): void {
 
-    this.selectedLeader.set(leader);
+    if (!this.canAddMoreLeaders()) {
+      return;
+    }
+
+    if (
+      this.selectedLeaders().some(item => item.id === leader.id)
+    ) {
+      return;
+    }
+
+    this.selectedLeaders.update(list => [...list, leader]);
     this.leaderSearch.set('');
 
   }
 
-  clearLeaderSelection(): void {
+  removeLeader(leaderId: number): void {
 
-    this.selectedLeader.set(null);
-    this.leaderSearch.set('');
+    this.selectedLeaders.update(list =>
+      list.filter(item => item.id !== leaderId)
+    );
 
   }
 
@@ -181,19 +238,51 @@ export class StandbyRelevoModalComponent {
     }
 
     const values = this.form.getRawValue();
-    const leader = this.selectedLeader();
+    const leaders = this.selectedLeaders();
 
-    if (!leader) {
+    if (leaders.length === 0) {
       return;
     }
 
-    this.delegationService.delegate({
-      toLeader: leader.nombre,
+    const payload = {
+      toLeaders: leaders.map(leader => leader.nombre),
       motivo: values.motivo as StandbyDelegationReason,
       nota: values.nota.trim(),
-      fechaInicio: new Date(values.fechaInicio + 'T00:00:00'),
-      fechaFin: new Date(values.fechaFin + 'T00:00:00')
-    });
+      fechaInicio: this.combineDateTime(
+        values.fechaInicio,
+        values.horaInicio
+      ),
+      fechaFin: this.combineDateTime(
+        values.fechaFin,
+        values.horaFin
+      )
+    };
+
+    const editing = this.editingDelegation();
+
+    if (editing) {
+      const updated = this.delegationService.updateDelegation(
+        editing.id,
+        payload
+      );
+
+      if (!updated) {
+        return;
+      }
+
+      this.delegated.emit();
+      this.close();
+
+      this.saveSuccess.show({
+        title: 'Delegación actualizada',
+        message:
+          `${this.delegationService.leadersLabel(updated)} podrá programar standby por ti. Sigues siendo la líder titular.`
+      });
+
+      return;
+    }
+
+    const created = this.delegationService.delegate(payload);
 
     this.delegated.emit();
     this.close();
@@ -201,8 +290,64 @@ export class StandbyRelevoModalComponent {
     this.saveSuccess.show({
       title: 'Relevo registrado',
       message:
-        `${leader.nombre} podrá programar standby por ti. Sigues siendo la líder titular.`
+        `${this.delegationService.leadersLabel(created)} podrá programar standby por ti. Sigues siendo la líder titular.`
     });
+
+  }
+
+  private loadDelegation(delegation: StandbyDelegation): void {
+
+    const peers = delegation.toLeaders
+      .map(name =>
+        this.allLeaders.find(leader => leader.nombre === name) ??
+        this.peerFromName(name)
+      );
+
+    this.selectedLeaders.set(peers);
+    this.leaderSearch.set('');
+    this.motivoIsOther.set(delegation.motivo === 'otro');
+    this.syncNotaValidators(delegation.motivo === 'otro');
+
+    this.form.reset({
+      motivo: delegation.motivo,
+      fechaInicio: this.toDateInput(delegation.fechaInicio),
+      horaInicio: this.toTimeInput(delegation.fechaInicio),
+      fechaFin: this.toDateInput(delegation.fechaFin),
+      horaFin: this.toTimeInput(delegation.fechaFin),
+      nota: delegation.nota || ''
+    });
+
+  }
+
+  private peerFromName(nombre: string): StandbyLeaderPeer {
+
+    const parts = nombre.trim().split(/\s+/);
+    const initials = parts
+      .slice(0, 2)
+      .map(part => part.charAt(0).toUpperCase())
+      .join('') || '?';
+
+    return {
+      id: -Math.abs(this.hashName(nombre)),
+      nombre,
+      evc: '—',
+      linea: '—',
+      equipo: 0,
+      initials
+    };
+
+  }
+
+  private hashName(value: string): number {
+
+    let hash = 0;
+
+    for (let i = 0; i < value.length; i++) {
+      hash = (hash << 5) - hash + value.charCodeAt(i);
+      hash |= 0;
+    }
+
+    return hash || 1;
 
   }
 
@@ -211,14 +356,43 @@ export class StandbyRelevoModalComponent {
     this.form.reset({
       motivo: '',
       fechaInicio: '',
+      horaInicio: '08:00',
       fechaFin: '',
+      horaFin: '18:00',
       nota: ''
     });
 
     this.leaderSearch.set('');
-    this.selectedLeader.set(null);
+    this.selectedLeaders.set([]);
     this.motivoIsOther.set(false);
     this.syncNotaValidators(false);
+
+  }
+
+  private combineDateTime(date: string, time: string): Date {
+
+    const safeTime = time?.trim() || '00:00';
+
+    return new Date(`${date}T${safeTime}:00`);
+
+  }
+
+  private toDateInput(date: Date): string {
+
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+
+  }
+
+  private toTimeInput(date: Date): string {
+
+    const hours = `${date.getHours()}`.padStart(2, '0');
+    const minutes = `${date.getMinutes()}`.padStart(2, '0');
+
+    return `${hours}:${minutes}`;
 
   }
 

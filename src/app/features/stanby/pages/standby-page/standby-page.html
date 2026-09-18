@@ -13,9 +13,10 @@
         <div class="relevo-status__copy">
           <strong>Delegación activa</strong>
           <p>
-            {{ outgoing.toLeader }} programa standby por ti hasta el
-            {{ formatDelegationDate(outgoing.fechaFin) }}
+            {{ delegationService.leadersLabel(outgoing) }} también puede programar
+            hasta el {{ formatDelegationDate(outgoing.fechaFin) }}
             ({{ delegationService.reasonLabel(outgoing.motivo) }}).
+            Tú conservas tus permisos de líder.
           </p>
         </div>
 
@@ -48,11 +49,7 @@
 
     }
 
-    @if (
-      panelView() === 'program' &&
-      hasSelection &&
-      !delegationService.hasDelegatedOut()
-    ) {
+    @if (panelView() === 'program' && hasSelection) {
 
       <div class="selection-banner">
         <p>
@@ -103,7 +100,9 @@
             <h2 class="section-title">Programar standby</h2>
             <p class="section-subtitle">
               @if (delegationService.hasDelegatedOut()) {
-                Tienes una delegación activa: otro líder programa por ti.
+                Delegaste la programación y sigues con tus permisos de líder.
+                También pueden programar:
+                {{ delegationService.leadersLabel(delegationService.activeOutgoing()!) }}.
               } @else if (delegationService.isActingForAnotherLeader()) {
                 Programa standby en nombre de
                 <strong>{{ delegationService.activeIncoming()?.fromLeader }}</strong>.
@@ -347,7 +346,6 @@
             <input
               type="checkbox"
               [checked]="allSelected"
-              [disabled]="delegationService.hasDelegatedOut()"
               (change)="toggleSelectAll($any($event.target).checked)"
             />
             <span>
@@ -398,8 +396,9 @@
         <div class="inline-panel inline-panel--delegate">
 
           <p class="inline-panel__lead">
-            Conservas tu rol de líder titular. La persona delegada podrá
-            programar standby de tu equipo durante el periodo que indiques.
+            Conservas tu rol y permisos de líder titular. Hasta 3 personas
+            delegadas también podrán programar standby de tu equipo durante
+            el periodo (con fecha y hora) que indiques.
           </p>
 
           @if (delegationService.activeOutgoing(); as outgoing) {
@@ -407,8 +406,9 @@
             <div class="delegate-card">
               <strong>Ya tienes una delegación activa</strong>
               <p>
-                {{ outgoing.toLeader }} programa por ti hasta el
-                {{ formatDelegationDate(outgoing.fechaFin) }}.
+                {{ delegationService.leadersLabel(outgoing) }} también puede programar
+                hasta el {{ formatDelegationDate(outgoing.fechaFin) }}.
+                Tú conservas tus permisos.
               </p>
               <button
                 type="button"
@@ -424,8 +424,8 @@
             <div class="delegate-card">
               <strong>Nueva delegación</strong>
               <p>
-                Elige un líder, el motivo y las fechas para transferir
-                temporalmente la programación.
+                Elige hasta 3 líderes, el motivo, fechas y horas para
+                transferir temporalmente la programación.
               </p>
               <button
                 type="button"
@@ -447,10 +447,52 @@
               </p>
             </header>
 
-            @if (delegationService.history().length === 0) {
+            <div
+              class="delegate-history__tabs"
+              role="tablist"
+              aria-label="Filtro de historial"
+            >
+              <button
+                type="button"
+                role="tab"
+                class="delegate-history__tab"
+                [class.delegate-history__tab--active]="
+                  delegationHistoryTab === 'current'
+                "
+                [attr.aria-selected]="delegationHistoryTab === 'current'"
+                (click)="setDelegationHistoryTab('current')"
+              >
+                Vigentes
+                <span class="delegate-history__tab-count">
+                  {{ delegationService.historyCurrent().length }}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                class="delegate-history__tab"
+                [class.delegate-history__tab--active]="
+                  delegationHistoryTab === 'deleted'
+                "
+                [attr.aria-selected]="delegationHistoryTab === 'deleted'"
+                (click)="setDelegationHistoryTab('deleted')"
+              >
+                Eliminadas
+                <span class="delegate-history__tab-count">
+                  {{ delegationService.historyDeleted().length }}
+                </span>
+              </button>
+            </div>
+
+            @if (delegationHistoryRows.length === 0) {
 
               <p class="delegate-history__empty">
-                Aún no hay delegaciones registradas.
+                @if (delegationHistoryTab === 'deleted') {
+                  No hay delegaciones eliminadas.
+                } @else {
+                  No hay delegaciones vigentes.
+                }
               </p>
 
             } @else {
@@ -459,37 +501,29 @@
                 <table class="delegate-history__table">
                   <thead>
                     <tr>
-                      <th>Dirección</th>
                       <th>De</th>
                       <th>Para</th>
                       <th>Motivo</th>
+                      <th>Nota</th>
                       <th>Periodo</th>
                       <th>Estado</th>
+                      @if (delegationHistoryTab === 'current') {
+                        <th>Acciones</th>
+                      }
                     </tr>
                   </thead>
                   <tbody>
                     @for (
-                      item of delegationService.history();
+                      item of delegationHistoryRows;
                       track item.id
                     ) {
                       <tr>
-                        <td>
-                          <span
-                            class="delegate-history__dir"
-                            [class.delegate-history__dir--out]="
-                              item.fromLeader === delegationService.ownerLeader
-                            "
-                            [class.delegate-history__dir--in]="
-                              item.toLeader === delegationService.ownerLeader &&
-                              item.fromLeader !== delegationService.ownerLeader
-                            "
-                          >
-                            {{ delegationService.directionLabel(item) }}
-                          </span>
-                        </td>
                         <td>{{ item.fromLeader }}</td>
-                        <td>{{ item.toLeader }}</td>
+                        <td>{{ delegationService.leadersLabel(item) }}</td>
                         <td>{{ delegationService.reasonLabel(item.motivo) }}</td>
+                        <td class="delegate-history__note">
+                          {{ item.nota?.trim() || '—' }}
+                        </td>
                         <td>
                           {{ formatDelegationDate(item.fechaInicio) }}
                           –
@@ -507,6 +541,46 @@
                             }}
                           </span>
                         </td>
+                        @if (delegationHistoryTab === 'current') {
+                          <td>
+                            @if (item.fromLeader === delegationService.ownerLeader) {
+                              <div class="delegate-history__actions">
+                                @if (
+                                  delegationService.statusOf(item) === 'activa' ||
+                                  delegationService.statusOf(item) === 'pendiente'
+                                ) {
+                                  <button
+                                    type="button"
+                                    class="icon-btn"
+                                    title="Editar"
+                                    aria-label="Editar delegación"
+                                    (click)="openEditRelevo(item)"
+                                  >
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                      <path
+                                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                                      />
+                                    </svg>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    class="icon-btn icon-btn--danger"
+                                    title="Cerrar / eliminar"
+                                    aria-label="Eliminar delegación"
+                                    (click)="deleteDelegation(item)"
+                                  >
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                      <path
+                                        d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                                      />
+                                    </svg>
+                                  </button>
+                                }
+                              </div>
+                            }
+                          </td>
+                        }
                       </tr>
                     }
                   </tbody>
@@ -635,6 +709,7 @@
 
   <app-standby-relevo-modal
     [visible]="showRelevoModal"
+    [editingDelegation]="editingDelegation"
     (closed)="closeRelevoModal()"
     (delegated)="onRelevoDelegated()"
   />

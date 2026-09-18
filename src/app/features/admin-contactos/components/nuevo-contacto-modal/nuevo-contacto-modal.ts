@@ -200,7 +200,7 @@ export class NuevoContactoModalComponent {
       celular: values.celular.trim(),
       nombre: values.nombre.trim(),
       correo: values.correo.trim(),
-      horario: values.horario,
+      horario: '24/7',
       bvc: app.bvc,
       ldc: app.ldc,
       celula: app.celula,

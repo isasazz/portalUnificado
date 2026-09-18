@@ -229,6 +229,13 @@
   color: $text-secondary;
 }
 
+.relevo-status__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-8;
+  flex-shrink: 0;
+}
+
 .relevo-status__action {
   @include button-base;
 
@@ -500,6 +507,12 @@
   line-height: 1.5;
 }
 
+.delegate-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-8;
+}
+
 .delegate-history {
   @include flex-column;
   gap: $space-16;
@@ -518,6 +531,76 @@
   margin: $space-4 0 0;
   font-size: $font-size-sm;
   color: $text-secondary;
+}
+
+.delegate-history__tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+  background: $background-body;
+}
+
+.delegate-history__tab {
+  @include button-base;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  min-height: 36px;
+  padding: 6px 14px;
+
+  border: none;
+  border-radius: $radius-sm;
+  background: transparent;
+
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+  cursor: pointer;
+}
+
+.delegate-history__tab:hover {
+  color: $text-primary;
+  background: rgba(44, 42, 41, 0.04);
+}
+
+.delegate-history__tab--active {
+  background: $surface;
+  color: $text-primary;
+  box-shadow: $shadow-sm;
+}
+
+.delegate-history__tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+
+  border-radius: $radius-pill;
+  background: rgba(44, 42, 41, 0.08);
+
+  font-size: 12px;
+  font-weight: $font-weight-bold;
+}
+
+.delegate-history__tab--active .delegate-history__tab-count {
+  background: rgba(253, 218, 36, 0.35);
+}
+
+.delegate-history__note {
+  max-width: 220px;
+  white-space: normal;
+  word-break: break-word;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  line-height: 1.35;
 }
 
 .delegate-history__empty {
@@ -604,6 +687,51 @@
 .delegate-history__status[data-status='revocada'] {
   background: rgba(255, 127, 65, 0.16);
   color: $naranja-alba;
+}
+
+.delegate-history__actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.delegate-history .icon-btn {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: $border-light;
+  color: $text-secondary;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  @include transition;
+}
+
+.delegate-history .icon-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.delegate-history .icon-btn:hover {
+  background: $border-color;
+  color: $text-primary;
+}
+
+.delegate-history .icon-btn--danger {
+  color: #e11d48;
+}
+
+.delegate-history .icon-btn--danger:hover {
+  background: rgba(225, 29, 72, 0.12);
+  color: #be123c;
 }
 
 .section-title {
