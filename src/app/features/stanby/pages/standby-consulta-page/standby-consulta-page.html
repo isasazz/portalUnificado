@@ -3,7 +3,7 @@
   <header class="consulta-header">
 
     <div>
-      <h1>Consulta Standby</h1>
+      <h1>Consulta Stand by</h1>
       <p>
         Revisa responsables, filtra por nombre y exporta reportería
         por mes o por rango de fechas (según fecha de inicio).
@@ -14,8 +14,8 @@
 
   <app-standby-report-export
     #consultaReport
-    title="Reportería de Standby"
-    subtitle="Descarga standby por mes o por rango. Solo se incluyen turnos cuya fecha de inicio cae en el periodo elegido."
+    title="Reportería de Stand by"
+    subtitle="Descarga turnos de stand by por mes o por rango. Solo se incluyen turnos cuya fecha de inicio cae en el periodo elegido."
     [disabled]="!hasSavedAssignments"
     (exportRequested)="downloadStandbyReport($event, consultaReport)"
   />
@@ -64,7 +64,7 @@
         <div>Responsable</div>
         <div>Celular</div>
         <div>Turnos</div>
-        <div>Estado / próximo standby</div>
+        <div>Estado / próximo stand by</div>
       </div>
 
       @for (row of peopleRows(); track row.name) {

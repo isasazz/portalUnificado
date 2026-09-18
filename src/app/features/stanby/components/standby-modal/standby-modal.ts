@@ -1336,7 +1336,7 @@ export class StandbyModalComponent {
       this.overrideConfirmMessage =
         `¿Seguro que quieres añadir a ${person} en estos días? ` +
         `Ya están programados para ${others.join(', ')}. ` +
-        `No se quita a nadie: se suma esta persona al mismo standby.`;
+        `No se quita a nadie: se suma esta persona al mismo turno de stand by.`;
     }
 
     this.showOverrideConfirmAlert = true;

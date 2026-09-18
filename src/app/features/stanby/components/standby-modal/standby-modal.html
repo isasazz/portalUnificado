@@ -9,7 +9,7 @@
       <div class="modal-header__info">
 
         <h2>
-          {{ editMode() ? 'Editar Standby' : 'Agregar Standby' }}
+          {{ editMode() ? 'Editar Stand by' : 'Agregar Stand by' }}
         </h2>
 
         @if (sessionApps.length > 0) {
@@ -204,12 +204,12 @@
             aria-live="polite"
           >
 
-            <strong>Añadir al mismo standby</strong>
+            <strong>Añadir al mismo stand by</strong>
 
             <p>
               Selecciona otra persona en esta lista para el
               mismo turno. Las fechas ya están definidas.
-              Para pasar a otro standby, usa «Aceptar selección».
+              Para pasar a otro stand by, usa «Aceptar selección».
             </p>
 
             @if (standbyWeeks.length === 1) {
@@ -295,7 +295,7 @@
               }
             }
             Selecciona un responsable para habilitar
-            la programación de standby.
+            la programación de stand by.
             Luego elige un viernes de inicio.
 
           </div>
@@ -310,7 +310,7 @@
             }
             Responsable seleccionado:
             {{ selectedUser }}
-            · Selecciona un viernes (standby de viernes a jueves)
+            · Selecciona un viernes (stand by de viernes a jueves)
             <button
               type="button"
               class="link-clear"
@@ -352,7 +352,7 @@
           </label>
 
           <small>
-            Cada standby dura 7 días: de viernes a jueves
+            Cada turno de stand by dura 7 días: de viernes a jueves
           </small>
 
           @if (responsablesForSummaryDisplay.length > 0) {
@@ -423,7 +423,7 @@
 
           @if (hasPendingStandbyDraft && !addingCoResponsable) {
             <p class="standby-flow-hint">
-              Puedes seguir agregando personas a este standby con +.
+              Puedes seguir agregando personas a este turno de stand by con +.
               Si necesitas cambiar fechas, hazlo en el calendario.
               Para dejar esta selección fija, pulsa «Aceptar selección».
             </p>
@@ -614,8 +614,8 @@
 <app-standby-alert
   [visible]="showAcceptConfirmAlert"
   [confirmMode]="true"
-  title="¿Finalizar este standby?"
-  message="¿Seguro que no quieres agregar otra persona a este standby? Para programar otro periodo, confirma con «Aceptar selección»."
+  title="¿Finalizar este turno de stand by?"
+  message="¿Seguro que no quieres agregar otra persona a este turno de stand by? Para programar otro periodo, confirma con «Aceptar selección»."
   confirmLabel="Sí, aceptar selección"
   cancelLabel="No, agregar otra persona"
   (confirmed)="confirmAcceptSelection()"
@@ -632,7 +632,7 @@
 
 <app-standby-alert
   [visible]="showConflictAlert"
-  title="Standby ocupado"
+  title="Stand by ocupado"
   [message]="conflictMessage"
   (closed)="closeConflictAlert()">
 </app-standby-alert>

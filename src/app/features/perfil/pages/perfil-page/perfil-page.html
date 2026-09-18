@@ -125,7 +125,7 @@
       </div>
 
       <div class="info-row info-row--locked">
-        <label>Próximo standby</label>
+        <label>Próximo stand by</label>
         @if (nextStandby()) {
           <span>
             {{ nextStandby()!.fechaInicio | date:'dd/MM/yyyy' }}
@@ -153,7 +153,7 @@
           [class.active]="activeTab() === 'proximos'"
           (click)="selectTab('proximos')"
         >
-          Próximos standby ({{ upcomingStandby().length }})
+          Próximos turnos de stand by ({{ upcomingStandby().length }})
         </button>
 
         <button
@@ -195,7 +195,7 @@
                 </div>
 
                 <div class="visit-row__service">
-                  Turno standby
+                  Turno de stand by
                 </div>
 
                 <div class="visit-row__doctor">
@@ -245,7 +245,7 @@
             }
 
             @if (upcomingStandby().length === 0) {
-              <p class="empty">No hay standby próximos.</p>
+              <p class="empty">No hay turnos de stand by próximos.</p>
             }
 
           </div>
@@ -305,7 +305,7 @@
                 </div>
 
                 <div class="visit-row__service">
-                  Turno standby
+                  Turno de stand by
                 </div>
 
                 <div class="visit-row__doctor">

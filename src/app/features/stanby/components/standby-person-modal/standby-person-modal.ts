@@ -148,7 +148,7 @@ export class StandbyPersonModalComponent {
 
     this.saveSuccess.show({
       title: '¡Listo!',
-      message: 'La persona quedó registrada en standby.'
+      message: 'La persona quedó registrada en stand by.'
     });
 
   }

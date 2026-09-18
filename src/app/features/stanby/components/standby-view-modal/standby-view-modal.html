@@ -27,7 +27,7 @@
 
           <div class="person-hero__info">
             <span class="person-hero__eyebrow">
-              Standby por persona
+              Stand by por persona
             </span>
             <h2>{{ personName() }}</h2>
             @if (personPhone()) {
@@ -41,7 +41,7 @@
 
         <div class="modal-header__info">
 
-          <h2>Detalle de standby</h2>
+          <h2>Detalle de stand by</h2>
 
           @if (aplicacionCodigo()) {
 
@@ -73,7 +73,7 @@
 
       @if (hasRowDetail()) {
 
-        <nav class="detail-tabs" aria-label="Detalle del standby">
+        <nav class="detail-tabs" aria-label="Detalle del stand by">
           <button
             type="button"
             class="detail-tabs__btn"
@@ -88,7 +88,7 @@
             [class.detail-tabs__btn--active]="detailTab() === 'standby'"
             (click)="setDetailTab('standby')"
           >
-            Standby
+            Stand by
           </button>
         </nav>
 
@@ -176,11 +176,11 @@
         <div class="empty-detail">
           <p>
             @if (isPersonView()) {
-              Esta persona no tiene standby programado registrado.
+              Esta persona no tiene turnos de stand by programados registrados.
             } @else if (serviceMode()) {
-              No hay standby registrado para este servicio.
+              No hay turnos de stand by registrados para este servicio.
             } @else {
-              No hay standby registrado para esta aplicación.
+              No hay turnos de stand by registrados para esta aplicación.
             }
           </p>
         </div>

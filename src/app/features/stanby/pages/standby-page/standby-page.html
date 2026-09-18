@@ -39,7 +39,7 @@
         <div class="relevo-status__copy">
           <strong>Delegación recibida</strong>
           <p>
-            Programas standby en nombre de
+            Programas stand by en nombre de
             {{ incoming.fromLeader }} hasta el
             {{ formatDelegationDate(incoming.fechaFin) }}.
           </p>
@@ -84,7 +84,7 @@
 
           @if (panelView() === 'apps') {
 
-            <h2 class="section-title">Standby programados</h2>
+            <h2 class="section-title">Stand by programados</h2>
             <p class="section-subtitle">
               @if (isAreasMode) {
                 Cobertura activa y próxima por persona, servicio
@@ -97,14 +97,14 @@
 
           } @else if (panelView() === 'program') {
 
-            <h2 class="section-title">Programar standby</h2>
+            <h2 class="section-title">Programar stand by</h2>
             <p class="section-subtitle">
               @if (delegationService.hasDelegatedOut()) {
                 Delegaste la programación y sigues con tus permisos de líder.
                 También pueden programar:
                 {{ delegationService.leadersLabel(delegationService.activeOutgoing()!) }}.
               } @else if (delegationService.isActingForAnotherLeader()) {
-                Programa standby en nombre de
+                Programa stand by en nombre de
                 <strong>{{ delegationService.activeIncoming()?.fromLeader }}</strong>.
               } @else if (isAreasMode) {
                 Filtra y selecciona los servicios que quieres programar.
@@ -115,23 +115,23 @@
 
           } @else if (panelView() === 'policies') {
 
-            <h2 class="section-title">Políticas Standby</h2>
+            <h2 class="section-title">Políticas Stand by</h2>
             <p class="section-subtitle">
-              Gobierno y definiciones Stand By, dentro del portal.
+              Gobierno y definiciones Stand by, dentro del portal.
             </p>
 
           } @else {
 
             <h2 class="section-title">Delegar programación</h2>
             <p class="section-subtitle">
-              Asigna a otro líder la programación de standby de tu equipo.
+              Asigna a otro líder la programación de stand by de tu equipo.
             </p>
 
           }
 
         </div>
 
-        <nav class="section-tabs" aria-label="Secciones de standby">
+        <nav class="section-tabs" aria-label="Secciones de stand by">
 
           <button
             type="button"
@@ -139,7 +139,7 @@
             [class.section-tabs__btn--active]="panelView() === 'apps'"
             (click)="setPanelView('apps')"
           >
-            Standby
+            Stand by
           </button>
 
           <button
@@ -157,7 +157,7 @@
             [class.section-tabs__btn--active]="panelView() === 'policies'"
             (click)="setPanelView('policies')"
           >
-            Políticas Standby
+            Políticas Stand by
           </button>
 
           <button
@@ -208,7 +208,7 @@
         <app-standby-report-export
           #standbyReport
           title="Descarga de reportes"
-          subtitle="Por mes o por rango de fechas. Solo entran standbys cuya fecha de inicio cae en el periodo."
+          subtitle="Por mes o por rango de fechas. Solo entran turnos de stand by cuya fecha de inicio cae en el periodo."
           [disabled]="!hasSavedAssignments"
           (exportRequested)="downloadStandbyReport($event, standbyReport)"
         />
@@ -284,8 +284,8 @@
               <button
                 type="button"
                 class="standby-row__edit"
-                title="Editar standby"
-                aria-label="Editar standby"
+                title="Editar stand by"
+                aria-label="Editar stand by"
                 (click)="openEditForRow(row, $event)"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -303,7 +303,7 @@
 
           @if (standbyListRows.length === 0) {
             <div class="standby-board__empty">
-              Aún no hay standby programado. Ve a Programar para empezar.
+              Aún no hay turnos de stand by programados. Ve a Programar para empezar.
             </div>
           }
 
@@ -397,7 +397,7 @@
 
           <p class="inline-panel__lead">
             Conservas tu rol y permisos de líder titular. Hasta 3 personas
-            delegadas también podrán programar standby de tu equipo durante
+            delegadas también podrán programar stand by de tu equipo durante
             el periodo (con fecha y hora) que indiques.
           </p>
 
@@ -606,7 +606,7 @@
       <div class="standby-panel__header">
 
         <div>
-          <h2>Agregadas al standby</h2>
+          <h2>Agregadas al stand by</h2>
           <p>
             {{ panelApplications.length }}
             {{ itemLabel }}(es)

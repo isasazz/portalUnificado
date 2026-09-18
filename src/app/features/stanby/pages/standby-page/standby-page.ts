@@ -590,7 +590,7 @@ export class StandbyPageComponent implements OnInit {
             : '—',
           footerLabel: primary
             ? `${primary.celula} · ${primary.ldc}`
-            : 'Standby programado',
+            : 'Stand by programado',
           observacion: assignment.observacion ?? '',
           color: assignment.color
         });
@@ -830,8 +830,8 @@ export class StandbyPageComponent implements OnInit {
     this.saveSuccess.show({
       title: '¡Listo!',
       message: wasEditing
-        ? 'Tu standby quedó actualizado.'
-        : 'Tu standby quedó programado.',
+        ? 'Tu stand by quedó actualizado.'
+        : 'Tu stand by quedó programado.',
       buttonLabel: 'Continuar'
     });
 
@@ -950,7 +950,7 @@ export class StandbyPageComponent implements OnInit {
       ldc: '—',
       celula: '—',
       service: (assignment.aplicaciones ?? [])[0]?.nombreAplicacion ?? '—',
-      footerLabel: 'Standby programado'
+      footerLabel: 'Stand by programado'
     };
     this.viewAssignments = this.scheduleService
       .getAssignmentsForPerson(assignment.responsable)
@@ -1209,7 +1209,7 @@ export class StandbyPageComponent implements OnInit {
 
     this.saveSuccess.show({
       title: 'Programación recuperada',
-      message: 'Vuelves a programar standby directamente.'
+      message: 'Vuelves a programar stand by directamente.'
     });
 
   }

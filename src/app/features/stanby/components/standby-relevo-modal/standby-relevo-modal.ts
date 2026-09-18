@@ -276,7 +276,7 @@ export class StandbyRelevoModalComponent {
       this.saveSuccess.show({
         title: 'Delegación actualizada',
         message:
-          `${this.delegationService.leadersLabel(updated)} podrá programar standby por ti. Sigues siendo la líder titular.`
+          `${this.delegationService.leadersLabel(updated)} podrá programar stand by por ti. Sigues siendo la líder titular.`
       });
 
       return;
@@ -290,7 +290,7 @@ export class StandbyRelevoModalComponent {
     this.saveSuccess.show({
       title: 'Relevo registrado',
       message:
-        `${this.delegationService.leadersLabel(created)} podrá programar standby por ti. Sigues siendo la líder titular.`
+        `${this.delegationService.leadersLabel(created)} podrá programar stand by por ti. Sigues siendo la líder titular.`
     });
 
   }

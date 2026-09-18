@@ -51,7 +51,7 @@ export class StandbyPoliciesViewerComponent {
 
   onPersonalClick(): void {
     this.soonHint.set(
-      'Pronto: el acceso a Personal del Stand By quedará disponible aquí.'
+      'Pronto: el acceso a Personal del Stand by quedará disponible aquí.'
     );
   }
 

@@ -52,7 +52,7 @@ export interface StandbyPolicyMeta {
 }
 
 export const STANDBY_POLICY_META: StandbyPolicyMeta = {
-  title: 'Stand By',
+  title: 'Stand by',
   subtitle:
     'Gobierno y definiciones de talento stand-by, integradas en el portal.',
   version: 'v2.1',
@@ -68,20 +68,20 @@ export const STANDBY_POLICIES_EMBED_URL =
 
 export const STANDBY_POLICIES_INTRO = {
   lead:
-    'La figura de Stand By (participación de un grupo de personas que soportan procesos asociados a la Continuidad del Negocio de la Organización) se creó con el fin de tener un soporte personal disponible en caso de presentarse alguna eventualidad.',
+    'La figura de Stand by (participación de un grupo de personas que soportan procesos asociados a la Continuidad del Negocio de la Organización) se creó con el fin de tener un soporte personal disponible en caso de presentarse alguna eventualidad.',
   contactLabel: 'Para validar novedades remitir su solicitud al correo',
   contactEmail: 'admincap@bancolombia.com.co',
   contactName: 'Administración de Capacidad',
   paymentNote:
-    '💲 El pago del Stand By se realizará durante la primera quincena del mes siguiente a la prestación del servicio 💰'
+    '💲 El pago del Stand by se realizará durante la primera quincena del mes siguiente a la prestación del servicio 💰'
 };
 
 export const STANDBY_POLICY_ACCORDION: StandbyPolicyAccordionItem[] = [
   {
     id: 'requisitos-area',
-    title: 'Requisitos para que un área aplique modelo Stand By',
+    title: 'Requisitos para que un área aplique modelo Stand by',
     intro:
-      'El concepto de Stand By será aplicable en aquellas áreas que cumplan con estos requisitos:',
+      'El concepto de Stand by será aplicable en aquellas áreas que cumplan con estos requisitos:',
     imageSide: 'left',
     bullets: [
       'Prestar servicios de disponibilidad total (7 X 24 horas), siempre y cuando, el área no maneje turnos sucesivos de 24 horas.',
@@ -94,20 +94,20 @@ export const STANDBY_POLICY_ACCORDION: StandbyPolicyAccordionItem[] = [
     id: 'condiciones-personal',
     title: 'Condiciones para el personal programado en Stand by',
     intro:
-      'El personal que presta Stand By debe cumplir estas condiciones operativas y de elegibilidad:',
+      'El personal que presta Stand by debe cumplir estas condiciones operativas y de elegibilidad:',
     imageSide: 'right',
     bullets: [
-      'El personal Stand By debe prestar soporte telefónico inmediato y, en caso de requerirse su desplazamiento a las instalaciones del Banco, debe acudir en un tiempo no mayor a **45 minutos**. Será responsabilidad de los jefes velar porque esta condición se cumpla.',
-      'Línea celular y modem asignado por el banco, rotativo por temas entre los empleados que atienden Stand By, en caso de ser necesario.',
+      'El personal Stand by debe prestar soporte telefónico inmediato y, en caso de requerirse su desplazamiento a las instalaciones del Banco, debe acudir en un tiempo no mayor a **45 minutos**. Será responsabilidad de los jefes velar porque esta condición se cumpla.',
+      'Línea celular y modem asignado por el banco, rotativo por temas entre los empleados que atienden Stand by, en caso de ser necesario.',
       'Token personal asignado por el banco, en caso de ser necesario.',
       'Tener disponibilidad rotativa de acuerdo a una programación mensual definida por el Banco. El líder es quien garantiza la rotación de los empleados semanalmente, para armonizar el bienestar y la salud de los colaboradores.',
-      'El líder es responsable de garantizar que el empleado programado para atención del Stand By tenga las herramientas y conocimientos necesarios para el cargo.',
-      'Es responsabilidad de quien presta el servicio reportar alertas y tiempos de atención en la página definida por cada Gerencia de Gestión Stand By **una vez por semana**. Esto es un prerrequisito para el respectivo pago de las horas Stand By.',
-      'El Stand By aplica para cargos del mapa de cargos profesionales que requieran prestar el servicio en niveles **H, I y J**, exceptuando los cargos con denominación de líder. Aplica también para el mapa de cargos operativos en niveles **9, 8, 7 e inferiores**.',
-      'A las personas que ocupen cargos de Experto, Jefe de Sección, Líderes de Línea de conocimiento, Dueños de Producto, Líderes de Área de Conocimiento, Líderes de EVC, Líderes de Entorno y superiores **no le son aplicables** los beneficios descritos en esta política, los cuales son exclusivos para las personas que conforman los equipos de Stand By.'
+      'El líder es responsable de garantizar que el empleado programado para atención del Stand by tenga las herramientas y conocimientos necesarios para el cargo.',
+      'Es responsabilidad de quien presta el servicio reportar alertas y tiempos de atención en la página definida por cada Gerencia de Gestión Stand by **una vez por semana**. Esto es un prerrequisito para el respectivo pago de las horas Stand by.',
+      'El Stand by aplica para cargos del mapa de cargos profesionales que requieran prestar el servicio en niveles **H, I y J**, exceptuando los cargos con denominación de líder. Aplica también para el mapa de cargos operativos en niveles **9, 8, 7 e inferiores**.',
+      'A las personas que ocupen cargos de Experto, Jefe de Sección, Líderes de Línea de conocimiento, Dueños de Producto, Líderes de Área de Conocimiento, Líderes de EVC, Líderes de Entorno y superiores **no le son aplicables** los beneficios descritos en esta política, los cuales son exclusivos para las personas que conforman los equipos de Stand by.'
     ],
     notes: [
-      '**Excepción:** los Líderes de Línea de Conocimiento y Dueños de Producto pueden prestar servicio de Stand By de manera excepcional, cuando no tengan el equipo idóneo para poder prestar dicho servicio; en ese caso se les reconocerá el pago aquí descrito y se les asignarán las herramientas correspondientes.'
+      '**Excepción:** los Líderes de Línea de Conocimiento y Dueños de Producto pueden prestar servicio de Stand by de manera excepcional, cuando no tengan el equipo idóneo para poder prestar dicho servicio; en ese caso se les reconocerá el pago aquí descrito y se les asignarán las herramientas correspondientes.'
     ]
   },
   {
@@ -115,13 +115,13 @@ export const STANDBY_POLICY_ACCORDION: StandbyPolicyAccordionItem[] = [
     title: 'Definición de los turnos',
     imageSide: 'left',
     bullets: [
-      'El turno de Stand By opera de **viernes a viernes** en horarios no hábiles.',
+      'El turno de Stand by opera de **viernes a viernes** en horarios no hábiles.',
       'Los días sábados, domingos y festivos se entienden disponibles, independientemente de la fecha.',
       'Los turnos se programan mes anticipado por el líder (del **15 al 30** de cada mes) y se publica en la herramienta definida por cada Gerencia de Gestión.',
-      'No se debe asignar tareas adicionales a las demandadas durante el turno de Stand By.'
+      'No se debe asignar tareas adicionales a las demandadas durante el turno de Stand by.'
     ],
     notes: [
-      '**Nota:** las pruebas de Alta Disponibilidad y Recuperación de Desastres podrán utilizar la figura de Stand By durante la planeación, diseño y ejecución de las pruebas de activación, conforme a la programación de las contingencias.'
+      '**Nota:** las pruebas de Alta Disponibilidad y Recuperación de Desastres podrán utilizar la figura de Stand by durante la planeación, diseño y ejecución de las pruebas de activación, conforme a la programación de las contingencias.'
     ]
   },
   {
@@ -131,11 +131,11 @@ export const STANDBY_POLICY_ACCORDION: StandbyPolicyAccordionItem[] = [
     bullets: [
       {
         text:
-          'Para los **casos excepcionales o de fuerza mayor**, en que una misma persona preste Stand By en 2 semanas continuas al mes, se podrá acordar con su respectivo líder un (1) día compensatorio para su disfrute en un periodo no superior a 1 mes.',
+          'Para los **casos excepcionales o de fuerza mayor**, en que una misma persona preste Stand by en 2 semanas continuas al mes, se podrá acordar con su respectivo líder un (1) día compensatorio para su disfrute en un periodo no superior a 1 mes.',
         note:
-          '**Nota:** la decisión del día compensatorio debe ser producto de un común acuerdo entre el jefe y el colaborador, y debe estar sustentada en la actividad que representó el Stand By para el colaborador durante las 2 semanas.'
+          '**Nota:** la decisión del día compensatorio debe ser producto de un común acuerdo entre el jefe y el colaborador, y debe estar sustentada en la actividad que representó el Stand by para el colaborador durante las 2 semanas.'
       },
-      'Para los casos en que el tiempo efectivo del turno de Stand By **supere las 4 horas continuas**, podrá acordarse con el líder el horario de ingreso al día siguiente. Los incidentes no resueltos deben tener continuidad y el líder debe evaluar si el tema puede ser entregado a otra persona del equipo o si el mismo Stand By lo debe resolver.'
+      'Para los casos en que el tiempo efectivo del turno de Stand by **supere las 4 horas continuas**, podrá acordarse con el líder el horario de ingreso al día siguiente. Los incidentes no resueltos deben tener continuidad y el líder debe evaluar si el tema puede ser entregado a otra persona del equipo o si el mismo Stand by lo debe resolver.'
     ]
   },
   {
@@ -146,14 +146,14 @@ export const STANDBY_POLICY_ACCORDION: StandbyPolicyAccordionItem[] = [
     imageSide: 'left',
     bullets: [
       'Es responsabilidad de los líderes reportar a cada Gerencia de Gestión, las novedades de las personas a su cargo previas al pago como son: retiros del Banco y traslados de áreas, así mismo, deberán confirmar el número de horas extras a pagar para los empleados que pertenecen al mapa de cargos operativos, a partir de la hora 44.',
-      'El reporte del pago del Stand By, será enviado desde cada Gerencia de Gestión a la Sección Nómina, con periodicidad mensual, para su pago en la primer quincena siguiente.'
+      'El reporte del pago del Stand by, será enviado desde cada Gerencia de Gestión a la Sección Nómina, con periodicidad mensual, para su pago en la primer quincena siguiente.'
     ],
     actions: [
-      { id: 'programar', label: 'Programación del Stand By', kind: 'program' },
-      { id: 'inscripcion', label: 'Inscripción al Stand By', kind: 'soon' },
+      { id: 'programar', label: 'Programación del Stand by', kind: 'program' },
+      { id: 'inscripcion', label: 'Inscripción al Stand by', kind: 'soon' },
       {
         id: 'modificar',
-        label: 'Modificar información del personal Stand By',
+        label: 'Modificar información del personal Stand by',
         kind: 'soon'
       }
     ]
@@ -163,15 +163,15 @@ export const STANDBY_POLICY_ACCORDION: StandbyPolicyAccordionItem[] = [
     title: 'Control',
     imageSide: 'right',
     bullets: [
-      'Es responsabilidad de los líderes verificar que las actividades y tiempo reportado por cada empleado durante el turno de Stand By corresponda con lo ejecutado.',
-      'Mensualmente las Gerencias de Gestión deberán generar un informe a cada Vicepresidencia con el número de horas pagadas por Stand By, las horas Stand By causadas, el número de personas que están reportando y las actividades que se atendieron.'
+      'Es responsabilidad de los líderes verificar que las actividades y tiempo reportado por cada empleado durante el turno de Stand by corresponda con lo ejecutado.',
+      'Mensualmente las Gerencias de Gestión deberán generar un informe a cada Vicepresidencia con el número de horas pagadas por Stand by, las horas Stand by causadas, el número de personas que están reportando y las actividades que se atendieron.'
     ]
   },
   {
     id: 'bonificacion',
     title: 'Bonificación',
     intro:
-      'El Banco pagará una bonificación por mera liberalidad constitutiva de factor salarial a quien cumpla funciones de Stand By, en las siguientes condiciones:',
+      'El Banco pagará una bonificación por mera liberalidad constitutiva de factor salarial a quien cumpla funciones de Stand by, en las siguientes condiciones:',
     imageSide: 'left',
     bullets: [],
     notes: [

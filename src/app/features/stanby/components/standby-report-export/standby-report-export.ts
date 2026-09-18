@@ -22,10 +22,10 @@ import {
 })
 export class StandbyReportExportComponent {
 
-  readonly title = input('Reportería Standby');
+  readonly title = input('Reportería Stand by');
 
   readonly subtitle = input(
-    'Exporta por mes o por rango. Se filtra por la fecha de inicio del standby.'
+    'Exporta por mes o por rango. Se filtra por la fecha de inicio del stand by.'
   );
 
   readonly disabled = input(false);
@@ -111,7 +111,7 @@ export class StandbyReportExportComponent {
 
   showEmptyResult(): void {
     this.emptyHint.set(
-      'No hay standby con fecha de inicio en ese periodo.'
+      'No hay turnos de stand by con fecha de inicio en ese periodo.'
     );
   }
 

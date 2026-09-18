@@ -25,9 +25,9 @@ export class InicioPageComponent {
     {
       path: '/standby',
       code: 'S',
-      title: 'Standby',
+      title: 'Stand by',
       description:
-        'Programa turnos de standby por aplicación, asigna responsables y revisa el calendario de cobertura.'
+        'Programa turnos de stand by por aplicación, asigna responsables y revisa el calendario de cobertura.'
     },
     {
       path: '/mantenimiento',
@@ -41,7 +41,7 @@ export class InicioPageComponent {
       code: 'P',
       title: 'Mi perfil',
       description:
-        'Revisa tu información personal, próximos turnos de standby e historial de asignaciones.'
+        'Revisa tu información personal, próximos turnos de stand by e historial de asignaciones.'
     }
   ];
 
