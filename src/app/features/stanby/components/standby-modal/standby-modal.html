@@ -196,7 +196,38 @@
 
         <h3>Responsables</h3>
 
-        @if (addingCoResponsable && standbyWeeks.length > 0) {
+        @if (editingAcceptedSelection && standbyWeeks.length > 0) {
+
+          <div
+            class="co-responsable-callout"
+            role="status"
+            aria-live="polite"
+          >
+
+            <strong>Editando selección</strong>
+
+            <p>
+              Puedes agregar o quitar personas y aplicaciones.
+              Marca o desmarca productos arriba, y usa la lista
+              o las fichas × para las personas. Luego pulsa
+              «Aceptar selección».
+            </p>
+
+            @if (standbyWeeks.length === 1) {
+              <span class="co-responsable-callout__dates">
+                {{ standbyWeeks[0].start | date:'dd/MM/yyyy' }}
+                →
+                {{ standbyWeeks[0].end | date:'dd/MM/yyyy' }}
+              </span>
+            } @else {
+              <span class="co-responsable-callout__dates">
+                {{ standbyWeeks.length }} periodos seleccionados
+              </span>
+            }
+
+          </div>
+
+        } @else if (addingCoResponsable && standbyWeeks.length > 0) {
 
           <div
             class="co-responsable-callout"
@@ -252,6 +283,7 @@
               "
               [class.user-card--disabled]="
                 addingCoResponsable &&
+                !editingAcceptedSelection &&
                 responsablesForSummary.includes(user)
               "
               (click)="selectUser(user)"
@@ -273,7 +305,7 @@
 
       <div class="calendar-section">
 
-        @if (!selectedUser && !addingCoResponsable) {
+        @if (!selectedUser && !addingCoResponsable && !editingAcceptedSelection) {
 
           <div class="info-message">
 
@@ -297,6 +329,19 @@
             Selecciona un responsable para habilitar
             la programación de stand by.
             Luego elige un viernes de inicio.
+
+          </div>
+
+        } @else if (editingAcceptedSelection) {
+
+          <div class="info-message success">
+
+            @if (hasMultipleProducts && appsForProgrammingLabel) {
+              <strong>{{ appsForProgrammingLabel }}</strong>
+              ·
+            }
+            Editando: agrega o quita personas y apps,
+            ajusta fechas si hace falta y acepta de nuevo.
 
           </div>
 
@@ -324,7 +369,11 @@
         }
 
         <app-standby-calendar
-          [enabled]="!!selectedUser || addingCoResponsable"
+          [enabled]="
+            !!selectedUser ||
+            addingCoResponsable ||
+            editingAcceptedSelection
+          "
           [occupiedRanges]="occupiedRanges"
           [showAddPerson]="showAddPersonOnCalendar"
           [lockSelection]="lockCalendarSelection"
@@ -421,7 +470,13 @@
             ></textarea>
           </label>
 
-          @if (hasPendingStandbyDraft && !addingCoResponsable) {
+          @if (editingAcceptedSelection) {
+            <p class="standby-flow-hint">
+              Estás editando esta selección: agrega o quita personas
+              y aplicaciones, ajusta fechas si hace falta y pulsa
+              «Aceptar selección» para aplicar los cambios.
+            </p>
+          } @else if (hasPendingStandbyDraft && !addingCoResponsable) {
             <p class="standby-flow-hint">
               Puedes seguir agregando personas a este turno de stand by con +.
               Si necesitas cambiar fechas, hazlo en el calendario.
@@ -431,7 +486,7 @@
 
           @if (addingCoResponsable) {
             <p class="summary-hint summary-hint--muted">
-              Elige la persona en el listado de la izquierda.
+              Mismos días: elige la persona en el listado de la izquierda.
             </p>
           }
 
@@ -478,23 +533,19 @@
                   <button
                     type="button"
                     class="trace-item__edit"
-                    title="Sumar persona a esta selección"
-                    aria-label="Sumar persona a esta selección"
+                    title="Editar esta selección"
+                    aria-label="Editar esta selección"
                     (click)="editAcceptedGroup(group, $event)"
                   >
-                    Sumar
+                    Editar
                   </button>
 
-                  @if (
-                    group.responsables.some(
-                      name => !group.persistedResponsables.includes(name)
-                    )
-                  ) {
+                  @if (group.responsables.length > 0) {
                     <button
                       type="button"
                       class="trace-item__remove"
-                      title="Quitar solo lo pendiente de guardar"
-                      aria-label="Quitar solo lo pendiente de guardar"
+                      title="Quitar esta selección"
+                      aria-label="Quitar esta selección"
                       (click)="removeAcceptedGroup(group, $event)"
                     >
                       ×
@@ -542,31 +593,26 @@
                     track name
                   ) {
                     <span
-                      class="person-chip"
-                      [class.person-chip--removable]="
-                        !group.persistedResponsables.includes(name)
-                      "
+                      class="person-chip person-chip--removable"
                       [class.person-chip--saved]="
                         group.persistedResponsables.includes(name)
                       "
                       [title]="
                         group.persistedResponsables.includes(name)
-                          ? 'Ya guardado'
+                          ? 'Guardado — puedes quitarlo'
                           : 'Pendiente de guardar'
                       "
                     >
                       {{ name }}
-                      @if (!group.persistedResponsables.includes(name)) {
-                        <button
-                          type="button"
-                          class="person-chip__remove"
-                          title="Quitar persona pendiente"
-                          aria-label="Quitar persona pendiente"
-                          (click)="removeAcceptedPerson(group, name, $event)"
-                        >
-                          ×
-                        </button>
-                      }
+                      <button
+                        type="button"
+                        class="person-chip__remove"
+                        title="Quitar persona"
+                        aria-label="Quitar persona"
+                        (click)="removeAcceptedPerson(group, name, $event)"
+                      >
+                        ×
+                      </button>
                     </span>
                   }
 
@@ -621,6 +667,18 @@
   (confirmed)="confirmAcceptSelection()"
   (cancelled)="onCancelAcceptConfirm()"
   (closed)="closeAcceptConfirmAlert()"
+/>
+
+<app-standby-alert
+  [visible]="showAddPersonDaysAlert"
+  [confirmMode]="true"
+  title="¿Mismos días u otros?"
+  message="¿La nueva persona debe quedar en los mismos días ya seleccionados, o quieres programarla en otros días?"
+  confirmLabel="Mismos días"
+  cancelLabel="Otros días"
+  (confirmed)="confirmAddPersonSameDays()"
+  (cancelled)="confirmAddPersonOtherDays()"
+  (closed)="closeAddPersonDaysAlert()"
 />
 
 <app-standby-alert

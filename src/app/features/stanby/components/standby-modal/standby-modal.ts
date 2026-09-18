@@ -222,6 +222,9 @@ export class StandbyModalComponent {
 
   addingToExistingWeek: GroupedAcceptance | null = null;
 
+  /** Edición libre de personas y apps de una selección aceptada. */
+  editingAcceptedSelection = false;
+
 
 
   selectedWeekStarts: Date[] = [];
@@ -239,7 +242,8 @@ export class StandbyModalComponent {
 
   showAcceptConfirmAlert = false;
 
-
+  /** Pregunta si la nueva persona va en los mismos días u en otros. */
+  showAddPersonDaysAlert = false;
 
   showSaveAlert = false;
 
@@ -535,6 +539,15 @@ export class StandbyModalComponent {
 
   clearSelectedUser(): void {
 
+    if (this.editingAcceptedSelection) {
+      const [next, ...rest] = this.coResponsables;
+      this.selectedUser = next;
+      this.coResponsables = rest;
+      this.addingCoResponsable = false;
+      this.persistActiveProductState();
+      return;
+    }
+
     this.selectedUser = undefined;
     this.coResponsables = [];
     this.addingCoResponsable = false;
@@ -564,19 +577,14 @@ export class StandbyModalComponent {
     event?.preventDefault();
     event?.stopPropagation();
 
-    // No borrar personas ya guardadas (trazabilidad).
-    if (group.persistedResponsables.includes(name)) {
-      return;
-    }
-
     const codes = group.aplicaciones.map(app => app.codigoAplicacion);
-    this.scheduleService.removeDraftPerson(name, group.start, codes);
+    this.scheduleService.removePersonFromWeek(name, group.start, codes);
 
     if (this.selectedUser === name) {
       this.clearSelectedUser();
+    } else {
+      this.removeCoResponsable(name);
     }
-
-    this.removeCoResponsable(name);
 
   }
 
@@ -588,24 +596,14 @@ export class StandbyModalComponent {
     event?.preventDefault();
     event?.stopPropagation();
 
-    // Si hay algo guardado en el grupo, solo quita lo pendiente de borrador.
     const codes = group.aplicaciones.map(app => app.codigoAplicacion);
-    const draftOnly = group.responsables.filter(
-      name => !group.persistedResponsables.includes(name)
-    );
 
-    for (const name of draftOnly) {
-      this.scheduleService.removeDraftPerson(name, group.start, codes);
-    }
-
-    if (
-      draftOnly.includes(this.selectedUser ?? '') ||
-      group.persistedResponsables.length === 0
-    ) {
-      // Si el grupo era solo borrador y quedó vacío, limpia UI
-      if (group.persistedResponsables.length === 0) {
-        this.scheduleService.removeDraftGroup(group.start, codes);
-      }
+    for (const name of [...group.responsables]) {
+      this.scheduleService.removePersonFromWeek(
+        name,
+        group.start,
+        codes
+      );
     }
 
     if (group.responsables.includes(this.selectedUser ?? '')) {
@@ -615,8 +613,8 @@ export class StandbyModalComponent {
   }
 
   /**
-   * Carga la selección en el formulario para sumar persona/app
-   * sin borrar lo ya aceptado o guardado.
+   * Reabre una selección para editar personas y apps con libertad
+   * (agregar / quitar) y volver a aceptar.
    */
   editAcceptedGroup(
     group: GroupedAcceptance,
@@ -627,6 +625,8 @@ export class StandbyModalComponent {
     event?.stopPropagation();
 
     const codes = group.aplicaciones.map(app => app.codigoAplicacion);
+
+    this.scheduleService.extractGroupForEdit(group.start, codes);
 
     this.selectedAppCodigos = [...codes];
 
@@ -645,17 +645,18 @@ export class StandbyModalComponent {
       }
     }
 
-    // No preselecciona responsable: el usuario elige a quién sumar.
-    this.selectedUser = undefined;
-    this.coResponsables = [];
-    this.addingCoResponsable = true;
-    this.addingToExistingWeek = group;
+    const [primary, ...rest] = group.responsables;
+    this.selectedUser = primary;
+    this.coResponsables = [...rest];
+    this.addingCoResponsable = false;
+    this.addingToExistingWeek = null;
+    this.editingAcceptedSelection = true;
     this.observacion = group.observacion || '';
     this.selectedWeekStarts = [new Date(group.start)];
 
     this.calendar?.setSelection(this.selectedWeekStarts);
     this.persistActiveProductState();
-    this.focusUsersForCoResponsable();
+    this.cdr.markForCheck();
 
   }
 
@@ -667,8 +668,11 @@ export class StandbyModalComponent {
 
     this.persistActiveProductState();
     this.programMode = mode;
-    this.addingCoResponsable = false;
-    this.addingToExistingWeek = null;
+
+    if (!this.editingAcceptedSelection) {
+      this.addingCoResponsable = false;
+      this.addingToExistingWeek = null;
+    }
 
     if (mode === 'all') {
       this.selectedAppCodigos = this.sessionApps.map(
@@ -677,7 +681,10 @@ export class StandbyModalComponent {
     } else {
       const active = this.activeAppCodigo;
       this.selectedAppCodigos = active ? [active] : [];
-      this.restoreProductState(this.activeAppCodigo);
+
+      if (!this.editingAcceptedSelection) {
+        this.restoreProductState(this.activeAppCodigo);
+      }
     }
 
   }
@@ -924,31 +931,21 @@ export class StandbyModalComponent {
 
   get responsablesForSummaryDisplay(): string[] {
 
-
-
-    const combined = [
-
-      ...(this.addingToExistingWeek?.responsables ?? [])
-
-    ];
-
-
-
-    for (const name of this.responsablesForSummary) {
-
-      if (!combined.includes(name)) {
-
-        combined.push(name);
-
-      }
-
+    if (this.editingAcceptedSelection) {
+      return this.responsablesForSummary;
     }
 
+    const combined = [
+      ...(this.addingToExistingWeek?.responsables ?? [])
+    ];
 
+    for (const name of this.responsablesForSummary) {
+      if (!combined.includes(name)) {
+        combined.push(name);
+      }
+    }
 
     return combined;
-
-
 
   }
 
@@ -998,17 +995,10 @@ export class StandbyModalComponent {
 
   get showAddPersonOnCalendar(): boolean {
 
-
-
     return (
-
-      this.canAddCoResponsable &&
-
+      (this.canAddCoResponsable || this.editingAcceptedSelection) &&
       !this.addingCoResponsable
-
     );
-
-
 
   }
 
@@ -1056,9 +1046,13 @@ export class StandbyModalComponent {
       const code = this.sessionApps[index]?.codigoAplicacion;
       this.selectedAppCodigos = code ? [code] : [];
       this.activeAppIndex = index;
-      this.addingCoResponsable = false;
-      this.addingToExistingWeek = null;
-      this.restoreProductState(this.activeAppCodigo);
+
+      if (!this.editingAcceptedSelection) {
+        this.addingCoResponsable = false;
+        this.addingToExistingWeek = null;
+        this.restoreProductState(this.activeAppCodigo);
+      }
+
       return;
     }
 
@@ -1081,18 +1075,25 @@ export class StandbyModalComponent {
       this.activeAppIndex = this.sessionApps.findIndex(
         app => app.codigoAplicacion === nextCode
       );
-      this.addingCoResponsable = false;
-      this.addingToExistingWeek = null;
-      this.restoreProductState(this.activeAppCodigo);
+
+      if (!this.editingAcceptedSelection) {
+        this.addingCoResponsable = false;
+        this.addingToExistingWeek = null;
+        this.restoreProductState(this.activeAppCodigo);
+      }
+
       return;
     }
 
     this.persistActiveProductState();
     this.selectedAppCodigos = [...this.selectedAppCodigos, code];
     this.activeAppIndex = index;
-    this.addingCoResponsable = false;
-    this.addingToExistingWeek = null;
-    this.restoreProductState(this.activeAppCodigo);
+
+    if (!this.editingAcceptedSelection) {
+      this.addingCoResponsable = false;
+      this.addingToExistingWeek = null;
+      this.restoreProductState(this.activeAppCodigo);
+    }
 
   }
 
@@ -1102,7 +1103,8 @@ export class StandbyModalComponent {
 
     if (
       this.addingCoResponsable &&
-      this.selectedWeekStarts.length > 0
+      this.selectedWeekStarts.length > 0 &&
+      !this.editingAcceptedSelection
     ) {
 
       if (this.responsablesForSummary.includes(user)) {
@@ -1123,6 +1125,34 @@ export class StandbyModalComponent {
 
     }
 
+    // En edición libre: clic alterna persona (agregar / quitar).
+    if (this.editingAcceptedSelection) {
+
+      if (this.selectedUser === user) {
+        const [next, ...rest] = this.coResponsables;
+        this.selectedUser = next;
+        this.coResponsables = rest;
+        this.persistActiveProductState();
+        return;
+      }
+
+      if (this.coResponsables.includes(user)) {
+        this.removeCoResponsable(user);
+        return;
+      }
+
+      if (!this.selectedUser) {
+        this.selectedUser = user;
+      } else {
+        this.coResponsables = [...this.coResponsables, user];
+      }
+
+      this.addingCoResponsable = false;
+      this.persistActiveProductState();
+      return;
+
+    }
+
     if (this.selectedUser === user) {
 
       this.clearSelectedUser();
@@ -1138,10 +1168,6 @@ export class StandbyModalComponent {
 
     this.addingToExistingWeek = null;
 
-    this.calendar?.clearSelection();
-
-    this.selectedWeekStarts = [];
-
     this.persistActiveProductState();
 
   }
@@ -1150,31 +1176,72 @@ export class StandbyModalComponent {
 
   startAddCoResponsable(): void {
 
-
-
-    if (!this.canAddCoResponsable) {
-
+    if (this.editingAcceptedSelection) {
+      this.focusUsersForCoResponsable();
       return;
-
     }
 
+    if (!this.canAddCoResponsable) {
+      return;
+    }
 
+    this.showAddPersonDaysAlert = true;
+    this.showAcceptConfirmAlert = false;
+    this.showConflictAlert = false;
+    this.showOverrideConfirmAlert = false;
+    this.showAcceptAlert = false;
+    this.cdr.markForCheck();
+
+  }
+
+  confirmAddPersonSameDays(): void {
+
+    this.showAddPersonDaysAlert = false;
+    this.beginAddCoResponsableSameDays();
+    this.cdr.markForCheck();
+
+  }
+
+  confirmAddPersonOtherDays(): void {
+
+    this.showAddPersonDaysAlert = false;
+
+    // Deja fija la selección actual y arranca otra persona en otros días.
+    if (this.canAccept) {
+      this.persistAcceptedSelection({ silent: true });
+    }
+
+    this.selectedUser = undefined;
+    this.coResponsables = [];
+    this.addingCoResponsable = false;
+    this.addingToExistingWeek = null;
+    this.selectedWeekStarts = [];
+    this.observacion = '';
+    this.calendar?.clearSelection();
+    this.persistActiveProductState();
+    this.focusUsersForCoResponsable();
+    this.cdr.markForCheck();
+
+  }
+
+  closeAddPersonDaysAlert(): void {
+
+    this.showAddPersonDaysAlert = false;
+    this.cdr.markForCheck();
+
+  }
+
+  private beginAddCoResponsableSameDays(): void {
+
+    if (!this.canAddCoResponsable) {
+      return;
+    }
 
     this.addingCoResponsable = true;
-
     this.addingToExistingWeek = null;
-
-    this.calendar?.setSelection(
-
-      this.selectedWeekStarts
-
-    );
-
+    this.calendar?.setSelection(this.selectedWeekStarts);
     this.persistActiveProductState();
-
     this.focusUsersForCoResponsable();
-
-
 
   }
 
@@ -1526,12 +1593,13 @@ export class StandbyModalComponent {
 
 
 
-  private persistAcceptedSelection(): void {
+  private persistAcceptedSelection(
+    options?: { silent?: boolean }
+  ): void {
 
-
-
-    const sourceApps =
-      this.addingToExistingWeek?.aplicaciones?.length
+    const sourceApps = this.editingAcceptedSelection
+      ? this.appsForProgramming
+      : this.addingToExistingWeek?.aplicaciones?.length
         ? this.addingToExistingWeek.aplicaciones
         : this.appsForProgramming;
 
@@ -1549,10 +1617,12 @@ export class StandbyModalComponent {
 
     }));
 
-    const responsables = this.responsablesForSummary.filter(
-      name =>
-        !this.addingToExistingWeek?.responsables.includes(name)
-    );
+    const responsables = this.editingAcceptedSelection
+      ? this.responsablesForSummary
+      : this.responsablesForSummary.filter(
+          name =>
+            !this.addingToExistingWeek?.responsables.includes(name)
+        );
 
     if (!responsables.length) {
 
@@ -1564,6 +1634,10 @@ export class StandbyModalComponent {
       this.observacion.trim() ||
       this.addingToExistingWeek?.observacion ||
       '';
+
+    if (this.editingAcceptedSelection) {
+      this.scheduleService.commitGroupEdit();
+    }
 
     for (const responsable of responsables) {
 
@@ -1597,6 +1671,8 @@ export class StandbyModalComponent {
 
     this.addingToExistingWeek = null;
 
+    this.editingAcceptedSelection = false;
+
     if (this.isProgramAll) {
       this.productStates.clear();
     } else {
@@ -1605,7 +1681,9 @@ export class StandbyModalComponent {
 
 
 
-    this.showAcceptAlert = true;
+    if (!options?.silent) {
+      this.showAcceptAlert = true;
+    }
 
 
 
@@ -1678,6 +1756,11 @@ export class StandbyModalComponent {
   close(): void {
 
 
+
+    if (this.editingAcceptedSelection) {
+      this.scheduleService.restoreGroupEdit();
+      this.editingAcceptedSelection = false;
+    }
 
     this.resetModalState();
 
@@ -1827,6 +1910,8 @@ export class StandbyModalComponent {
     this.addingCoResponsable = false;
 
     this.addingToExistingWeek = null;
+
+    this.editingAcceptedSelection = false;
 
     this.selectedWeekStarts = [];
 

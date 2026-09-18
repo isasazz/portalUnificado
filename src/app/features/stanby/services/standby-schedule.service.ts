@@ -89,6 +89,7 @@ export class StandbyScheduleService {
   /** Descarta borradores no guardados. No borra lo ya persistido. */
   cancelPendingEdit(): void {
 
+    this.restoreGroupEdit();
     this.draftAssignments = [];
     this.editRestore = [];
 
@@ -310,39 +311,162 @@ export class StandbyScheduleService {
 
   }
 
-  /**
-   * Libera una semana (vie–jue) para las apps dadas:
-   * quita borradores y guardados que se solapen.
-   */
-  releaseWeekForApps(weekStart: Date, appCodes: string[]): void {
+  /** Respaldo al sacar un grupo al formulario de edición. */
+  private groupEditBackup: {
+    assignment: StandbyAssignment;
+    wasSaved: boolean;
+  }[] = [];
 
-    if (appCodes.length === 0) {
+  private matchesWeekApps(
+    assignment: StandbyAssignment,
+    startKey: number,
+    appCodes: string[]
+  ): boolean {
+
+    if (this.startOfDay(assignment.fechaInicio) !== startKey) {
+      return false;
+    }
+
+    const codeSet = new Set(appCodes);
+    const codes = (assignment.aplicaciones ?? []).map(
+      app => app.codigoAplicacion
+    );
+
+    return (
+      codes.length === codeSet.size &&
+      codes.every(code => codeSet.has(code))
+    );
+
+  }
+
+  private cloneAssignment(
+    assignment: StandbyAssignment
+  ): StandbyAssignment {
+
+    return {
+      ...assignment,
+      fechaInicio: new Date(assignment.fechaInicio),
+      fechaFin: new Date(assignment.fechaFin),
+      aplicaciones: [...(assignment.aplicaciones ?? [])]
+    };
+
+  }
+
+  /**
+   * Saca un grupo (guardado o borrador) al formulario de edición.
+   * Si se cancela, se puede restaurar con restoreGroupEdit().
+   */
+  extractGroupForEdit(
+    start: Date,
+    appCodes: string[]
+  ): StandbyAssignment[] {
+
+    this.restoreGroupEdit();
+
+    const startKey = this.startOfDay(start);
+    const extracted: {
+      assignment: StandbyAssignment;
+      wasSaved: boolean;
+    }[] = [];
+
+    const fromSaved = this.savedAssignments.filter(item =>
+      this.matchesWeekApps(item, startKey, appCodes)
+    );
+
+    this.savedAssignments = this.savedAssignments.filter(
+      item => !this.matchesWeekApps(item, startKey, appCodes)
+    );
+
+    for (const item of fromSaved) {
+      extracted.push({
+        assignment: this.cloneAssignment(item),
+        wasSaved: true
+      });
+    }
+
+    const fromDraft = this.draftAssignments.filter(item =>
+      this.matchesWeekApps(item, startKey, appCodes)
+    );
+
+    this.draftAssignments = this.draftAssignments.filter(
+      item => !this.matchesWeekApps(item, startKey, appCodes)
+    );
+
+    for (const item of fromDraft) {
+      extracted.push({
+        assignment: this.cloneAssignment(item),
+        wasSaved: false
+      });
+    }
+
+    this.groupEditBackup = extracted.map(item => ({
+      assignment: this.cloneAssignment(item.assignment),
+      wasSaved: item.wasSaved
+    }));
+
+    return extracted.map(item => this.cloneAssignment(item.assignment));
+
+  }
+
+  /** Devuelve el grupo al estado previo si se cancela la edición. */
+  restoreGroupEdit(): void {
+
+    if (this.groupEditBackup.length === 0) {
       return;
     }
 
-    const { start, end } = toStandbyWeek(weekStart);
+    for (const item of this.groupEditBackup) {
+      const clone = this.cloneAssignment(item.assignment);
+
+      if (item.wasSaved) {
+        this.savedAssignments = [...this.savedAssignments, clone];
+      } else {
+        this.draftAssignments = [...this.draftAssignments, clone];
+      }
+    }
+
+    this.groupEditBackup = [];
+
+  }
+
+  /** Confirma la edición: descarta el respaldo (ya no se restaura). */
+  commitGroupEdit(): void {
+
+    this.groupEditBackup = [];
+
+  }
+
+  /** Quita persona de borrador y guardados en una semana/apps. */
+  removePersonFromWeek(
+    responsable: string,
+    start: Date,
+    appCodes: string[]
+  ): void {
+
+    this.removeDraftPerson(responsable, start, appCodes);
+
     const startKey = this.startOfDay(start);
-    const endKey = this.startOfDay(end);
     const codeSet = new Set(appCodes);
 
-    const keep = (assignment: StandbyAssignment): boolean => {
+    this.savedAssignments = this.savedAssignments.filter(assignment => {
+      if (assignment.responsable !== responsable) {
+        return true;
+      }
+
+      if (this.startOfDay(assignment.fechaInicio) !== startKey) {
+        return true;
+      }
+
       const codes = (assignment.aplicaciones ?? []).map(
         app => app.codigoAplicacion
       );
 
-      if (!codes.some(code => codeSet.has(code))) {
-        return true;
-      }
+      const sameApps =
+        codes.length === codeSet.size &&
+        codes.every(code => codeSet.has(code));
 
-      const a0 = this.startOfDay(assignment.fechaInicio);
-      const a1 = this.startOfDay(assignment.fechaFin);
-
-      const overlaps = a0 <= endKey && startKey <= a1;
-      return !overlaps;
-    };
-
-    this.draftAssignments = this.draftAssignments.filter(keep);
-    this.savedAssignments = this.savedAssignments.filter(keep);
+      return !sameApps;
+    });
 
   }
 
