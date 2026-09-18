@@ -54,13 +54,13 @@
                   class="product-tab"
                   role="tab"
                   [class.product-tab--active]="
-                    isProgramAll || activeAppIndex === i
+                    isAppSelectedForProgramming(app.codigoAplicacion)
                   "
                   [class.product-tab--done]="
                     isAppConfigured(app.codigoAplicacion)
                   "
                   [attr.aria-selected]="
-                    isProgramAll || activeAppIndex === i
+                    isAppSelectedForProgramming(app.codigoAplicacion)
                   "
                   (click)="selectActiveApp(i)"
                 >
@@ -156,11 +156,10 @@
                 {{ serviceMode() ? '+ Servicio' : '+ App' }}
                 si faltó alguno.
               } @else {
-                Programa cada
-                {{ serviceMode() ? 'servicio' : 'producto' }}
-                por separado. Pulsa un ítem para enfocarlo o
+                Marca las apps que quieras programar (puedes varias).
+                Pulsa de nuevo para quitar el foco, o
                 {{ serviceMode() ? '+ Servicio' : '+ App' }}
-                para añadir otro.
+                para añadir otra.
               }
             </p>
           } @else {
@@ -279,7 +278,7 @@
           <div class="info-message">
 
             @if (hasMultipleProducts && appsForProgrammingLabel) {
-              @if (isProgramAll) {
+              @if (isProgramAll || appsForProgramming.length > 1) {
                 {{ serviceMode() ? 'Servicios' : 'Aplicaciones' }}:
                 <strong>{{ appsForProgrammingLabel }}</strong>
                 ·
@@ -331,7 +330,8 @@
           [lockSelection]="lockCalendarSelection"
           (selectionChange)="onSelectionChange($event)"
           (addPerson)="startAddCoResponsable()"
-          (conflict)="onConflict($event)">
+          (conflict)="onConflict($event)"
+          (overrideRequest)="onOverrideRequest($event)">
         </app-standby-calendar>
 
       </div>
@@ -424,8 +424,8 @@
           @if (hasPendingStandbyDraft && !addingCoResponsable) {
             <p class="standby-flow-hint">
               Puedes seguir agregando personas a este standby con +.
-              Para pasar a otro standby o cambiar fechas, selecciona
-              «Aceptar selección».
+              Si necesitas cambiar fechas, hazlo en el calendario.
+              Para dejar esta selección fija, pulsa «Aceptar selección».
             </p>
           }
 
@@ -463,7 +463,7 @@
 
         <div class="summary-card trace">
 
-          <label>Selecciones aceptadas</label>
+          <label>Trazabilidad de programación</label>
 
           <ul class="week-list">
 
@@ -474,15 +474,33 @@
 
               <li class="trace-item">
 
-                <button
-                  type="button"
-                  class="trace-item__remove"
-                  title="Quitar esta selección"
-                  aria-label="Quitar esta selección"
-                  (click)="removeAcceptedGroup(group, $event)"
-                >
-                  ×
-                </button>
+                <div class="trace-item__actions">
+                  <button
+                    type="button"
+                    class="trace-item__edit"
+                    title="Sumar persona a esta selección"
+                    aria-label="Sumar persona a esta selección"
+                    (click)="editAcceptedGroup(group, $event)"
+                  >
+                    Sumar
+                  </button>
+
+                  @if (
+                    group.responsables.some(
+                      name => !group.persistedResponsables.includes(name)
+                    )
+                  ) {
+                    <button
+                      type="button"
+                      class="trace-item__remove"
+                      title="Quitar solo lo pendiente de guardar"
+                      aria-label="Quitar solo lo pendiente de guardar"
+                      (click)="removeAcceptedGroup(group, $event)"
+                    >
+                      ×
+                    </button>
+                  }
+                </div>
 
                 @if (group.aplicaciones.length > 0) {
                   <div class="trace-apps">
@@ -523,17 +541,32 @@
                     name of group.responsables;
                     track name
                   ) {
-                    <span class="person-chip person-chip--removable">
+                    <span
+                      class="person-chip"
+                      [class.person-chip--removable]="
+                        !group.persistedResponsables.includes(name)
+                      "
+                      [class.person-chip--saved]="
+                        group.persistedResponsables.includes(name)
+                      "
+                      [title]="
+                        group.persistedResponsables.includes(name)
+                          ? 'Ya guardado'
+                          : 'Pendiente de guardar'
+                      "
+                    >
                       {{ name }}
-                      <button
-                        type="button"
-                        class="person-chip__remove"
-                        title="Quitar persona"
-                        aria-label="Quitar persona"
-                        (click)="removeAcceptedPerson(group, name, $event)"
-                      >
-                        ×
-                      </button>
+                      @if (!group.persistedResponsables.includes(name)) {
+                        <button
+                          type="button"
+                          class="person-chip__remove"
+                          title="Quitar persona pendiente"
+                          aria-label="Quitar persona pendiente"
+                          (click)="removeAcceptedPerson(group, name, $event)"
+                        >
+                          ×
+                        </button>
+                      }
                     </span>
                   }
 
@@ -603,3 +636,15 @@
   [message]="conflictMessage"
   (closed)="closeConflictAlert()">
 </app-standby-alert>
+
+<app-standby-alert
+  [visible]="showOverrideConfirmAlert"
+  [confirmMode]="true"
+  title="¿Añadir persona a estos días?"
+  [message]="overrideConfirmMessage"
+  confirmLabel="Sí, añadir a esta persona"
+  cancelLabel="Cancelar"
+  (confirmed)="confirmOverrideOccupied()"
+  (cancelled)="cancelOverrideOccupied()"
+  (closed)="cancelOverrideOccupied()"
+/>

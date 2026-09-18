@@ -578,6 +578,11 @@
   padding-right: 4px;
 }
 
+.person-chip--saved {
+  border-color: rgba(0, 195, 137, 0.45);
+  background: rgba(0, 195, 137, 0.12);
+}
+
 .person-chip__remove {
   display: inline-flex;
   align-items: center;
@@ -706,10 +711,42 @@
   background: $background-body;
 }
 
-.trace-item__remove {
+.trace-item__actions {
   position: absolute;
   top: $space-8;
   right: $space-8;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trace-item__edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 24px;
+  padding: 0 8px;
+
+  border: 1px solid $border-light;
+  border-radius: $radius-sm;
+  background: $surface;
+
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  line-height: 1;
+  color: $text-secondary;
+  cursor: pointer;
+}
+
+.trace-item__edit:hover {
+  border-color: $link-color;
+  color: $link-color;
+}
+
+.trace-item__remove {
+  position: static;
 
   display: inline-flex;
   align-items: center;

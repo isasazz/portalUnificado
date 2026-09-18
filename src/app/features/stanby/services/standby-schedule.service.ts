@@ -59,8 +59,8 @@ export class StandbyScheduleService {
   }
 
   /**
-   * Saca la asignación de guardados y la pone en borrador
-   * para reabrir el modal de programación con lo ya configurado.
+   * Abre contexto de edición sin sacar lo guardado.
+   * Lo existente permanece (trazabilidad); lo nuevo va a borrador.
    */
   beginEdit(assignmentId: number): StandbyAssignment | null {
 
@@ -72,11 +72,11 @@ export class StandbyScheduleService {
       return null;
     }
 
-    // Descarta borradores previos de otra sesión
+    // Solo limpia borradores de una sesión anterior; no toca guardados.
     this.draftAssignments = [];
     this.editRestore = [];
 
-    const clone: StandbyAssignment = {
+    return {
       ...assignment,
       fechaInicio: new Date(assignment.fechaInicio),
       fechaFin: new Date(assignment.fechaFin),
@@ -84,43 +84,13 @@ export class StandbyScheduleService {
       observacion: assignment.observacion
     };
 
-    this.editRestore = [clone];
-    this.savedAssignments = this.savedAssignments.filter(
-      item => item.id !== assignmentId
-    );
-    this.draftAssignments = [
-      {
-        ...clone,
-        fechaInicio: new Date(clone.fechaInicio),
-        fechaFin: new Date(clone.fechaFin),
-        aplicaciones: [...(clone.aplicaciones ?? [])]
-      }
-    ];
-
-    return clone;
-
   }
 
-  /** Restaura la asignación si se cancela la edición. */
+  /** Descarta borradores no guardados. No borra lo ya persistido. */
   cancelPendingEdit(): void {
 
-    if (this.editRestore.length === 0) {
-      this.draftAssignments = [];
-      return;
-    }
-
-    this.savedAssignments = [
-      ...this.savedAssignments,
-      ...this.editRestore.map(item => ({
-        ...item,
-        fechaInicio: new Date(item.fechaInicio),
-        fechaFin: new Date(item.fechaFin),
-        aplicaciones: [...(item.aplicaciones ?? [])]
-      }))
-    ];
-
-    this.editRestore = [];
     this.draftAssignments = [];
+    this.editRestore = [];
 
   }
 
@@ -180,6 +150,28 @@ export class StandbyScheduleService {
                 }
               : assignment
         );
+        return;
+      }
+
+      // Ya está guardada esa persona en esa semana/apps: no duplicar.
+      const alreadySaved = this.savedAssignments.some(assignment => {
+        if (assignment.responsable !== responsable) {
+          return false;
+        }
+
+        if (this.startOfDay(assignment.fechaInicio) !== startKey) {
+          return false;
+        }
+
+        const codes = (assignment.aplicaciones ?? [])
+          .map(app => app.codigoAplicacion)
+          .sort()
+          .join('|');
+
+        return codes === appCodes;
+      });
+
+      if (alreadySaved) {
         return;
       }
 
@@ -315,6 +307,42 @@ export class StandbyScheduleService {
 
       return !codes.some(code => codeSet.has(code));
     });
+
+  }
+
+  /**
+   * Libera una semana (vie–jue) para las apps dadas:
+   * quita borradores y guardados que se solapen.
+   */
+  releaseWeekForApps(weekStart: Date, appCodes: string[]): void {
+
+    if (appCodes.length === 0) {
+      return;
+    }
+
+    const { start, end } = toStandbyWeek(weekStart);
+    const startKey = this.startOfDay(start);
+    const endKey = this.startOfDay(end);
+    const codeSet = new Set(appCodes);
+
+    const keep = (assignment: StandbyAssignment): boolean => {
+      const codes = (assignment.aplicaciones ?? []).map(
+        app => app.codigoAplicacion
+      );
+
+      if (!codes.some(code => codeSet.has(code))) {
+        return true;
+      }
+
+      const a0 = this.startOfDay(assignment.fechaInicio);
+      const a1 = this.startOfDay(assignment.fechaFin);
+
+      const overlaps = a0 <= endKey && startKey <= a1;
+      return !overlaps;
+    };
+
+    this.draftAssignments = this.draftAssignments.filter(keep);
+    this.savedAssignments = this.savedAssignments.filter(keep);
 
   }
 

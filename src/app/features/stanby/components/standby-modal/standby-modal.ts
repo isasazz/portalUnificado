@@ -2,6 +2,8 @@ import {
 
   ChangeDetectionStrategy,
 
+  ChangeDetectorRef,
+
   Component,
 
   effect,
@@ -81,6 +83,9 @@ interface GroupedAcceptance {
   end: Date;
 
   responsables: string[];
+
+  /** Ya persistidas: no se eliminan al editar/sumar. */
+  persistedResponsables: string[];
 
   /** Observación de la selección (misma para el grupo). */
   observacion: string;
@@ -175,15 +180,20 @@ export class StandbyModalComponent {
 
 
   private readonly scheduleService =
-
     inject(StandbyScheduleService);
 
-
+  private readonly cdr = inject(ChangeDetectorRef);
 
   activeAppIndex = 0;
 
   /** Una app a la vez, o todas con la misma persona/fechas. */
   programMode: 'single' | 'all' = 'all';
+
+  /**
+   * En "Una a una": apps marcadas para programar (multi-selección).
+   * En "Todas juntas": se sincroniza con todas las de la sesión.
+   */
+  selectedAppCodigos: string[] = [];
 
   /** Apps de esta sesión (incluye las añadidas dentro del modal). */
   sessionApps: StandbyApplication[] = [];
@@ -237,11 +247,16 @@ export class StandbyModalComponent {
 
   showConflictAlert = false;
 
-
-
   conflictMessage = '';
 
+  /** Confirmación para liberar días ocupados y asignarlos a la persona actual. */
+  showOverrideConfirmAlert = false;
 
+  overrideConfirmMessage = '';
+
+  private pendingOverrideWeekStarts: Date[] = [];
+
+  private pendingOverridePerson: string | null = null;
 
   users = [
 
@@ -287,14 +302,57 @@ export class StandbyModalComponent {
 
   }
 
+  /** Apps a las que aplica la programación actual (puede ser varias en "Una a una"). */
   get appsForProgramming(): StandbyApplication[] {
 
     if (this.isProgramAll) {
       return this.sessionApps;
     }
 
+    const selected = new Set(this.selectedAppCodigos);
+
+    const picked = this.sessionApps.filter(app =>
+      selected.has(app.codigoAplicacion)
+    );
+
+    if (picked.length > 0) {
+      return picked;
+    }
+
     const active = this.activeApp;
     return active ? [active] : [];
+
+  }
+
+  isAppSelectedForProgramming(codigo: string): boolean {
+
+    if (this.isProgramAll) {
+      return true;
+    }
+
+    return this.selectedAppCodigos.includes(codigo);
+
+  }
+
+  private syncSelectedAppCodigosFromSession(): void {
+
+    const codes = this.sessionApps.map(app => app.codigoAplicacion);
+
+    if (this.programMode === 'all') {
+      this.selectedAppCodigos = [...codes];
+      return;
+    }
+
+    const keep = this.selectedAppCodigos.filter(code =>
+      codes.includes(code)
+    );
+
+    this.selectedAppCodigos =
+      keep.length > 0
+        ? keep
+        : codes.length > 0
+          ? [codes[Math.min(this.activeAppIndex, codes.length - 1)]]
+          : [];
 
   }
 
@@ -343,16 +401,18 @@ export class StandbyModalComponent {
 
   isAppConfigured(codigo: string): boolean {
 
-    return this.scheduleService.draftAssignments.some(
-
-      assignment =>
-
+    const inList = (
+      assignments: { aplicaciones?: { codigoAplicacion: string }[] }[]
+    ) =>
+      assignments.some(assignment =>
         assignment.aplicaciones?.some(
-
           app => app.codigoAplicacion === codigo
-
         )
+      );
 
+    return (
+      inList(this.scheduleService.draftAssignments) ||
+      inList(this.scheduleService.savedAssignments)
     );
 
   }
@@ -415,12 +475,6 @@ export class StandbyModalComponent {
     }
 
     this.sessionApps = [...this.sessionApps, { ...app, selected: true }];
-
-    if (this.sessionApps.length > 1) {
-      this.programMode = 'all';
-    }
-
-    this.activeAppIndex = this.sessionApps.length - 1;
     this.closeAddAppMenu();
 
   }
@@ -435,6 +489,7 @@ export class StandbyModalComponent {
       this.scheduleService.removeDraftsForApps([codigoAplicacion]);
       this.productStates.delete(codigoAplicacion);
       this.sessionApps = [];
+      this.selectedAppCodigos = [];
       this.activeAppIndex = 0;
       this.programMode = 'single';
       this.clearSelectedUser();
@@ -454,11 +509,20 @@ export class StandbyModalComponent {
     this.sessionApps = this.sessionApps.filter(
       app => app.codigoAplicacion !== codigoAplicacion
     );
+    this.selectedAppCodigos = this.selectedAppCodigos.filter(
+      code => code !== codigoAplicacion
+    );
 
     if (this.activeAppIndex >= this.sessionApps.length) {
       this.activeAppIndex = Math.max(0, this.sessionApps.length - 1);
     } else if (removedIndex < this.activeAppIndex) {
       this.activeAppIndex -= 1;
+    }
+
+    if (this.selectedAppCodigos.length === 0 && this.sessionApps.length > 0) {
+      this.selectedAppCodigos = [
+        this.sessionApps[this.activeAppIndex].codigoAplicacion
+      ];
     }
 
     if (this.sessionApps.length <= 1) {
@@ -471,22 +535,13 @@ export class StandbyModalComponent {
 
   clearSelectedUser(): void {
 
-    const name = this.selectedUser;
-
     this.selectedUser = undefined;
     this.coResponsables = [];
     this.addingCoResponsable = false;
     this.addingToExistingWeek = null;
     this.selectedWeekStarts = [];
     this.calendar?.clearSelection();
-
-    if (name && this.sessionApps.length > 0) {
-      this.scheduleService.removeDraftPersonFromApps(
-        name,
-        this.sessionApps.map(app => app.codigoAplicacion)
-      );
-    }
-
+    // No borra borradores ni guardados: solo limpia la UI de selección.
     this.persistActiveProductState();
 
   }
@@ -509,6 +564,11 @@ export class StandbyModalComponent {
     event?.preventDefault();
     event?.stopPropagation();
 
+    // No borrar personas ya guardadas (trazabilidad).
+    if (group.persistedResponsables.includes(name)) {
+      return;
+    }
+
     const codes = group.aplicaciones.map(app => app.codigoAplicacion);
     this.scheduleService.removeDraftPerson(name, group.start, codes);
 
@@ -528,12 +588,74 @@ export class StandbyModalComponent {
     event?.preventDefault();
     event?.stopPropagation();
 
+    // Si hay algo guardado en el grupo, solo quita lo pendiente de borrador.
     const codes = group.aplicaciones.map(app => app.codigoAplicacion);
-    this.scheduleService.removeDraftGroup(group.start, codes);
+    const draftOnly = group.responsables.filter(
+      name => !group.persistedResponsables.includes(name)
+    );
+
+    for (const name of draftOnly) {
+      this.scheduleService.removeDraftPerson(name, group.start, codes);
+    }
+
+    if (
+      draftOnly.includes(this.selectedUser ?? '') ||
+      group.persistedResponsables.length === 0
+    ) {
+      // Si el grupo era solo borrador y quedó vacío, limpia UI
+      if (group.persistedResponsables.length === 0) {
+        this.scheduleService.removeDraftGroup(group.start, codes);
+      }
+    }
 
     if (group.responsables.includes(this.selectedUser ?? '')) {
       this.clearSelectedUser();
     }
+
+  }
+
+  /**
+   * Carga la selección en el formulario para sumar persona/app
+   * sin borrar lo ya aceptado o guardado.
+   */
+  editAcceptedGroup(
+    group: GroupedAcceptance,
+    event?: Event
+  ): void {
+
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    const codes = group.aplicaciones.map(app => app.codigoAplicacion);
+
+    this.selectedAppCodigos = [...codes];
+
+    if (group.aplicaciones.length > 1) {
+      const allInSession = codes.every(code =>
+        this.sessionApps.some(app => app.codigoAplicacion === code)
+      );
+      this.programMode = allInSession ? 'all' : 'single';
+    } else {
+      this.programMode = 'single';
+      const index = this.sessionApps.findIndex(
+        app => app.codigoAplicacion === group.codigoAplicacion
+      );
+      if (index >= 0) {
+        this.activeAppIndex = index;
+      }
+    }
+
+    // No preselecciona responsable: el usuario elige a quién sumar.
+    this.selectedUser = undefined;
+    this.coResponsables = [];
+    this.addingCoResponsable = true;
+    this.addingToExistingWeek = group;
+    this.observacion = group.observacion || '';
+    this.selectedWeekStarts = [new Date(group.start)];
+
+    this.calendar?.setSelection(this.selectedWeekStarts);
+    this.persistActiveProductState();
+    this.focusUsersForCoResponsable();
 
   }
 
@@ -548,7 +670,13 @@ export class StandbyModalComponent {
     this.addingCoResponsable = false;
     this.addingToExistingWeek = null;
 
-    if (mode === 'single') {
+    if (mode === 'all') {
+      this.selectedAppCodigos = this.sessionApps.map(
+        app => app.codigoAplicacion
+      );
+    } else {
+      const active = this.activeAppCodigo;
+      this.selectedAppCodigos = active ? [active] : [];
       this.restoreProductState(this.activeAppCodigo);
     }
 
@@ -634,74 +762,106 @@ export class StandbyModalComponent {
 
   get groupedAccepted(): GroupedAcceptance[] {
 
-    const map =
-      new Map<string, GroupedAcceptance>();
-
-    this.scheduleService.draftAssignments.forEach(
-      assignment => {
-
-        const apps = [...(assignment.aplicaciones ?? [])];
-
-        if (!apps.length) {
-          return;
-        }
-
-        const appsKey = apps
-          .map(app => app.codigoAplicacion)
-          .sort()
-          .join('|');
-
-        const key =
-          `${assignment.fechaInicio.getTime()}-${appsKey}`;
-
-        let group = map.get(key);
-
-        if (!group) {
-          const primary = apps[0];
-
-          group = {
-            codigoAplicacion: primary.codigoAplicacion,
-            nombreAplicacion: primary.nombreAplicacion,
-            aplicaciones: apps,
-            appsKey,
-            start: assignment.fechaInicio,
-            end: assignment.fechaFin,
-            responsables: [],
-            observacion: ''
-          };
-
-          map.set(key, group);
-        }
-
-        if (
-          !group.responsables.includes(
-            assignment.responsable
-          )
-        ) {
-          group.responsables.push(
-            assignment.responsable
-          );
-        }
-
-        const note = assignment.observacion?.trim();
-        if (note && !group.observacion) {
-          group.observacion = note;
-        }
-
-      }
+    const sessionCodes = new Set(
+      this.sessionApps.map(app => app.codigoAplicacion)
     );
 
-    return [...map.values()].sort(
-      (a, b) => {
-        const byApps = a.appsKey.localeCompare(b.appsKey);
+    if (sessionCodes.size === 0) {
+      return [];
+    }
 
-        if (byApps !== 0) {
-          return byApps;
-        }
+    const map = new Map<string, GroupedAcceptance>();
 
-        return a.start.getTime() - b.start.getTime();
+    const ingest = (
+      assignment: {
+        fechaInicio: Date;
+        fechaFin: Date;
+        responsable: string;
+        aplicaciones?: { codigoAplicacion: string; nombreAplicacion: string }[];
+        observacion?: string;
+      },
+      persisted: boolean
+    ): void => {
+
+      const apps = [...(assignment.aplicaciones ?? [])].filter(app =>
+        sessionCodes.has(app.codigoAplicacion)
+      );
+
+      if (!apps.length) {
+        return;
       }
+
+      // Si el assignment tiene más apps, usar las del assignment completo
+      // cuando todas están en sesión; si no, las filtradas.
+      const fullApps = [...(assignment.aplicaciones ?? [])];
+      const useApps =
+        fullApps.length > 0 &&
+        fullApps.every(app => sessionCodes.has(app.codigoAplicacion))
+          ? fullApps
+          : apps;
+
+      const appsKey = useApps
+        .map(app => app.codigoAplicacion)
+        .sort()
+        .join('|');
+
+      const key = `${assignment.fechaInicio.getTime()}-${appsKey}`;
+
+      let group = map.get(key);
+
+      if (!group) {
+        const primary = useApps[0];
+
+        group = {
+          codigoAplicacion: primary.codigoAplicacion,
+          nombreAplicacion: primary.nombreAplicacion,
+          aplicaciones: useApps,
+          appsKey,
+          start: assignment.fechaInicio,
+          end: assignment.fechaFin,
+          responsables: [],
+          persistedResponsables: [],
+          observacion: ''
+        };
+
+        map.set(key, group);
+      }
+
+      if (!group.responsables.includes(assignment.responsable)) {
+        group.responsables.push(assignment.responsable);
+      }
+
+      if (
+        persisted &&
+        !group.persistedResponsables.includes(assignment.responsable)
+      ) {
+        group.persistedResponsables.push(assignment.responsable);
+      }
+
+      const note = assignment.observacion?.trim();
+      if (note && !group.observacion) {
+        group.observacion = note;
+      }
+
+    };
+
+    // Primero lo guardado (trazabilidad), luego borradores pendientes.
+    this.scheduleService.savedAssignments.forEach(assignment =>
+      ingest(assignment, true)
     );
+    this.scheduleService.draftAssignments.forEach(assignment =>
+      ingest(assignment, false)
+    );
+
+    return [...map.values()].sort((a, b) => {
+      const byApps = a.appsKey.localeCompare(b.appsKey);
+
+      if (byApps !== 0) {
+        return byApps;
+      }
+
+      return a.start.getTime() - b.start.getTime();
+    });
 
   }
 
@@ -797,30 +957,22 @@ export class StandbyModalComponent {
   get acceptAlertMessage(): string {
 
     if (!this.hasMultipleProducts) {
-
-      return 'Continúa con otros usuarios para programar standby.';
-
+      return 'Puedes seguir sumando personas a esos días o pulsar Guardar.';
     }
 
     if (this.isProgramAll) {
-
-      return 'La selección quedó aplicada a todas las aplicaciones. Revisa y guarda, o sigue agregando personas.';
-
+      return 'La selección quedó aplicada a las aplicaciones. Puedes seguir sumando personas o guardar.';
     }
 
     const pending = this.sessionApps.filter(
-
       app => !this.isAppConfigured(app.codigoAplicacion)
-
     );
 
     if (pending.length === 0) {
-
-      return 'Todos los productos tienen selección. Revisa y guarda.';
-
+      return 'Todos los productos tienen selección. Puedes seguir sumando personas o guardar.';
     }
 
-    return `Listo para ${this.activeApp?.codigoAplicacion ?? 'este producto'}. Cambia de producto arriba para programar ${pending.length} restante(s).`;
+    return `Listo para ${this.activeApp?.codigoAplicacion ?? 'este producto'}. Cambia de producto arriba para programar ${pending.length} restante(s), o sigue sumando personas.`;
 
   }
 
@@ -864,25 +1016,9 @@ export class StandbyModalComponent {
 
   get lockCalendarSelection(): boolean {
 
-
-
-    if (this.addingCoResponsable) {
-
-      return true;
-
-    }
-
-
-
-    return (
-
-      this.standbyWeeks.length > 0 &&
-
-      !!this.selectedUser
-
-    );
-
-
+    // Solo bloquea al añadir co-responsable (mismas fechas).
+    // Con persona elegida se pueden cambiar o reasignar días.
+    return this.addingCoResponsable;
 
   }
 
@@ -908,37 +1044,55 @@ export class StandbyModalComponent {
 
   selectActiveApp(index: number): void {
 
+    if (
+      index < 0 ||
+      index >= this.sessionApps.length
+    ) {
+      return;
+    }
+
     if (this.isProgramAll) {
       this.setProgramMode('single');
-    }
-
-    if (
-
-      index === this.activeAppIndex ||
-
-      index < 0 ||
-
-      index >= this.sessionApps.length
-
-    ) {
-
+      const code = this.sessionApps[index]?.codigoAplicacion;
+      this.selectedAppCodigos = code ? [code] : [];
+      this.activeAppIndex = index;
+      this.addingCoResponsable = false;
+      this.addingToExistingWeek = null;
+      this.restoreProductState(this.activeAppCodigo);
       return;
-
     }
 
+    const code = this.sessionApps[index].codigoAplicacion;
 
+    // Multi-selección en "Una a una": clic alterna la app (sin quitar la última).
+    const already = this.selectedAppCodigos.includes(code);
+
+    if (already) {
+      if (this.selectedAppCodigos.length <= 1) {
+        this.activeAppIndex = index;
+        return;
+      }
+
+      this.persistActiveProductState();
+      this.selectedAppCodigos = this.selectedAppCodigos.filter(
+        item => item !== code
+      );
+      const nextCode = this.selectedAppCodigos[this.selectedAppCodigos.length - 1];
+      this.activeAppIndex = this.sessionApps.findIndex(
+        app => app.codigoAplicacion === nextCode
+      );
+      this.addingCoResponsable = false;
+      this.addingToExistingWeek = null;
+      this.restoreProductState(this.activeAppCodigo);
+      return;
+    }
 
     this.persistActiveProductState();
-
+    this.selectedAppCodigos = [...this.selectedAppCodigos, code];
     this.activeAppIndex = index;
-
     this.addingCoResponsable = false;
-
     this.addingToExistingWeek = null;
-
     this.restoreProductState(this.activeAppCodigo);
-
-
 
   }
 
@@ -946,49 +1100,28 @@ export class StandbyModalComponent {
 
   selectUser(user: string): void {
 
-
-
     if (
-
       this.addingCoResponsable &&
-
       this.selectedWeekStarts.length > 0
-
     ) {
 
-
-
-      if (
-
-        this.responsablesForSummary.includes(user)
-
-      ) {
-
+      if (this.responsablesForSummary.includes(user)) {
         this.addingCoResponsable = false;
-
         return;
-
       }
 
+      const others = this.responsablesForSummary.filter(
+        name => name !== user
+      );
 
-
-      this.coResponsables = [
-
-        ...this.coResponsables,
-
-        user
-
-      ];
-
-      this.addingCoResponsable = false;
-
-      this.persistActiveProductState();
-
+      this.askAddPersonToWeeks(
+        user,
+        this.selectedWeekStarts.map(d => new Date(d)),
+        others
+      );
       return;
 
     }
-
-
 
     if (this.selectedUser === user) {
 
@@ -996,8 +1129,6 @@ export class StandbyModalComponent {
       return;
 
     }
-
-
 
     this.selectedUser = user;
 
@@ -1011,11 +1142,7 @@ export class StandbyModalComponent {
 
     this.selectedWeekStarts = [];
 
-
-
     this.persistActiveProductState();
-
-
 
   }
 
@@ -1142,31 +1269,152 @@ export class StandbyModalComponent {
 
   onConflict(message: string): void {
 
-
-
     this.conflictMessage = message;
-
     this.showConflictAlert = true;
-
     this.showAcceptAlert = false;
-
     this.showAcceptConfirmAlert = false;
-
+    this.showOverrideConfirmAlert = false;
     this.showSaveAlert = false;
-
-
 
   }
 
+  onOverrideRequest(event: {
+    weekStart: Date;
+    occupants: string[];
+  }): void {
 
+    if (!this.selectedUser) {
+      this.onConflict(
+        'Selecciona un responsable antes de añadir a estos días.'
+      );
+      return;
+    }
+
+    const forPerson = this.selectedUser;
+    const uniqueOccupants = [
+      ...new Set(event.occupants.filter(Boolean))
+    ];
+    const others = uniqueOccupants.filter(
+      name => name !== forPerson
+    );
+
+    // Ya está esa persona en esos días: no duplicar.
+    if (others.length === 0 && uniqueOccupants.includes(forPerson)) {
+      this.onConflict(
+        `${forPerson} ya está en esos días. Elige otra persona para sumarla.`
+      );
+      return;
+    }
+
+    this.askAddPersonToWeeks(
+      forPerson,
+      [new Date(event.weekStart)],
+      others
+    );
+
+  }
+
+  /**
+   * Pide confirmación y, si acepta, suma la persona a esas semanas
+   * sin quitar a quienes ya están (sirve tras Guardar también).
+   */
+  private askAddPersonToWeeks(
+    person: string,
+    weekStarts: Date[],
+    others: string[]
+  ): void {
+
+    this.pendingOverridePerson = person;
+    this.pendingOverrideWeekStarts = weekStarts.map(
+      d => new Date(d)
+    );
+
+    if (others.length === 0) {
+      this.overrideConfirmMessage =
+        `¿Seguro que quieres añadir a ${person} en estos días?`;
+    } else {
+      this.overrideConfirmMessage =
+        `¿Seguro que quieres añadir a ${person} en estos días? ` +
+        `Ya están programados para ${others.join(', ')}. ` +
+        `No se quita a nadie: se suma esta persona al mismo standby.`;
+    }
+
+    this.showOverrideConfirmAlert = true;
+    this.showConflictAlert = false;
+    this.showAcceptAlert = false;
+    this.showAcceptConfirmAlert = false;
+    this.showSaveAlert = false;
+    this.cdr.markForCheck();
+
+  }
+
+  confirmOverrideOccupied(): void {
+
+    const weekStarts = this.pendingOverrideWeekStarts;
+    const responsable = this.pendingOverridePerson;
+    const existingGroup = this.addingToExistingWeek;
+    const note =
+      this.observacion.trim() ||
+      existingGroup?.observacion ||
+      '';
+
+    this.showOverrideConfirmAlert = false;
+    this.pendingOverrideWeekStarts = [];
+    this.pendingOverridePerson = null;
+    this.addingCoResponsable = false;
+    this.addingToExistingWeek = null;
+
+    if (!responsable || weekStarts.length === 0) {
+      this.cdr.markForCheck();
+      return;
+    }
+
+    const appsSource =
+      existingGroup?.aplicaciones?.length
+        ? existingGroup.aplicaciones
+        : this.appsForProgramming;
+
+    if (!appsSource.length) {
+      this.cdr.markForCheck();
+      return;
+    }
+
+    const apps = appsSource.map(app => ({
+      codigoAplicacion: app.codigoAplicacion,
+      nombreAplicacion: app.nombreAplicacion
+    }));
+
+    this.scheduleService.acceptWeeks(
+      responsable,
+      weekStarts.map(start => toStandbyWeek(start)),
+      apps,
+      note
+    );
+
+    this.selectedUser = undefined;
+    this.coResponsables = [];
+    this.selectedWeekStarts = [];
+    this.calendar?.clearSelection();
+    this.persistActiveProductState();
+
+    this.showAcceptAlert = true;
+    this.cdr.markForCheck();
+
+  }
+
+  cancelOverrideOccupied(): void {
+
+    this.showOverrideConfirmAlert = false;
+    this.pendingOverrideWeekStarts = [];
+    this.pendingOverridePerson = null;
+    this.addingCoResponsable = false;
+    this.cdr.markForCheck();
+
+  }
 
   closeConflictAlert(): void {
 
-
-
     this.showConflictAlert = false;
-
-
 
   }
 
@@ -1563,7 +1811,12 @@ export class StandbyModalComponent {
 
     this.activeAppIndex = 0;
 
-    this.programMode = this.sessionApps.length > 1 ? 'all' : 'single';
+    this.programMode = 'single';
+
+    this.selectedAppCodigos =
+      this.sessionApps.length > 0
+        ? [this.sessionApps[0].codigoAplicacion]
+        : [];
 
     this.productStates.clear();
 
@@ -1591,7 +1844,10 @@ export class StandbyModalComponent {
 
   }
 
-  /** Precarga responsable si ya hay semanas en borrador (modo edición). */
+  /**
+   * En edición: deja visibles las selecciones aceptadas (borrador)
+   * sin preseleccionar responsable, para poder sumar otra persona.
+   */
   private hydrateFromExistingDrafts(): void {
 
     const codes = new Set(
@@ -1609,7 +1865,7 @@ export class StandbyModalComponent {
       return;
     }
 
-    this.selectedUser = drafts[0].responsable;
+    // No fijar selectedUser: el usuario elige a quién sumar o editar.
     this.observacion = drafts[0].observacion ?? '';
 
   }

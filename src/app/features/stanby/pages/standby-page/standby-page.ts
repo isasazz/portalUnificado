@@ -245,11 +245,11 @@ export class StandbyPageComponent implements OnInit {
         return;
       }
 
-      application.selected = true;
+      // Deep-link: suma esa app a la selección (no reemplaza las demás).
       this.applications = this.applications.map(app =>
         app.id === application.id
           ? { ...app, selected: true }
-          : app
+          : { ...app }
       );
       this.panelView.set('program');
       this.addToStandbyPanel();
@@ -385,20 +385,20 @@ export class StandbyPageComponent implements OnInit {
       return;
     }
 
+    // Multi-selección: cada clic solo alterna esa app; no desmarca las demás.
     this.applications = this.applications.map(application => {
+      if (application.id !== id) {
+        return { ...application };
+      }
 
-      if (
-        application.id !== id ||
-        this.hasAppStandby(application.codigoAplicacion)
-      ) {
-        return application;
+      if (this.hasAppStandby(application.codigoAplicacion)) {
+        return { ...application };
       }
 
       return {
         ...application,
         selected: !application.selected
       };
-
     });
 
     this.syncPanelWithSelection();

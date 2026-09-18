@@ -41,6 +41,15 @@ export class StandbyCalendarComponent {
 
   readonly conflict = output<string>();
 
+  /**
+   * Viernes ocupado pulsado con calendario habilitado:
+   * el padre puede pedir confirmación y liberar el rango.
+   */
+  readonly overrideRequest = output<{
+    weekStart: Date;
+    occupants: string[];
+  }>();
+
   currentDate = new Date();
 
   /** Fechas de inicio (viernes) de cada semana seleccionada. */
@@ -125,12 +134,12 @@ export class StandbyCalendarComponent {
 
     }
 
-    if (this.isOccupied(day)) {
-      this.emitOccupantsForDay(day.date);
+    if (!this.enabled()) {
       return;
     }
 
-    if (!this.enabled()) {
+    if (this.isOccupied(day) || this.weekHasOccupied(day.date)) {
+      this.emitOverrideOrConflict(day.date);
       return;
     }
 
@@ -152,11 +161,6 @@ export class StandbyCalendarComponent {
     }
 
     if (!this.isFriday(day.date)) {
-      return;
-    }
-
-    if (this.weekHasOccupied(day.date)) {
-      this.emitOccupantsForWeek(day.date);
       return;
     }
 
@@ -186,27 +190,29 @@ export class StandbyCalendarComponent {
 
   private emitOccupantsForDay(date: Date): void {
 
-    const occupants = this.occupiedRanges()
-      .filter(range =>
-        this.isDateInRange(
-          date,
-          range.start,
-          range.end
-        )
-      )
-      .map(range => range.responsable)
-      .filter((name): name is string => !!name);
-
+    const occupants = this.getOccupantsForWeek(date);
     this.emitOccupantMessage(occupants);
 
   }
 
-  private emitOccupantsForWeek(date: Date): void {
+  private emitOverrideOrConflict(date: Date): void {
+
+    const weekStart = this.getWeekStart(date);
+    const occupants = this.getOccupantsForWeek(date);
+
+    this.overrideRequest.emit({
+      weekStart,
+      occupants
+    });
+
+  }
+
+  private getOccupantsForWeek(date: Date): string[] {
 
     const weekStart = this.getWeekStart(date);
     const end = this.addDays(weekStart, 6);
 
-    const occupants = this.occupiedRanges()
+    return this.occupiedRanges()
       .filter(range =>
         this.rangesOverlap(
           weekStart,
@@ -217,8 +223,6 @@ export class StandbyCalendarComponent {
       )
       .map(range => range.responsable)
       .filter((name): name is string => !!name);
-
-    this.emitOccupantMessage(occupants);
 
   }
 
