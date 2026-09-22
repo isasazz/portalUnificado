@@ -76,6 +76,17 @@
   white-space: nowrap;
 }
 
+.list-toolbar__actions {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: $space-8;
+}
+
+.list-toolbar__report {
+  white-space: nowrap;
+}
+
 .list-filters > .filters-grid {
   display: flex;
   flex-wrap: wrap;
@@ -184,14 +195,24 @@
   box-shadow: inset 0 -2px 0 #9ca3af;
 }
 
-.filter-tab--programada.filter-tab--active {
+.filter-tab--agil.filter-tab--active {
+  color: #00c389;
+  box-shadow: inset 0 -2px 0 #00c389;
+}
+
+.filter-tab--estandar.filter-tab--active {
   color: $link-color;
   box-shadow: inset 0 -2px 0 $link-color;
 }
 
-.filter-tab--promesa.filter-tab--active {
-  color: $violeta-orquidea;
-  box-shadow: inset 0 -2px 0 $violeta-orquidea;
+.filter-tab--programada.filter-tab--active {
+  color: #9063cd;
+  box-shadow: inset 0 -2px 0 #9063cd;
+}
+
+.filter-tab--emergencia.filter-tab--active {
+  color: #e11d48;
+  box-shadow: inset 0 -2px 0 #e11d48;
 }
 
 .filter-links {
@@ -348,8 +369,21 @@
   color: $link-color;
 }
 
-.tipo-label--promesa {
+.tipo-label--promesa,
+.tipo-label--programada {
   color: $violeta-orquidea;
+}
+
+.tipo-label--agil {
+  color: #0a7a56;
+}
+
+.tipo-label--estandar {
+  color: #0b6e8a;
+}
+
+.tipo-label--emergencia {
+  color: #be123c;
 }
 
 .window-tile__dot {
@@ -1404,7 +1438,13 @@
     grid-template-columns: 1fr;
   }
 
-  .list-toolbar__add {
+  .list-toolbar__actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .list-toolbar__add,
+  .list-toolbar__report {
     width: 100%;
   }
 }
@@ -1420,4 +1460,148 @@
   .mantenimiento-page--panel-open .windows-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.tipo-label--agil {
+  border-color: rgba(0, 195, 137, 0.45);
+  background: rgba(0, 195, 137, 0.12);
+  color: #0a7a56;
+}
+
+.tipo-label--estandar {
+  border-color: rgba(89, 203, 235, 0.45);
+  background: rgba(89, 203, 235, 0.14);
+  color: #0b6e8a;
+}
+
+.tipo-label--programada {
+  border-color: rgba(144, 99, 205, 0.45);
+  background: rgba(144, 99, 205, 0.12);
+  color: #6b46a8;
+}
+
+.tipo-label--emergencia {
+  border-color: rgba(225, 29, 72, 0.4);
+  background: rgba(225, 29, 72, 0.1);
+  color: #be123c;
+}
+
+.circular-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(253, 218, 36, 0.7);
+  background: rgba(253, 218, 36, 0.25);
+  font-size: 10px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.window-tile--circular {
+  border-color: rgba(253, 218, 36, 0.55);
+}
+
+.window-tile {
+  cursor: pointer;
+}
+
+.window-tile__report {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: #f7f7f7;
+}
+
+.window-tile__crq,
+.window-tile__crq-estado,
+.window-tile__hours {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+
+  span {
+    min-width: 72px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+}
+
+.report-detail {
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+
+  h3 {
+    margin: 0 0 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
+.report-detail__grid,
+.report-detail dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  margin: 0;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  dt {
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.window-chooser__grid--tipos {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.choice-card--agil .choice-card__accent {
+  background: #00c389;
+}
+
+.choice-card--estandar .choice-card__accent {
+  background: #59cbeb;
+}
+
+.choice-card--emergencia .choice-card__accent {
+  background: #e11d48;
+}
+
+.preview-item--alert span {
+  color: #9a7b00;
+  font-weight: 600;
+}
+
+.field-optional {
+  color: #6b7280;
+  font-weight: 400;
 }

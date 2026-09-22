@@ -21,11 +21,16 @@ from '../../../stanby/models/standby-application.model';
 import {
   MaintenanceWindow,
   MaintenanceWindowType,
-  TipoVentanaForm
+  TipoVentanaForm,
+  TIPO_VENTANA_FORM_TO_LABEL,
+  TIPO_VENTANA_META
 } from '../../models/maintenance-window.model';
 
 import { MantenimientoService }
 from '../../services/mantenimiento.service';
+
+import { MantenimientoReportService }
+from '../../services/mantenimiento-report.service';
 
 import { SaveSuccessService }
 from '../../../../shared/services/save-success.service';
@@ -49,6 +54,8 @@ export class MantenimientoPageComponent {
   private readonly fb = inject(FormBuilder);
 
   readonly mantenimiento = inject(MantenimientoService);
+
+  private readonly reportService = inject(MantenimientoReportService);
 
   private readonly saveSuccess = inject(SaveSuccessService);
 
@@ -81,32 +88,41 @@ export class MantenimientoPageComponent {
 
   private highlightTimer: ReturnType<typeof setTimeout> | null = null;
 
-  private static readonly CRQ_PATTERN = /^CRQ-\d{5}$/i;
+  private static readonly CRQ_PATTERN = /^CRQ[-_]?\d{5,}$/i;
 
   readonly editingWindow = signal<MaintenanceWindow | undefined>(
+    undefined
+  );
+
+  readonly detailWindow = signal<MaintenanceWindow | undefined>(
     undefined
   );
 
   readonly createForm = this.fb.group({
     tipoVentana: ['' as TipoVentanaForm],
     crq: [''],
+    estadoCrq: ['Borrador'],
     estado: ['Programada'],
     frecuencia: ['Semanal'],
     fechaInicio: ['2026-08-20T22:00', Validators.required],
     fechaFin: ['2026-08-21T02:00', Validators.required],
     zonaHoraria: ['América / Bogotá'],
     impacto: ['Servicio degradado durante la ventana'],
-    observacion: ['']
+    observacion: [''],
+    circular028: [false]
   });
 
   readonly editForm = this.fb.group({
     estado: [''],
+    estadoCrq: [''],
+    crq: [''],
     frecuencia: [''],
     fechaInicio: ['', Validators.required],
     fechaFin: ['', Validators.required],
     zonaHoraria: [''],
     impacto: [''],
     observacion: [''],
+    circular028: [false],
     aplicacion: [{ value: '', disabled: true }],
     nombreAplicacion: [{ value: '', disabled: true }],
     evc: [{ value: '', disabled: true }],
@@ -172,14 +188,25 @@ export class MantenimientoPageComponent {
     )
   );
 
-  readonly isVentanaProgramada = computed(() => {
+  readonly selectedTipoLabel = computed(() => {
     this.formRevision();
-    return this.createForm.controls.tipoVentana.value === 'programada';
+    const key = this.createForm.controls.tipoVentana.value;
+    if (!key) {
+      return '';
+    }
+    return TIPO_VENTANA_FORM_TO_LABEL[key];
   });
 
-  readonly isPromesaServicio = computed(() => {
+  readonly selectedTipoMeta = computed(() => {
+    const label = this.selectedTipoLabel();
+    return label ? TIPO_VENTANA_META[label] : null;
+  });
+
+  readonly requiresCrq = computed(() => {
     this.formRevision();
-    return this.createForm.controls.tipoVentana.value === 'promesa';
+    const tipo = this.createForm.controls.tipoVentana.value;
+    // Ágil puede ir sin CRQ; el resto del reporte sí lo exige.
+    return !!tipo && tipo !== 'agil';
   });
 
   readonly canFillFormFields = computed(() => {
@@ -190,7 +217,7 @@ export class MantenimientoPageComponent {
       return false;
     }
 
-    if (tipo === 'promesa') {
+    if (!this.requiresCrq()) {
       return true;
     }
 
@@ -211,10 +238,16 @@ export class MantenimientoPageComponent {
 
   readonly canSave = computed(() => {
     this.formRevision();
+    const circular = !!this.createForm.controls.circular028.value;
+    const canManageCircular =
+      !circular || this.mantenimiento.permissions().canManage;
+
     return (
+      this.mantenimiento.permissions().canCreate &&
       this.canFillFormFields() &&
       !!this.selectedApp() &&
-      this.createForm.valid
+      this.createForm.valid &&
+      canManageCircular
     );
   });
 
@@ -285,7 +318,12 @@ export class MantenimientoPageComponent {
 
   openForm(): void {
 
+    if (!this.mantenimiento.permissions().canCreate) {
+      return;
+    }
+
     this.closeEditPanel();
+    this.closeDetailPanel();
     this.resetCreateForm();
     this.showTypeModal.set(true);
 
@@ -310,11 +348,18 @@ export class MantenimientoPageComponent {
 
   }
 
-  selectTipoVentana(tipo: 'programada' | 'promesa'): void {
+  selectTipoVentana(tipo: Exclude<TipoVentanaForm, ''>): void {
+
+    const meta = TIPO_VENTANA_META[TIPO_VENTANA_FORM_TO_LABEL[tipo]];
 
     this.createForm.patchValue({
       tipoVentana: tipo,
-      crq: ''
+      crq: '',
+      estadoCrq: 'Borrador',
+      impacto: meta.causaAfectacion
+        ? 'Servicio degradado durante la ventana'
+        : 'Sin afectación al servicio',
+      circular028: false
     });
     this.selectedApp.set(undefined);
     this.filterEvc.set('');
@@ -381,17 +426,71 @@ export class MantenimientoPageComponent {
 
   }
 
-  tipoLabel(tipo: MaintenanceWindowType): string {
+  downloadReport(): void {
 
-    return tipo === 'Ventana programada'
-      ? 'Programada'
-      : 'Promesa de servicio';
+    if (!this.mantenimiento.permissions().canView) {
+      return;
+    }
+
+    const windows = this.mantenimiento.filteredWindows();
+
+    if (windows.length === 0) {
+      this.saveSuccess.show({
+        title: 'Sin datos',
+        message: 'No hay ventanas con los filtros actuales para exportar.'
+      });
+      return;
+    }
+
+    this.reportService.downloadExcel(windows);
+    this.saveSuccess.show({
+      title: 'Reporte descargado',
+      message:
+        `Se exportaron ${windows.length} ventana(s) ` +
+        'con CRQ, estado CRQ, EVC y horas.'
+    });
 
   }
 
-  isPromesa(window: MaintenanceWindow): boolean {
+  downloadSingleReport(window: MaintenanceWindow): void {
 
-    return window.tipo === 'Promesa de servicio';
+    this.reportService.downloadExcel(
+      [window],
+      `Reporte_ventana_${window.crq || window.id}.xlsx`
+    );
+    this.saveSuccess.show({
+      title: 'Reporte descargado',
+      message: 'Se descargó el reporte de esta ventana.'
+    });
+
+  }
+
+  tipoLabel(tipo: MaintenanceWindowType): string {
+    return tipo;
+  }
+
+  tipoClass(tipo: MaintenanceWindowType): string {
+    return MantenimientoService.tipoClass(tipo);
+  }
+
+  horaInicio(window: MaintenanceWindow): string {
+    return MantenimientoService.extractTime(window.fechaInicio);
+  }
+
+  horaFin(window: MaintenanceWindow): string {
+    return MantenimientoService.extractTime(window.fechaFin);
+  }
+
+  openDetailPanel(window: MaintenanceWindow): void {
+
+    this.closeEditPanel();
+    this.detailWindow.set(window);
+
+  }
+
+  closeDetailPanel(): void {
+
+    this.detailWindow.set(undefined);
 
   }
 
@@ -402,15 +501,23 @@ export class MantenimientoPageComponent {
 
     event.stopPropagation();
 
+    if (!this.mantenimiento.permissions().canEdit) {
+      return;
+    }
+
+    this.closeDetailPanel();
     this.editingWindow.set(window);
     this.editForm.patchValue({
       estado: window.estado,
+      estadoCrq: window.estadoCrq ?? 'Borrador',
+      crq: window.crq ?? '',
       frecuencia: window.frecuencia,
       fechaInicio: window.fechaInicio,
       fechaFin: window.fechaFin,
       zonaHoraria: window.zonaHoraria,
       impacto: window.impacto,
       observacion: window.observacion,
+      circular028: window.circular028 ?? false,
       aplicacion: window.aplicacion,
       nombreAplicacion: window.nombreAplicacion,
       evc: window.evc,
@@ -436,23 +543,38 @@ export class MantenimientoPageComponent {
     }
 
     const values = this.editForm.getRawValue();
+    const circular028 = !!values.circular028;
+
+    if (
+      circular028 &&
+      !window.circular028 &&
+      !this.mantenimiento.permissions().canManage
+    ) {
+      return;
+    }
+
     const savedId = window.id;
 
     this.mantenimiento.updateWindow(window.id, {
       estado: values.estado ?? window.estado,
+      estadoCrq: values.estadoCrq ?? window.estadoCrq,
+      crq: values.crq?.trim() || window.crq,
       frecuencia: values.frecuencia ?? window.frecuencia,
       fechaInicio: values.fechaInicio ?? window.fechaInicio,
       fechaFin: values.fechaFin ?? window.fechaFin,
       zonaHoraria: values.zonaHoraria ?? window.zonaHoraria,
       impacto: values.impacto ?? window.impacto,
-      observacion: values.observacion ?? window.observacion
+      observacion: values.observacion ?? window.observacion,
+      circular028
     });
 
     this.closeEditPanel();
     this.focusSavedWindow(savedId);
     this.saveSuccess.show({
       title: '¡Listo!',
-      message: 'La ventana se actualizó.'
+      message: circular028
+        ? 'Actualizada. Circular 028 irá al consejo de cambios.'
+        : 'La ventana se actualizó.'
     });
 
   }
@@ -465,12 +587,27 @@ export class MantenimientoPageComponent {
       return;
     }
 
+    if (!this.mantenimiento.permissions().canCreate) {
+      return;
+    }
+
     const values = this.createForm.getRawValue();
-    const isProgramada = values.tipoVentana === 'programada';
-    const tipo = isProgramada
-      ? 'Ventana programada' as const
-      : 'Promesa de servicio' as const;
+    const tipoKey = values.tipoVentana;
+
+    if (!tipoKey) {
+      return;
+    }
+
+    const tipo = TIPO_VENTANA_FORM_TO_LABEL[tipoKey];
     const estado = values.estado ?? 'Programada';
+    const circular028 = !!values.circular028;
+
+    if (
+      circular028 &&
+      !this.mantenimiento.permissions().canManage
+    ) {
+      return;
+    }
 
     const newId = Date.now();
 
@@ -482,7 +619,7 @@ export class MantenimientoPageComponent {
       ldc: app.ldc,
       celula: app.celula,
       service: app.service,
-      evc: app.celula,
+      evc: app.celula || app.service || '',
       linea: app.ldc,
       frecuencia: values.frecuencia ?? 'Semanal',
       fechaInicio: MantenimientoService.formatDateTime(
@@ -496,9 +633,9 @@ export class MantenimientoPageComponent {
       impacto: values.impacto ?? '',
       observacion: values.observacion?.trim() ?? '',
       tipo,
-      crq: isProgramada
-        ? values.crq?.trim()
-        : undefined
+      crq: values.crq?.trim() || undefined,
+      estadoCrq: values.estadoCrq ?? 'Borrador',
+      circular028
     });
 
     this.mantenimiento.listFilterTipo.set(tipo);
@@ -511,7 +648,9 @@ export class MantenimientoPageComponent {
     this.focusSavedWindow(newId);
     this.saveSuccess.show({
       title: '¡Listo!',
-      message: 'La ventana se guardó.'
+      message: circular028
+        ? 'Ventana guardada. Circular 028 irá al consejo de cambios.'
+        : 'La ventana se guardó.'
     });
 
   }
@@ -572,13 +711,15 @@ export class MantenimientoPageComponent {
     this.createForm.reset({
       tipoVentana: '' as TipoVentanaForm,
       crq: '',
+      estadoCrq: 'Borrador',
       estado: 'Programada',
       frecuencia: 'Semanal',
       fechaInicio: '2026-08-20T22:00',
       fechaFin: '2026-08-21T02:00',
       zonaHoraria: 'América / Bogotá',
       impacto: 'Servicio degradado durante la ventana',
-      observacion: ''
+      observacion: '',
+      circular028: false
     });
     this.formRevision.update(v => v + 1);
 

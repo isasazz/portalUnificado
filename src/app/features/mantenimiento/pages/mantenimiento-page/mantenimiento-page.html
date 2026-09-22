@@ -29,13 +29,28 @@
 
           </div>
 
-          <button
-            type="button"
-            class="btn-save list-toolbar__add"
-            (click)="openForm()"
-          >
-            Agregar ventana
-          </button>
+          <div class="list-toolbar__actions">
+
+            <button
+              type="button"
+              class="btn-secondary list-toolbar__report"
+              [disabled]="mantenimiento.filteredWindows().length === 0"
+              (click)="downloadReport()"
+            >
+              Descargar reporte
+            </button>
+
+            @if (mantenimiento.permissions().canCreate) {
+              <button
+                type="button"
+                class="btn-save list-toolbar__add"
+                (click)="openForm()"
+              >
+                Agregar ventana
+              </button>
+            }
+
+          </div>
 
         </div>
 
@@ -64,23 +79,45 @@
               <button
                 type="button"
                 role="tab"
-                class="filter-tab filter-tab--programada"
-                [class.filter-tab--active]="mantenimiento.listFilterTipo() === 'Ventana programada'"
-                [attr.aria-selected]="mantenimiento.listFilterTipo() === 'Ventana programada'"
-                (click)="toggleTipoFilter('Ventana programada')"
+                class="filter-tab filter-tab--agil"
+                [class.filter-tab--active]="mantenimiento.listFilterTipo() === 'Ágil'"
+                [attr.aria-selected]="mantenimiento.listFilterTipo() === 'Ágil'"
+                (click)="toggleTipoFilter('Ágil')"
               >
-                Ventana programada
+                Ágil
               </button>
 
               <button
                 type="button"
                 role="tab"
-                class="filter-tab filter-tab--promesa"
-                [class.filter-tab--active]="mantenimiento.listFilterTipo() === 'Promesa de servicio'"
-                [attr.aria-selected]="mantenimiento.listFilterTipo() === 'Promesa de servicio'"
-                (click)="toggleTipoFilter('Promesa de servicio')"
+                class="filter-tab filter-tab--estandar"
+                [class.filter-tab--active]="mantenimiento.listFilterTipo() === 'Estándar'"
+                [attr.aria-selected]="mantenimiento.listFilterTipo() === 'Estándar'"
+                (click)="toggleTipoFilter('Estándar')"
               >
-                Promesa de servicio
+                Estándar
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                class="filter-tab filter-tab--programada"
+                [class.filter-tab--active]="mantenimiento.listFilterTipo() === 'Programada'"
+                [attr.aria-selected]="mantenimiento.listFilterTipo() === 'Programada'"
+                (click)="toggleTipoFilter('Programada')"
+              >
+                Programada
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                class="filter-tab filter-tab--emergencia"
+                [class.filter-tab--active]="mantenimiento.listFilterTipo() === 'Emergencia'"
+                [attr.aria-selected]="mantenimiento.listFilterTipo() === 'Emergencia'"
+                (click)="toggleTipoFilter('Emergencia')"
+              >
+                Emergencia
               </button>
 
             </div>
@@ -152,7 +189,7 @@
               No hay ventanas con esos filtros.
             }
           </p>
-          @if (mantenimiento.windows().length === 0) {
+          @if (mantenimiento.windows().length === 0 && mantenimiento.permissions().canCreate) {
             <button
               type="button"
               class="btn-save"
@@ -181,6 +218,8 @@
                 [class.window-tile--just-saved]="
                   highlightedWindowId() === window.id
                 "
+                [class.window-tile--circular]="window.circular028"
+                (click)="openDetailPanel(window)"
               >
 
                 <div class="window-tile__top">
@@ -188,7 +227,7 @@
                   <div class="window-tile__meta-row">
                     <span
                       class="tipo-label"
-                      [class.tipo-label--promesa]="isPromesa(window)"
+                      [ngClass]="tipoClass(window.tipo)"
                     >
                       {{ tipoLabel(window.tipo) }}
                     </span>
@@ -201,6 +240,12 @@
                     >
                       {{ window.estado }}
                     </span>
+
+                    @if (window.circular028) {
+                      <span class="circular-badge" title="Va al consejo de cambios">
+                        Circular 028
+                      </span>
+                    }
                   </div>
 
                   <div class="window-tile__actions">
@@ -209,18 +254,20 @@
                       {{ window.frecuencia }}
                     </span>
 
-                    <button
-                      type="button"
-                      class="icon-btn"
-                      title="Editar ventana"
-                      (click)="openEditPanel(window, $event)"
-                    >
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                        />
-                      </svg>
-                    </button>
+                    @if (mantenimiento.permissions().canEdit) {
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        title="Editar ventana"
+                        (click)="openEditPanel(window, $event)"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path
+                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                          />
+                        </svg>
+                      </button>
+                    }
 
                   </div>
 
@@ -237,15 +284,29 @@
                   </h3>
 
                   <p class="window-tile__org">
-                    {{ window.celula }} · {{ window.ldc }}
+                    {{ window.evc }} · {{ window.ldc }}
                   </p>
 
-                  @if (isPromesa(window) && window.crq) {
-                    <p class="window-tile__crq">
-                      <span>CRQ</span>
-                      {{ window.crq }}
+                  <div class="window-tile__report">
+                    @if (window.crq) {
+                      <p class="window-tile__crq">
+                        <span>CRQ</span>
+                        {{ window.crq }}
+                      </p>
+                    }
+                    @if (window.estadoCrq) {
+                      <p class="window-tile__crq-estado">
+                        <span>Estado CRQ</span>
+                        {{ window.estadoCrq }}
+                      </p>
+                    }
+                    <p class="window-tile__hours">
+                      <span>Hora</span>
+                      {{ horaInicio(window) }}
+                      →
+                      {{ horaFin(window) }}
                     </p>
-                  }
+                  </div>
 
                   <p class="window-tile__impact">
                     {{ window.impacto }}
@@ -331,7 +392,7 @@
         <div class="edit-modal__summary">
           <span
             class="tipo-label"
-            [class.tipo-label--promesa]="isPromesa(window)"
+            [ngClass]="tipoClass(window.tipo)"
           >
             {{ tipoLabel(window.tipo) }}
           </span>
@@ -342,12 +403,51 @@
             {{ window.estado }}
           </span>
           <span class="edit-modal__freq">{{ window.frecuencia }}</span>
+          @if (window.circular028) {
+            <span class="circular-badge">Circular 028</span>
+          }
         </div>
 
         <div
           class="edit-modal__body"
           [formGroup]="editForm"
         >
+
+          <div class="report-detail report-detail--edit">
+            <h3>Datos del reporte</h3>
+            <dl>
+              <div>
+                <dt>Número de la CRQ</dt>
+                <dd>
+                  <input type="text" formControlName="crq" placeholder="CRQ..." />
+                </dd>
+              </div>
+              <div>
+                <dt>Estado de la CRQ</dt>
+                <dd>
+                  <select formControlName="estadoCrq">
+                    <option value="Borrador">Borrador</option>
+                    <option value="Programado">Programado</option>
+                    <option value="Implantación en curso">Implantación en curso</option>
+                    <option value="Cancelado">Cancelado</option>
+                    <option value="Rechazado">Rechazado</option>
+                  </select>
+                </dd>
+              </div>
+              <div>
+                <dt>EVC</dt>
+                <dd>{{ window.evc }}</dd>
+              </div>
+              <div>
+                <dt>Hora inicio</dt>
+                <dd>{{ horaInicio(window) }}</dd>
+              </div>
+              <div>
+                <dt>Hora fin</dt>
+                <dd>{{ horaFin(window) }}</dd>
+              </div>
+            </dl>
+          </div>
 
           <div class="field">
             <label>Estado</label>
@@ -417,6 +517,16 @@
             />
           </div>
 
+          <div class="field field--circular">
+            <label class="checkbox-row">
+              <input type="checkbox" formControlName="circular028" />
+              <span>
+                Circular 028 — impacta muchos servicios
+                (consejo de cambios)
+              </span>
+            </label>
+          </div>
+
           <div class="field">
             <label>Observación</label>
             <textarea
@@ -447,6 +557,122 @@
             Guardar cambios
           </button>
 
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
+  @if (detailWindow(); as window) {
+
+    <div
+      class="edit-modal-backdrop"
+      (click)="closeDetailPanel()"
+    >
+
+      <div
+        class="edit-modal detail-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detail-window-title"
+        (click)="$event.stopPropagation()"
+      >
+
+        <div class="edit-modal__header">
+          <div>
+            <h2 id="detail-window-title">Detalle del reporte</h2>
+            <p>
+              {{ window.aplicacion }} · {{ window.nombreAplicacion }}
+            </p>
+          </div>
+          <button
+            type="button"
+            class="panel-close"
+            (click)="closeDetailPanel()"
+            aria-label="Cerrar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="edit-modal__summary">
+          <span class="tipo-label" [ngClass]="tipoClass(window.tipo)">
+            {{ tipoLabel(window.tipo) }}
+          </span>
+          <span class="status-label" [ngClass]="statusClass(window.estado)">
+            {{ window.estado }}
+          </span>
+          @if (window.circular028) {
+            <span class="circular-badge">
+              Circular 028 · consejo de cambios
+            </span>
+          }
+        </div>
+
+        <div class="report-detail">
+          <h3>Datos que sale el reporte de la ventana</h3>
+          <dl class="report-detail__grid">
+            <div>
+              <dt>Número de la CRQ</dt>
+              <dd>{{ window.crq || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Estado de la CRQ</dt>
+              <dd>{{ window.estadoCrq || '—' }}</dd>
+            </div>
+            <div>
+              <dt>EVC</dt>
+              <dd>{{ window.evc || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Hora inicio</dt>
+              <dd>{{ horaInicio(window) }}</dd>
+            </div>
+            <div>
+              <dt>Hora fin</dt>
+              <dd>{{ horaFin(window) }}</dd>
+            </div>
+            <div>
+              <dt>Inicio completo</dt>
+              <dd>{{ window.fechaInicio }}</dd>
+            </div>
+            <div>
+              <dt>Fin completo</dt>
+              <dd>{{ window.fechaFin }}</dd>
+            </div>
+            <div>
+              <dt>Impacto</dt>
+              <dd>{{ window.impacto || '—' }}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="edit-modal__footer">
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="closeDetailPanel()"
+          >
+            Cerrar
+          </button>
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="downloadSingleReport(window)"
+          >
+            Descargar reporte
+          </button>
+          @if (mantenimiento.permissions().canEdit) {
+            <button
+              type="button"
+              class="btn-save"
+              (click)="openEditPanel(window, $event)"
+            >
+              Editar
+            </button>
+          }
         </div>
 
       </div>
@@ -500,7 +726,39 @@
 
           </header>
 
-          <div class="window-chooser__grid">
+          <div class="window-chooser__grid window-chooser__grid--tipos">
+
+            <button
+              type="button"
+              class="choice-card choice-card--agil"
+              (click)="selectTipoVentana('agil')"
+            >
+              <span class="choice-card__accent" aria-hidden="true"></span>
+              <div class="choice-card__content">
+                <h3>Ágil</h3>
+                <p>No causa afectación al servicio.</p>
+              </div>
+              <span class="choice-card__cta">
+                Continuar
+                <span aria-hidden="true">→</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="choice-card choice-card--estandar"
+              (click)="selectTipoVentana('estandar')"
+            >
+              <span class="choice-card__accent" aria-hidden="true"></span>
+              <div class="choice-card__content">
+                <h3>Estándar</h3>
+                <p>Cambio estándar con ventana definida.</p>
+              </div>
+              <span class="choice-card__cta">
+                Continuar
+                <span aria-hidden="true">→</span>
+              </span>
+            </button>
 
             <button
               type="button"
@@ -508,59 +766,28 @@
               (click)="selectTipoVentana('programada')"
             >
               <span class="choice-card__accent" aria-hidden="true"></span>
-
-              <div class="choice-card__visual" aria-hidden="true">
-                <span class="choice-card__mark"></span>
-                <span class="choice-card__mark"></span>
-                <span class="choice-card__mark"></span>
-              </div>
-
               <div class="choice-card__content">
-                <h3>Ventana programada</h3>
-                <p>
-                  Mantenimiento planificado con fechas, frecuencia
-                  y seguimiento operativo.
-                </p>
-                <ul>
-                  <li>Calendario y recurrencia</li>
-                  <li>Estado del ciclo de vida</li>
-                  <li>Impacto sobre la aplicación</li>
-                </ul>
+                <h3>Programada</h3>
+                <p>Mantenimiento planificado en calendario.</p>
               </div>
-
               <span class="choice-card__cta">
-                Continuar con programada
+                Continuar
                 <span aria-hidden="true">→</span>
               </span>
             </button>
 
             <button
               type="button"
-              class="choice-card choice-card--promesa"
-              (click)="selectTipoVentana('promesa')"
+              class="choice-card choice-card--emergencia"
+              (click)="selectTipoVentana('emergencia')"
             >
               <span class="choice-card__accent" aria-hidden="true"></span>
-
-              <div class="choice-card__visual" aria-hidden="true">
-                <span class="choice-card__ring"></span>
-                <span class="choice-card__ring choice-card__ring--inner"></span>
-              </div>
-
               <div class="choice-card__content">
-                <h3>Promesa de servicio</h3>
-                <p>
-                  Compromiso formal de disponibilidad o atención,
-                  ligado a un CRQ cuando aplique.
-                </p>
-                <ul>
-                  <li>Acuerdo de servicio</li>
-                  <li>Trazabilidad con CRQ</li>
-                  <li>Ventana de cumplimiento</li>
-                </ul>
+                <h3>Emergencia</h3>
+                <p>Atención urgente fuera del ciclo normal.</p>
               </div>
-
               <span class="choice-card__cta">
-                Continuar con promesa
+                Continuar
                 <span aria-hidden="true">→</span>
               </span>
             </button>
@@ -577,14 +804,11 @@
                 id="type-modal-title"
                 class="window-chooser__title"
               >
-                {{
-                  isVentanaProgramada()
-                    ? 'Ventana programada'
-                    : 'Promesa de servicio'
-                }}
+                {{ selectedTipoLabel() }}
               </h2>
               <p class="window-chooser__subtitle">
-                Completa los datos para guardar la ventana.
+                {{ selectedTipoMeta()?.descripcion }}
+                Completa los datos del reporte de la ventana.
               </p>
             </div>
 
@@ -605,17 +829,11 @@
 
               <div
                 class="selected-type"
-                [class.selected-type--promesa]="isPromesaServicio()"
+                [ngClass]="'selected-type--' + (createForm.controls.tipoVentana.value || '')"
               >
                 <div>
                   <span class="selected-type__label">Tipo seleccionado</span>
-                  <strong>
-                    {{
-                      isVentanaProgramada()
-                        ? 'Ventana programada'
-                        : 'Promesa de servicio'
-                    }}
-                  </strong>
+                  <strong>{{ selectedTipoLabel() }}</strong>
                 </div>
 
                 <button
@@ -627,29 +845,60 @@
                 </button>
               </div>
 
-              @if (isVentanaProgramada()) {
-
-                <div
-                  class="field field--crq"
-                  [formGroup]="createForm"
-                >
-                  <label>CRQ</label>
-                  <input
-                    type="text"
-                    formControlName="crq"
-                    placeholder="Ej: CRQ-12345"
-                    [class.field-input--invalid]="isCrqInvalid()"
-                  />
-                  @if (isCrqInvalid()) {
-                    <small class="field-error">CRQ inválido</small>
-                  } @else if (!canFillFormFields()) {
-                    <small class="field-hint">
-                      Formato: CRQ- y 5 dígitos (ej. CRQ-12345)
-                    </small>
+              <div
+                class="field field--crq"
+                [formGroup]="createForm"
+              >
+                <label>
+                  Número de la CRQ
+                  @if (!requiresCrq()) {
+                    <span class="field-optional">(opcional)</span>
                   }
-                </div>
+                </label>
+                <input
+                  type="text"
+                  formControlName="crq"
+                  placeholder="Ej: CRQ000000323508"
+                  [class.field-input--invalid]="isCrqInvalid()"
+                />
+                @if (isCrqInvalid()) {
+                  <small class="field-error">CRQ inválido</small>
+                } @else if (requiresCrq() && !canFillFormFields()) {
+                  <small class="field-hint">
+                    Formato: CRQ seguido de dígitos (ej. CRQ000000323508)
+                  </small>
+                }
+              </div>
 
-              }
+              <div class="field" [formGroup]="createForm">
+                <label>Estado de la CRQ</label>
+                <select formControlName="estadoCrq">
+                  <option value="Borrador">Borrador</option>
+                  <option value="Programado">Programado</option>
+                  <option value="Implantación en curso">Implantación en curso</option>
+                  <option value="Cancelado">Cancelado</option>
+                  <option value="Rechazado">Rechazado</option>
+                </select>
+              </div>
+
+              <div
+                class="field field--circular"
+                [formGroup]="createForm"
+              >
+                <label class="checkbox-row">
+                  <input
+                    type="checkbox"
+                    formControlName="circular028"
+                  />
+                  <span>
+                    Circular 028 — impacta muchos servicios
+                    (va al consejo de cambios)
+                    @if (!mantenimiento.permissions().canManage) {
+                      · requiere rol líder
+                    }
+                  </span>
+                </label>
+              </div>
 
             </section>
 
@@ -854,19 +1103,39 @@
 
                   <div class="preview-item">
                     <label>Tipo</label>
+                    <span>{{ selectedTipoLabel() }}</span>
+                  </div>
+
+                  <div class="preview-item">
+                    <label>Número CRQ</label>
+                    <span>{{ createPreview().crq || '—' }}</span>
+                  </div>
+
+                  <div class="preview-item">
+                    <label>Estado CRQ</label>
+                    <span>{{ createPreview().estadoCrq || '—' }}</span>
+                  </div>
+
+                  <div class="preview-item">
+                    <label>EVC</label>
                     <span>
-                      {{
-                        isVentanaProgramada()
-                          ? 'Ventana programada'
-                          : 'Promesa de servicio'
-                      }}
+                      {{ selectedApp()?.celula || selectedApp()?.service || '—' }}
                     </span>
                   </div>
 
-                  @if (isVentanaProgramada()) {
-                    <div class="preview-item">
-                      <label>CRQ</label>
-                      <span>{{ createPreview().crq || '—' }}</span>
+                  <div class="preview-item">
+                    <label>Hora inicio / fin</label>
+                    <span>
+                      {{ formatPreview(createPreview().fechaInicio ?? '') }}
+                      →
+                      {{ formatPreview(createPreview().fechaFin ?? '') }}
+                    </span>
+                  </div>
+
+                  @if (createPreview().circular028) {
+                    <div class="preview-item preview-item--alert">
+                      <label>Circular 028</label>
+                      <span>Va al consejo de cambios</span>
                     </div>
                   }
 

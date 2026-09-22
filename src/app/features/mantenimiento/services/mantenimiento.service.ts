@@ -7,7 +7,9 @@ import {
 
 import {
   MaintenanceWindow,
-  MaintenanceWindowType
+  MaintenanceWindowType,
+  MantenimientoPermissions,
+  MantenimientoRole
 } from '../models/maintenance-window.model';
 
 import { MAINTENANCE_WINDOWS_MOCK }
@@ -31,7 +33,24 @@ export class MantenimientoService {
 
   readonly windows = this.windowsSource.asReadonly();
 
-  readonly listFilterEstado = signal('En ejecución');
+  /**
+   * Rol activo (mock): sistema crea, todas editan,
+   * todos visualizan, líder gestiona (Circular 028).
+   */
+  readonly currentRole = signal<MantenimientoRole>('sistema');
+
+  readonly permissions = computed<MantenimientoPermissions>(() => {
+    const role = this.currentRole();
+
+    return {
+      canCreate: role === 'sistema',
+      canEdit: true,
+      canView: true,
+      canManage: role === 'lider' || role === 'sistema'
+    };
+  });
+
+  readonly listFilterEstado = signal('');
   readonly listFilterTipo = signal<MaintenanceWindowType | ''>('');
   readonly listSearchApp = signal('');
 
@@ -58,13 +77,19 @@ export class MantenimientoService {
       const matchSearch =
         !term ||
         window.aplicacion.toLowerCase().includes(term) ||
-        window.nombreAplicacion.toLowerCase().includes(term);
+        window.nombreAplicacion.toLowerCase().includes(term) ||
+        (window.crq ?? '').toLowerCase().includes(term) ||
+        (window.evc ?? '').toLowerCase().includes(term);
 
       return matchPortal && matchEstado && matchTipo && matchSearch;
 
     });
 
   });
+
+  setRole(role: MantenimientoRole): void {
+    this.currentRole.set(role);
+  }
 
   addWindow(window: MaintenanceWindow): void {
 
@@ -103,6 +128,14 @@ export class MantenimientoService {
 
   }
 
+  /** Extrae la hora (HH:mm) de un texto dd/MM/yyyy HH:mm. */
+  static extractTime(fechaHora: string): string {
+
+    const match = fechaHora.match(/(\d{1,2}:\d{2})\s*$/);
+    return match?.[1] ?? fechaHora;
+
+  }
+
   static formatDateTime(value: string): string {
 
     const date = new Date(value);
@@ -128,7 +161,7 @@ export class MantenimientoService {
 
     const key = estado.toLowerCase();
 
-    if (key.includes('ejecución')) {
+    if (key.includes('ejecución') || key.includes('implantación')) {
       return 'status--running';
     }
 
@@ -136,11 +169,26 @@ export class MantenimientoService {
       return 'status--done';
     }
 
-    if (key.includes('cancelada')) {
+    if (key.includes('cancelad') || key.includes('rechazad')) {
       return 'status--cancel';
     }
 
     return 'status--scheduled';
+
+  }
+
+  static tipoClass(tipo: MaintenanceWindowType): string {
+
+    switch (tipo) {
+      case 'Ágil':
+        return 'tipo-label--agil';
+      case 'Estándar':
+        return 'tipo-label--estandar';
+      case 'Emergencia':
+        return 'tipo-label--emergencia';
+      default:
+        return 'tipo-label--programada';
+    }
 
   }
 

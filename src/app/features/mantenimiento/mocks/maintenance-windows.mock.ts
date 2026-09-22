@@ -15,7 +15,7 @@ function fromApp(codigo: string) {
     ldc: app?.ldc ?? '',
     celula: app?.celula ?? '',
     service: app?.service ?? '',
-    evc: app?.celula ?? '',
+    evc: app?.celula || app?.service || 'EVC GALA',
     linea: app?.ldc ?? '',
     nombreAplicacion: app?.nombreAplicacion ?? ''
   };
@@ -32,9 +32,12 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     fechaFin: '21/08/2026 02:00',
     zonaHoraria: 'América / Bogotá',
     estado: 'Programada',
-    impacto: 'Servicio degradado durante la ventana',
-    observacion: 'Reinicio coordinado con operaciones',
-    tipo: 'Ventana programada'
+    impacto: 'Sin afectación al servicio',
+    observacion: 'Despliegue ágil sin downtime',
+    tipo: 'Ágil',
+    crq: 'CRQ000000323508',
+    estadoCrq: 'Programado',
+    circular028: false
   },
   {
     id: 2,
@@ -47,7 +50,10 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     estado: 'Programada',
     impacto: 'Canales digitales no disponibles',
     observacion: 'Notificar a canales 24h antes',
-    tipo: 'Ventana programada'
+    tipo: 'Estándar',
+    crq: 'CRQ000000331378',
+    estadoCrq: 'Borrador',
+    circular028: false
   },
   {
     id: 3,
@@ -60,7 +66,10 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     estado: 'Programada',
     impacto: 'App móvil en modo lectura',
     observacion: '',
-    tipo: 'Ventana programada'
+    tipo: 'Programada',
+    crq: 'CRQ000000340112',
+    estadoCrq: 'Programado',
+    circular028: false
   },
   {
     id: 4,
@@ -73,21 +82,26 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     estado: 'En ejecución',
     impacto: 'Alertas con demora temporal',
     observacion: 'Ventana en curso',
-    tipo: 'Ventana programada'
+    tipo: 'Programada',
+    crq: 'CRQ000000351200',
+    estadoCrq: 'Implantación en curso',
+    circular028: false
   },
   {
     id: 5,
     aplicacion: 'NU0113005',
     ...fromApp('NU0113005'),
-    frecuencia: 'Diaria',
-    fechaInicio: '21/08/2026 00:00',
-    fechaFin: '21/08/2026 02:00',
+    frecuencia: 'Una vez',
+    fechaInicio: '21/09/2026 20:00',
+    fechaFin: '22/09/2026 00:00',
     zonaHoraria: 'América / Bogotá',
     estado: 'Finalizada',
-    impacto: 'Pagos diferidos al finalizar',
-    observacion: 'Cerrada sin incidentes',
-    tipo: 'Promesa de servicio',
-    crq: 'CRQ-10890'
+    impacto: 'Impacto transversal a varios servicios',
+    observacion: 'Circular 028 — consejo de cambios',
+    tipo: 'Emergencia',
+    crq: 'CRQ000000360001',
+    estadoCrq: 'Cancelado',
+    circular028: true
   },
   {
     id: 6,
@@ -99,8 +113,11 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     zonaHoraria: 'América / Bogotá',
     estado: 'Programada',
     impacto: 'Actualización de núcleo',
-    observacion: 'Pendiente validación de cab',
-    tipo: 'Ventana programada'
+    observacion: 'Pendiente validación',
+    tipo: 'Estándar',
+    crq: 'CRQ000000370455',
+    estadoCrq: 'Programado',
+    circular028: true
   },
   {
     id: 7,
@@ -113,7 +130,9 @@ export const MAINTENANCE_WINDOWS_MOCK: MaintenanceWindow[] = [
     estado: 'Programada',
     impacto: 'Originación de créditos no disponible',
     observacion: 'Coordinado con mesa de ayuda',
-    tipo: 'Promesa de servicio',
-    crq: 'CRQ-11567'
+    tipo: 'Emergencia',
+    crq: 'CRQ000000380990',
+    estadoCrq: 'Rechazado',
+    circular028: false
   }
 ];
