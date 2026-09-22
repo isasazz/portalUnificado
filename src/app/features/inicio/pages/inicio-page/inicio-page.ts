@@ -23,6 +23,13 @@ export class InicioPageComponent {
         'Consulta y administra los contactos de cada aplicación: celular, correo, horario, EVC y línea.'
     },
     {
+      path: '/alertas',
+      code: 'A',
+      title: 'Alertas',
+      description:
+        'Consulta alertas de Dynatrace, CloudWatch y AIOps, filtra por estado y severidad, y revisa el detalle operativo.'
+    },
+    {
       path: '/standby',
       code: 'S',
       title: 'Stand by',

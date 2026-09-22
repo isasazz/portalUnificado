@@ -70,6 +70,13 @@ export const routes: Routes = [
           import(
             './features/mantenimiento/pages/mantenimiento-page/mantenimiento-page'
           ).then(m => m.MantenimientoPageComponent)
+      },
+      {
+        path: 'alertas',
+        loadComponent: () =>
+          import(
+            './features/alertas/pages/alertas-page/alertas-page'
+          ).then(m => m.AlertasPageComponent)
       }
     ]
   }
